@@ -1,8 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Hexa_Hub.Constants;
 
-public class Class1
+public class Category
 {
-	public Class1()
-	{
-	}
+    [Required]
+    [Key]
+    public int CategoryId { get; set; }
+
+    [Required]
+    [MaxLength(55)]
+    public string CategoryName { get; set; }
 }
