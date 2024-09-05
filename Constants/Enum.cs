@@ -13,4 +13,18 @@ public class Enum
         Employee,
         Admin
     }
+
+    public enum RequestStatus
+    {
+        Pending,
+        Allocated,
+        Rejected
+    }
+
+    public enum IssueType
+    {
+        Malfunction,
+        Repair,
+        Installation
+    }
 }
