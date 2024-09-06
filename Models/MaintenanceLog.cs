@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
-public class Maintenancelogs
+public class Maintenancelog
 {
     [Required]
     [Key]
@@ -20,4 +21,9 @@ public class Maintenancelogs
     public decimal? Cost { get; set; }
 
     public string? Maintenance_Description { get; set; }
+
+    //Navigation Properties
+    // * - 1 Relation
+
+    public Asset? Asset { get; set; }
 }

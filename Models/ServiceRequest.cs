@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class ServiceRequest
@@ -26,4 +27,9 @@ public class ServiceRequest
 
     [Required]
     public string ServiceDescription { get; set; }
+
+    //Navigation Properties
+    // 1 - * Relation
+
+    public ICollection<Asset>? Assets { get; set; } = new List<Asset>();
 }

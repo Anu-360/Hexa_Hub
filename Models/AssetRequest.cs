@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 
@@ -32,4 +33,9 @@ public class AssetRequest
     [Required]
     [DefaultValue(RequestStatus.Pending)]
     public RequestStatus Request_Status { get; set; } = RequestStatus.Pending;
+
+    //Navigation Properties
+    // 1 - 1 Relation
+
+    public Asset? Asset {  get; set; }
 }

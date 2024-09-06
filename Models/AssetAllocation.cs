@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class AssetAlocation
@@ -24,4 +25,9 @@ public class AssetAlocation
     [DataType(DataType.Date)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     public DateTime AllocatedDate { get; set; }
+
+    //Navigation Properties
+    // 1 - 1 Relation
+
+    public User? User { get; set; }
 }

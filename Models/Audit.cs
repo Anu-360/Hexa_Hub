@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class Audit
@@ -23,4 +24,9 @@ public class Audit
 
     [Required]
     public string AuditMessage { get; set; }
+
+    //Navigation Properties
+    // 1 - 1 Relation
+
+    public Asset? Asset { get; set; }
 }

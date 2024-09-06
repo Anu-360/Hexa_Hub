@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class UserProfile
@@ -34,4 +35,9 @@ public class UserProfile
     public string Address { get; set; }
 
     public byte[]? ProfileImage { get; set; }
+
+    //Navigation Properties
+    // 1- 1 Relation
+
+    public User? User { get; set; }
 }

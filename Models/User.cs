@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class User
@@ -45,4 +46,25 @@ public class User
     [Required]
     [DefaultValue(UserType.Employee)]
     public UserType User_Type { get; private set; } = UserType.Employee;
+
+    //Navigation Properties
+    // 1 - 1 Relation
+
+    public AuditRequest? AuditRequest { get; set; }
+
+    public UserProfile? UserProfile { get; set; }
+
+    // 1 - * Relation
+
+    public ICollection<Asset>? Assets { get; set; } = new List<Asset>();
+
+    public ICollection<AssetRequest>? AssetRequests { get; set; } = new List<AssetRequest>();
+
+    public ICollection<ServiceRequest>? ServiceRequests { get; set; } = new List<ServiceRequest>();
+
+    public ICollection<AssetAllocation>? AssetAllocations { get; set; } = new List<AssetAllocation>();
+
+    public ICollection<ReturnRequest>? ReturnRequests { get; set; } = new List<ReturnRequest>();
+
+   
 }
