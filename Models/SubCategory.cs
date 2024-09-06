@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class SubCategory
@@ -18,4 +19,9 @@ public class SubCategory
 
     [Required]
     public int Quantity { get; set; }
+
+    //Navigation Properties
+    // 1 - 1 Relation
+
+    public Category? Category { get; set; }  
 }

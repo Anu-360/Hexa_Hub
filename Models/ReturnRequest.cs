@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Hexa_Hub.Constants;
 
 public class ReturnRequest
@@ -30,4 +31,13 @@ public class ReturnRequest
 
     [Required]
     public string Condition { get; set; }
+
+    //Navigation Properties
+    // * - 1 Relation
+
+    public Asset? Asset { get; set; }
+
+    //* - * Relation
+
+    public ICollection<User>? Users { get; set; } = new List<User>(); 
 }
