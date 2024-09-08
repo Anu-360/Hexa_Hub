@@ -55,8 +55,6 @@ public class User
 
     // 1 - * Relation
 
-    public ICollection<Asset>? Assets { get; set; } = new List<Asset>();
-
     public ICollection<AssetRequest>? AssetRequests { get; set; } = new List<AssetRequest>();
 
     public ICollection<ServiceRequest>? ServiceRequests { get; set; } = new List<ServiceRequest>();
