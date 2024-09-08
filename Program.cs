@@ -1,7 +1,9 @@
 
+<<<<<<<<< Temporary merge branch 1
 using Microsoft.EntityFrameworkCore;
+=========
 using Hexa_Hub.Repository;
-
+>>>>>>>>> Temporary merge branch 2
 
 namespace Hexa_Hub
 {
