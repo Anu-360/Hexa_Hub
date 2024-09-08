@@ -1,5 +1,4 @@
 
-using Microsoft.EntityFrameworkCore;
 
 namespace Hexa_Hub
 {
@@ -8,6 +7,7 @@ namespace Hexa_Hub
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddScoped<ICategory, CategoryService>();
 
             // Add services to the container.
 
