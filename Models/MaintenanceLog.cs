@@ -1,17 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
 
-public class Maintenancelog
+
+public class MaintenanceLog
 {
     [Required]
     [Key]
     public int MaintenanceId { get; set; }
 
     [Required]
-    [ForeignKey("Asset")]
     public int AssetId { get; set; }
+
+    [Required]
+    public int UserId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -26,4 +28,6 @@ public class Maintenancelog
     // * - 1 Relation
 
     public Asset? Asset { get; set; }
+
+    public User? User { get; set; } 
 }

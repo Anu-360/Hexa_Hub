@@ -1,24 +1,21 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
-public class AssetAlocation
+public class AssetAllocation
 {
     [Required]
     [Key]
     public int AllocationId { get; set; }
 
     [Required]
-    [ForeignKey("Asset")]
     public int AssetId { get; set; }
 
     [Required]
-    [ForeignKey("User")]
-    public int EmpId { get; set; }
+    public int UserId { get; set; }
 
     [Required]
-    [ForeignKey("AssetRequest")]
     public int AssetReqId { get; set; }
 
     [Required]
@@ -30,4 +27,8 @@ public class AssetAlocation
     // 1 - 1 Relation
 
     public User? User { get; set; }
+
+    public Asset? Asset { get; set; }   
+
+    public AssetRequest? AssetRequests { get; set; }
 }

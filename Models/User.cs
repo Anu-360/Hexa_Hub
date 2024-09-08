@@ -1,47 +1,48 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
 public class User
 {
     [Required]
     [Key]
-    public int EmpId { get; set; }
+    public int UserId { get; set; }
 
     [Required]
     [MaxLength(55)]
-    public string EmpName { get; set; }
+    public string? UserName { get; set; }
 
     [Required]
     [EmailAddress]
-    public string EmpMail { get; set; }
+    public string? UserMail { get; set; }
 
     [Required]
-    public string Gender { get; set; }
+    public string? Gender { get; set; }
 
     [Required]
-    public string Dept { get; set; }
+    public string? Dept { get; set; }
 
     [Required]
-    public string Designation { get; set; }
+    public string? Designation { get; set; }
 
     [Required]
     [Phone(ErrorMessage = "Please enter a valid phone number")]
-    public string PhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; }
 
     [Required]
-    public string Address { get; set; }
+    public string? Address { get; set; }
 
     [Required]
-    public string Branch { get; set; }
+    public string? Branch { get; set; }
 
     [Required]
     [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
     [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
         ErrorMessage = "Password must contain Uppercase, alphanumeric and special characters")]
 
-    public string Password { get; set; }
+    public string? Password { get; set; }
 
     [Required]
     [DefaultValue(UserType.Employee)]
@@ -49,8 +50,6 @@ public class User
 
     //Navigation Properties
     // 1 - 1 Relation
-
-    public AuditRequest? AuditRequest { get; set; }
 
     public UserProfile? UserProfile { get; set; }
 
@@ -65,6 +64,10 @@ public class User
     public ICollection<AssetAllocation>? AssetAllocations { get; set; } = new List<AssetAllocation>();
 
     public ICollection<ReturnRequest>? ReturnRequests { get; set; } = new List<ReturnRequest>();
+
+    public ICollection<Audit>? Audits { get; set; } = new List<Audit>();
+
+    public ICollection<MaintenanceLog>? MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
 
    
 }

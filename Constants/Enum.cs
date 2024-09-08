@@ -6,7 +6,7 @@ public class Enum
     {
         OpenToRequest,
         Allocated,
-        Maintenance
+        UnderMaintenance
     }
     public enum UserType
     {
@@ -27,4 +27,27 @@ public class Enum
         Repair,
         Installation
     }
+
+    public enum AuditStatus
+    {
+        Sent,
+        Pending,
+        Completed
+    }
+
+    public enum ServiceReqStatus
+    {
+        UnderReview,
+        Approved,
+        Completed
+    }
+
+    public enum ReturnReqStatus
+    {
+        Sent,
+        Approved,
+        Rejected,
+        Returned
+    }
+
 }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using System.ComponentModel;
+using static Enum;
 
 public class Asset
 {
@@ -11,25 +12,23 @@ public class Asset
 
     [Required]
     [MaxLength(55)]
-    public string AssetName { get; set; }
+    public string ? AssetName { get; set; }
 
     public string? AssetDescription { get; set; }
 
     [Required]
-    [ForeignKey("Category")]
     public int CategoryId { get; set; }
 
     [Required]
-    [ForeignKey("SubCategory")]
     public int SubCategoryId { get; set; }
 
     public byte[]? AssetImage { get; set; }
 
     [Required]
-    public string SerialNumber { get; set; }
+    public string? SerialNumber { get; set; }
 
     [Required]
-    public string Model { get; set; }
+    public string? Model { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -38,7 +37,7 @@ public class Asset
 
     [Required]
     [MaxLength(55)]
-    public string Location { get; set; }
+    public string? Location { get; set; }
 
     [Required]
     public decimal Value { get; set; }
@@ -54,13 +53,10 @@ public class Asset
     //Navigation Properties
     // 1 - 1 Relations
 
-    public User? User { get; set; }
-
     public Category? Category { get; set; }
 
-    public Audit? Audit { get; set; }   
+    public SubCategory? SubCategories { get; set; }
 
-    public ReturnRequest? ReturnRequest { get; set; }
 
     // 1 - * Relations
 
@@ -69,6 +65,14 @@ public class Asset
     public ICollection<ServiceRequest>? ServiceRequests { get; set; } = new List<ServiceRequest>();
 
     public ICollection<MaintenanceLog>? MaintenanceLogs { get; set; } = new List<MaintenanceLog>();
+
+    public ICollection<Audit>? Audits { get; set; } = new List<Audit>();
+
+    public ICollection<ReturnRequest>? ReturnRequests { get; set; } = new List<ReturnRequest>();
+
+    public ICollection<AssetAllocation>? AssetAllocations { get; set; } = new List<AssetAllocation>();
+        
+        
 
 
 
