@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
+using System.ComponentModel;
 
 
 public class AssetRequest
@@ -11,16 +12,13 @@ public class AssetRequest
     public int AssetReqId { get; set; }
 
     [Required]
-    [ForeignKey("Employee")]
-    public int EmpId { get; set; }
+    public int UserId { get; set; }
 
     [Required]
-    [ForeignKey("Asset")]
     public int AssetId { get; set; }
 
     [Required]
-    [ForeignKey("Category")]
-    public string CategoryId { get; set; }
+    public string? CategoryId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -28,7 +26,7 @@ public class AssetRequest
     public DateTime AssetReqDate { get; set; }
 
     [Required]
-    public string AssetReqReason { get; set; }
+    public string? AssetReqReason { get; set; }
 
     [Required]
     [DefaultValue(RequestStatus.Pending)]
@@ -38,4 +36,8 @@ public class AssetRequest
     // 1 - 1 Relation
 
     public Asset? Asset {  get; set; }
+
+    public User? User { get; set; }
+
+    public AssetAllocation? AssetAlocation { get; set; }
 }

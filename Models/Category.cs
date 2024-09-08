@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
 public class Category
 {
@@ -11,7 +11,7 @@ public class Category
 
     [Required]
     [MaxLength(55)]
-    public string CategoryName { get; set; }
+    public string? CategoryName { get; set; }
 
     //Navigation Properties
     // 1 - * Relation

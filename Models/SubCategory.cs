@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
 public class SubCategory
 {
@@ -11,10 +11,9 @@ public class SubCategory
 
     [Required]
     [MaxLength(55)]
-    public string SubCategoryName { get; set; }
+    public string? SubCategoryName { get; set; }
 
     [Required]
-    [ForeignKey("Category")]
     public int CategoryId { get; set; }
 
     [Required]
@@ -23,5 +22,11 @@ public class SubCategory
     //Navigation Properties
     // 1 - 1 Relation
 
-    public Category? Category { get; set; }  
+    public Category? Category { get; set; }
+
+    // 1 - * Relation
+
+    public ICollection<Asset>? Assets { get; set; } = new List<Asset>();
+
+
 }

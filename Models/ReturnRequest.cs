@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
 public class ReturnRequest
 {
@@ -10,15 +10,12 @@ public class ReturnRequest
     public int ReturnId { get; set; }
 
     [Required]
-    [ForeignKey("Employee")]
-    public int EmpId { get; set; }
+    public int UserId { get; set; }
 
     [Required]
-    [ForeignKey("Asset")]
     public int AssetId { get; set; }
 
     [Required]
-    [ForeignKey("Category")]
     public int CategoryId { get; set; }
 
     [Required]
@@ -27,17 +24,18 @@ public class ReturnRequest
     public DateTime ReturnDate { get; set; }
 
     [Required]
-    public string Reason { get; set; }
+    public string? Reason { get; set; }
 
     [Required]
-    public string Condition { get; set; }
+    public string? Condition { get; set; }
+
+    [Required]
+    public ReturnReqStatus ReturnStatus { get; set; }   
 
     //Navigation Properties
     // * - 1 Relation
 
     public Asset? Asset { get; set; }
 
-    //* - * Relation
-
-    public ICollection<User>? Users { get; set; } = new List<User>(); 
+    public User? User { get; set; } 
 }

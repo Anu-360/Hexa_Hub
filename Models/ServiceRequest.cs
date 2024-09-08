@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Hexa_Hub.Constants;
+using static Enum;
 
 public class ServiceRequest
 {
@@ -10,12 +10,10 @@ public class ServiceRequest
     public int ServiceId { get; set; }
 
     [Required]
-    [ForeignKey("Asset")]
     public int AssetId { get; set; }
 
     [Required]
-    [ForeignKey("Employee")]
-    public int EmpId { get; set; }
+    public int UserId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -26,10 +24,15 @@ public class ServiceRequest
     public IssueType Issue_Type { get; set; }
 
     [Required]
-    public string ServiceDescription { get; set; }
+    public string? ServiceDescription { get; set; }
+
+    [Required]
+    public ServiceReqStatus ServiceReqStatus { get; set; }
 
     //Navigation Properties
-    // 1 - * Relation
+    // 1 - 1 Relation
 
-    public ICollection<Asset>? Assets { get; set; } = new List<Asset>();
+    public Asset? Asset { get; set; }
+
+    public User? User { get; set; } 
 }
