@@ -1,7 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
-
 namespace Hexa_Hub
 {
     public class Program
@@ -23,6 +23,9 @@ namespace Hexa_Hub
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<DataContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
 
             var app = builder.Build();
 
