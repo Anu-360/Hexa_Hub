@@ -46,11 +46,11 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        //public Task<UserProfile> UpdateProfiles(UserProfile userProfile)
-        //{
-        //    _context.UserProfiles.Update(userProfile);
-        //    return Task.FromResult(userProfile);
-        //}
+        public Task<UserProfile> UpdateProfiles(UserProfile userProfile)
+        {
+            _context.UserProfiles.Update(userProfile);
+            return Task.FromResult(userProfile);
+        }
         //public async Task<string?> UploadProfileImageAsync(int userId, IFormFile file)
         //{
         //    var userProfile = await _context.UserProfiles.FindAsync(userId);

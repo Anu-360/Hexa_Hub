@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
@@ -30,7 +31,21 @@ namespace Hexa_Hub.Controllers
         public async Task<ActionResult<IEnumerable<ReturnRequest>>> GetReturnRequests()
         {
             //return await _context.ReturnRequests.ToListAsync();
-            return await _returnRequestRepo.GetAllReturnRequest();
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if(userRole == "Admin")
+            {
+                return await _returnRequestRepo.GetAllReturnRequest();
+            }
+            else
+            {
+                var req = await _returnRequestRepo.GetReturnRequestById(userId);
+                if (req == null)
+                {
+                    return NotFound();
+                }
+                return Ok(new List<ReturnRequest> { req });
+            }
         }
 
         // GET: api/ReturnRequests/5
@@ -39,20 +54,40 @@ namespace Hexa_Hub.Controllers
         public async Task<ActionResult<ReturnRequest>> GetReturnRequest(int id)
         {
             //var returnRequest = await _context.ReturnRequests.FindAsync(id);
-            var returnRequest = await _returnRequestRepo.GetReturnRequestById(id);
+            //var returnRequest = await _returnRequestRepo.GetReturnRequestById(id);
 
-            if (returnRequest == null)
+            //if (returnRequest == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //return returnRequest;
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole == "Admin")
             {
-                return NotFound();
+                var req = await _returnRequestRepo.GetReturnRequestById(id);
+                if (req == null)
+                {
+                    return NotFound();
+                }
+                return req;
             }
-
-            return returnRequest;
+            else
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var req = await _returnRequestRepo.GetReturnRequestById(userId);
+                if (req == null)
+                {
+                    return NotFound();
+                }
+                return Ok(new List<ReturnRequest> { req });
+            }
         }
 
         // PUT: api/ReturnRequests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> PutReturnRequest(int id, ReturnRequest returnRequest)
         {
             if (id != returnRequest.ReturnId)
@@ -60,6 +95,16 @@ namespace Hexa_Hub.Controllers
                 return BadRequest();
             }
 
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var existingId = await _returnRequestRepo.GetReturnRequestById(id);
+            if (existingId == null)
+            {
+                return NotFound();
+            }
+            if (existingId.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
             //_context.Entry(returnRequest).State = EntityState.Modified;
             _returnRequestRepo.UpdateReturnRequest(returnRequest);
 
@@ -86,7 +131,7 @@ namespace Hexa_Hub.Controllers
         // POST: api/ReturnRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles ="User")]
         public async Task<ActionResult<ReturnRequest>> PostReturnRequest(ReturnRequest returnRequest)
         {
             //_context.ReturnRequests.Add(returnRequest);
@@ -99,7 +144,7 @@ namespace Hexa_Hub.Controllers
 
         // DELETE: api/ReturnRequests/5
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> DeleteReturnRequest(int id)
         {
             //var returnRequest = await _context.ReturnRequests.FindAsync(id);
