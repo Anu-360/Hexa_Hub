@@ -1,37 +1,51 @@
 ﻿using Hexa_Hub.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hexa_Hub.Repository
 {
     public class AuditRepo : IAuditRepo
     {
-        public Task AddAuditReq(Audit audit)
+        private readonly DataContext _context;
+
+        public AuditRepo(DataContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task AddAuditReq(Audit audit)
+        {
+            _context.Audits.Add(audit);
         }
 
-        public Task DeleteAuditReq(int id)
+        public async Task DeleteAuditReq(int id)
         {
-            throw new NotImplementedException();
+            var aId = await _context.Audits.FindAsync(id);
+            if(aId == null)
+            {
+                throw new Exception("Audit Not Found");
+            }
+            _context.Audits.Remove(aId);
         }
 
-        public Task<List<Audit>> GetAllAudits()
+        public async Task<List<Audit>> GetAllAudits()
         {
-            throw new NotImplementedException();
+            return await _context.Audits
+                .ToListAsync();
         }
 
-        public Task<Audit?> GetAuditById(int id)
+        public async Task<Audit?> GetAuditById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Audits.FirstOrDefaultAsync(a=>a.AuditId == id);
         }
 
-        public Task Save()
+        public async Task Save()
         {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
         }
 
         public Task<Audit> UpdateAudit(Audit audit)
         {
-            throw new NotImplementedException();
+            _context.Audits.Update(audit);
+            return Task.FromResult(audit);
         }
     }
 }
