@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class Enum
+public class MultiValues
 {
     public enum AssetStatus
     {
