@@ -1,4 +1,5 @@
 
+using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 
 namespace Hexa_Hub
@@ -9,6 +10,12 @@ namespace Hexa_Hub
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<ICategory, CategoryService>();
+            builder.Services.AddScoped<IAsset, AssetService>(); 
+            builder.Services.AddScoped<IAssetAllocation, AssetAllocationService>(); 
+            builder.Services.AddScoped<IAssetRequest, AssetRequestService>();   
+            builder.Services.AddScoped<ISubCategory,SubCategoryService>();  
+            builder.Services.AddScoped<IServiceRequest, ServiceRequestImpl>();
+           
 
             // Add services to the container.
 

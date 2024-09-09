@@ -1,4 +1,4 @@
-﻿using Hexa_Hub.Repository;
+﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 namespace Hexa_Hub.Repository
 {
