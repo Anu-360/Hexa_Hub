@@ -9,9 +9,19 @@ namespace Hexa_Hub
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-     
-         
-           
+
+            builder.Services.AddScoped<ICategory, CategoryService>();
+            builder.Services.AddScoped<IAsset, AssetService>(); 
+            builder.Services.AddScoped<IAssetAllocation, AssetAllocationService>(); 
+            builder.Services.AddScoped<IAssetRequest, AssetRequestService>();   
+            builder.Services.AddScoped<ISubCategory,SubCategoryService>();  
+            builder.Services.AddScoped<IServiceRequest, ServiceRequestImpl>();
+            builder.Services.AddScoped<IAuditRepo,AuditRepo>();
+            builder.Services.AddScoped<IMaintenanceLogRepo, MaintenanceLogRepo>();
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
+            builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
+            builder.Services.AddScoped<IUserProfileRepo,UserProfileRepo>();
+
 
             // Add services to the container.
 
