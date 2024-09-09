@@ -9,12 +9,7 @@ namespace Hexa_Hub
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddScoped<ICategory, CategoryService>();
-            builder.Services.AddScoped<IAsset, AssetService>(); 
-            builder.Services.AddScoped<IAssetAllocation, AssetAllocationService>(); 
-            builder.Services.AddScoped<IAssetRequest, AssetRequestService>();   
-            builder.Services.AddScoped<ISubCategory,SubCategoryService>();  
-            builder.Services.AddScoped<IServiceRequest, ServiceRequestImpl>();
+     
          
            
 
