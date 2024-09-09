@@ -15,7 +15,11 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IAssetRequest, AssetRequestService>();   
             builder.Services.AddScoped<ISubCategory,SubCategoryService>();  
             builder.Services.AddScoped<IServiceRequest, ServiceRequestImpl>();
-           
+            builder.Services.AddScoped<IAuditRepo,AuditRepo>();
+            builder.Services.AddScoped<IMaintenanceLogRepo, MaintenanceLogRepo>();
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
+            builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
+            builder.Services.AddScoped<IUserProfileRepo,UserProfileRepo>();
 
             // Add services to the container.
 
