@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using static Enum;
+using static MultiValues;
 
     public class DataContext : DbContext
     {

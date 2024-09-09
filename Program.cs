@@ -42,6 +42,7 @@ namespace Hexa_Hub
             builder.Services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -64,6 +65,7 @@ namespace Hexa_Hub
 
             builder.Services.AddAuthorization();
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+
             // Add services to the container.
 
             
