@@ -29,12 +29,17 @@ namespace Hexa_Hub.Repository
         public async Task<List<Audit>> GetAllAudits()
         {
             return await _context.Audits
+                .Include(a=>a.User)
+                .Include(a=>a.Asset)
                 .ToListAsync();
         }
 
         public async Task<Audit?> GetAuditById(int id)
         {
-            return await _context.Audits.FirstOrDefaultAsync(a=>a.AuditId == id);
+            return await _context.Audits
+                    .Include(a => a.User)
+                    .Include(a => a.Asset)
+                    .FirstOrDefaultAsync(a=>a.AuditId == id);
         }
 
         public async Task Save()

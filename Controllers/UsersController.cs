@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Hexa_Hub.Interface;
-using Hexa_Hub.Repository;
+﻿using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Enum;
+using System.Security.Claims;
 
 namespace Hexa_Hub.Controllers
 {
@@ -38,7 +32,7 @@ namespace Hexa_Hub.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles ="Admin")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             //var user = await _context.Users.FindAsync(id);
@@ -58,9 +52,18 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (id != user.UserId)
             {
                 return BadRequest();
+            }
+            if (userRole != "Admin")
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                if (id != userId)
+                {
+                    return Forbid();
+                }
             }
 
             _userRepo.UpdateUser(user);
@@ -130,7 +133,7 @@ namespace Hexa_Hub.Controllers
         // DELETE: api/Users/5
 
         [HttpDelete("{id}")]
-        [Authorize(Roles ="User")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _userRepo.GetUserById(id);

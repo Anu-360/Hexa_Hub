@@ -54,14 +54,26 @@ namespace Hexa_Hub.Controllers
         public async Task<ActionResult<Audit>> GetAudit(int id)
         {
             //var audit = await _context.Audits.FindAsync(id);
-            var audit = await _auditRepo.GetAuditById(id);
-
-            if (audit == null)
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole == "Admin")
             {
-                return NotFound();
+                var audit = await _auditRepo.GetAuditById(id);
+                if (audit == null)
+                {
+                    return NotFound();
+                }
+                return audit;
             }
-
-            return audit;
+            else
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var audit = await _auditRepo.GetAuditById(userId);
+                if (audit == null)
+                {
+                    return NotFound();
+                }
+                return Ok(new List<Audit> { audit });
+            }
         }
 
         // PUT: api/Audits/5
@@ -76,8 +88,17 @@ namespace Hexa_Hub.Controllers
             }
 
             //_context.Entry(audit).State = EntityState.Modified;
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var existingId = await _auditRepo.GetAuditById(id);
+            if(existingId == null)
+            {
+                return NotFound();
+            }
+            if (existingId.UserId != userId && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
             _auditRepo.UpdateAudit(audit);
-
             try
             {
                 //await _context.SaveChangesAsync();
