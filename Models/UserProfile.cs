@@ -1,7 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using System.Text.Json.Serialization;
+
 using static MultiValues;
+
 
 public class UserProfile
 {
@@ -38,7 +42,7 @@ public class UserProfile
 
     //Navigation Properties
     // 1- 1 Relation
-
+    [JsonIgnore]
     public User? User { get; set; }
 
    

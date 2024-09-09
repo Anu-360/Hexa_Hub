@@ -2,7 +2,12 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using System.Text.Json.Serialization;
+
+
 using static MultiValues;
+
 
 public class User
 {
@@ -46,11 +51,11 @@ public class User
 
     [Required]
     [DefaultValue(UserType.Employee)]
-    public UserType User_Type { get; private set; } = UserType.Employee;
+    public UserType User_Type { get; set; } = UserType.Employee;
 
     //Navigation Properties
     // 1 - 1 Relation
-
+    [JsonIgnore]
     public UserProfile? UserProfile { get; set; }
 
     // 1 - * Relation

@@ -1,4 +1,6 @@
 ﻿using Hexa_Hub.Interface;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hexa_Hub.Repository
@@ -56,6 +58,11 @@ namespace Hexa_Hub.Repository
         {
             _context.Users.Update(user);
             return Task.FromResult(user);
+        }
+
+        public async Task<User?> validateUser(string email, string password)
+        {
+            return await _context.Users.FirstOrDefaultAsync(vu=>vu.UserMail == email &&  vu.Password == password);
         }
     }
 }
