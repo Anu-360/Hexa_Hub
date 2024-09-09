@@ -9,6 +9,7 @@ namespace Hexa_Hub
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             builder.Services.AddScoped<ICategory, CategoryService>();
             builder.Services.AddScoped<IAsset, AssetService>(); 
             builder.Services.AddScoped<IAssetAllocation, AssetAllocationService>(); 
@@ -20,6 +21,7 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
             builder.Services.AddScoped<IUserProfileRepo,UserProfileRepo>();
+
 
             // Add services to the container.
 
