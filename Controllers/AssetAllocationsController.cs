@@ -29,7 +29,6 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<AssetAllocation>>> GetAssetAllocations()
         {
-            
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if(userRole == "Admin")
@@ -52,7 +51,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAssetAllocation(int id)
         {
-
             try
             {
                 await _assetallocation.DeleteAllocation(id);
