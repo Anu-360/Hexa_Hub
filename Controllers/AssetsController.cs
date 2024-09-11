@@ -123,7 +123,7 @@ namespace Hexa_Hub.Controllers
             return Ok(new { FileName = fileName });
         }
 
-        
+        //image
         [HttpGet("{assetId}/assetImage")]
         [Authorize]
         public async Task<IActionResult> GetAssetImage(int assetId)
