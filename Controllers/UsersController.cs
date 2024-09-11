@@ -26,7 +26,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles ="Admin")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            //return await _context.Users.ToListAsync();
             return await _userRepo.GetAllUser();
         }
 
@@ -35,7 +34,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles ="Admin")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            //var user = await _context.Users.FindAsync(id);
             var user = await _userRepo.GetUserById(id);
 
             if (user == null)
@@ -107,8 +105,6 @@ namespace Hexa_Hub.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            //_context.Users.Add(user);
-            //await _context.SaveChangesAsync();
             _userRepo.AddUser(user);
             await _userRepo.Save();
 

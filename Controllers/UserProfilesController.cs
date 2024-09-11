@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Controllers
@@ -34,7 +35,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserProfile>> GetUserProfile(int id)
         {
-            //var userProfile = await _context.UserProfiles.FindAsync(id);
             var userProfile = await _userProfile.GetProfilesById(id);
 
             if (userProfile == null)
@@ -99,49 +99,6 @@ namespace Hexa_Hub.Controllers
 
             return NoContent();
         }
-        //[HttpPost("{userId}/UplaodImage")]
-        ////public async Task<IActionResult> UploadProfileImage(int userId, IFormFile)
-
-        //// POST: api/UserProfiles
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<UserProfile>> RegisterUserProfile(UserProfile userProfile)
-        //{
-        //    _context.UserProfiles.Add(userProfile);
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        if (UserProfileExists(userProfile.UserId))
-        //        {
-        //            return Conflict();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return CreatedAtAction("GetUserProfile", new { id = userProfile.UserId }, userProfile);
-        //}
-
-        //// DELETE: api/UserProfiles/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteUserProfile(int id)
-        //{
-        //    var userProfile = await _context.UserProfiles.FindAsync(id);
-        //    if (userProfile == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.UserProfiles.Remove(userProfile);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
 
         private bool UserProfileExists(int id)
         {
@@ -149,13 +106,23 @@ namespace Hexa_Hub.Controllers
         }
 
         [HttpPut("{userId}/upload")]
+        [Authorize]
         public async Task<IActionResult> UploadProfileImage(int userId, IFormFile file)
         {
+            var loggedUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            if(loggedUser != userId)
+            {
+                return Unauthorized("You are not Authorized to Update the Image");
+            }
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
-
+            var supportedFiles = new[] {  "image/jpeg", "image/png" };
+            if (!supportedFiles.Contains(file.ContentType))
+            {
+                return BadRequest("Only JPEG or PNG format are allowed");
+            }
             var fileName = await _userProfile.UploadProfileImageAsync(userId, file);
             if (fileName == null)
             {
@@ -164,6 +131,27 @@ namespace Hexa_Hub.Controllers
 
             return Ok(new { FileName = fileName });
         }
-
+        [Authorize]
+        [HttpGet("{userId}/profileImage")]
+        public async Task<IActionResult> GetProfileImage(int userId)
+        {
+            var userProfile = await _userProfile.GetProfilesById(userId);
+            if(userProfile == null || userProfile.ProfileImage == null)
+            {
+                var defualtImagePath = _userProfile.GetDefaultImagePath();
+                return PhysicalFile(defualtImagePath, "image/jpeg");
+            }
+            using (var memoryStream = new MemoryStream(userProfile.ProfileImage))
+            {
+                var fileExtensions = Path.GetExtension("profile-img.jpg").ToLowerInvariant();
+                var contentType = fileExtensions switch
+                {
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    _ => "application/octet-stream"
+                };
+                return File(memoryStream.ToArray(), contentType);
+            }
+        }
     }
 }

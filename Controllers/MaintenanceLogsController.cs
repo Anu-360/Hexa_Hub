@@ -72,13 +72,10 @@ namespace Hexa_Hub.Controllers
             {
                 return BadRequest();
             }
-
-            //_context.Entry(maintenanceLog).State = EntityState.Modified;
             _maintenanceLogRepo.UpdateMaintenanceLog(maintenanceLog);
 
             try
             {
-                //await _context.SaveChangesAsync();
                 await _maintenanceLogRepo.Save();
             }
             catch (DbUpdateConcurrencyException)
@@ -96,17 +93,17 @@ namespace Hexa_Hub.Controllers
             return NoContent();
         }
 
-        // POST: api/MaintenanceLogs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<MaintenanceLog>> PostMaintenanceLog(MaintenanceLog maintenanceLog)
-        {
-            _maintenanceLogRepo.AddMaintenanceLog(maintenanceLog);
-            await _maintenanceLogRepo.Save();
+        //// POST: api/MaintenanceLogs
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<MaintenanceLog>> PostMaintenanceLog(MaintenanceLog maintenanceLog)
+        //{
+        //    _maintenanceLogRepo.AddMaintenanceLog(maintenanceLog);
+        //    await _maintenanceLogRepo.Save();
 
-            return CreatedAtAction("GetMaintenanceLog", new { id = maintenanceLog.MaintenanceId }, maintenanceLog);
-        }
+        //    return CreatedAtAction("GetMaintenanceLog", new { id = maintenanceLog.MaintenanceId }, maintenanceLog);
+        //}
 
         // DELETE: api/MaintenanceLogs/5
         [HttpDelete("{id}")]

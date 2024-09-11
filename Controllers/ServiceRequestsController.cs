@@ -29,27 +29,7 @@ namespace Hexa_Hub.Controllers
         }
 
         //// GET: api/ServiceRequests
-        //[HttpGet]
-        //[Authorize]
-        //public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetServiceRequests()
-        //{
-        //    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        //    var userRole = User.FindFirstValue(ClaimTypes.Role);
-        //    if (userRole == "Admin")
-        //    {
-        //        return await _serviceRequest.GetAllServiceRequests();
-        //    }
-        //    else
-        //    {
-        //        var req = await _serviceRequest.GetServiceRequestById(userId);
-        //        if (req == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        return Ok(new List<ServiceRequest> { req });
-        //    }
-        //}
-        // GET: api/ServiceRequests
+        
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetServiceRequests()
