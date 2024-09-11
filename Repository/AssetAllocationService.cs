@@ -15,47 +15,55 @@ namespace Hexa_Hub.Repository
         public async Task<List<AssetAllocation>> GetAllAllocations()
         {
             return await _context.AssetAllocations
-                                 .Include(a => a.User)
-                                 .Include(a => a.Asset)
-                                 .Include(a => a.AssetRequests)
-                                 .ToListAsync();
+                .Include(aa=>aa.Asset)
+                    .ThenInclude(asset => asset.Category)
+                    .ThenInclude(category => category.SubCategories)    
+                .Include(aa=>aa.User)
+                .ToListAsync();
+        }
+
+        public async Task AddAllocation(AssetAllocation allocation)
+        {
+            _context.AssetAllocations.Add(allocation);
+
+        }
+        public async Task DeleteAllocation(int id)
+        {
+            var allocation = await GetAllocationById(id);
+            if (allocation == null)
+            {
+                throw new Exception("Allocation not found");
+            }
+            _context.AssetAllocations.Remove(allocation);
+        }
+
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
         }
 
         public async Task<AssetAllocation?> GetAllocationById(int id)
         {
             return await _context.AssetAllocations
-                                 .Include(a => a.User)
-                                 .Include(a => a.Asset)
-                                 .Include(a => a.AssetRequests)
-                                 .FirstOrDefaultAsync(a => a.AllocationId == id);
+                .Include(aa => aa.Asset)
+                    .ThenInclude(asset => asset.Category)
+                    .ThenInclude(category => category.SubCategories)
+                .Include(aa => aa.User)
+                .FirstOrDefaultAsync(aa => aa.AllocationId == id);
         }
 
-        public async Task<AssetAllocation> AddAllocation(AssetAllocation allocation)
+        public async Task<List<AssetAllocation>> GetAllocationListById(int userId)
         {
-            _context.AssetAllocations.Add(allocation);
-            await _context.SaveChangesAsync();
-            return allocation;
+            return await _context.AssetAllocations
+                .Where(aa => aa.UserId == userId)
+                .Include(aa => aa.Asset)
+                    .ThenInclude(asset => asset.Category)
+                    .ThenInclude(category => category.SubCategories)
+                .Include(aa => aa.User)
+                .Include(aa => aa.AssetRequests)
+                .ToListAsync();
         }
 
-        public async Task<AssetAllocation> UpdateAllocation(AssetAllocation allocation)
-        {
-            _context.AssetAllocations.Update(allocation);
-            await _context.SaveChangesAsync();
-            return allocation;
-        }
-
-        public async Task<bool> DeleteAllocation(int id)
-        {
-            var allocation = await _context.AssetAllocations.FindAsync(id);
-            if (allocation == null)
-            {
-                return false;
-            }
-
-            _context.AssetAllocations.Remove(allocation);
-            await _context.SaveChangesAsync();
-            return true;
-        }
     }
 
 }

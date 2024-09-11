@@ -1,7 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
 public class ReturnRequest
 {
@@ -30,7 +31,8 @@ public class ReturnRequest
     public string? Condition { get; set; }
 
     [Required]
-    public ReturnReqStatus ReturnStatus { get; set; }   
+    [DefaultValue(ReturnReqStatus.Sent)]
+    public ReturnReqStatus ReturnStatus { get; set; } = ReturnReqStatus.Sent;
 
     //Navigation Properties
     // * - 1 Relation

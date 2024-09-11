@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Controllers
 {
@@ -10,12 +11,14 @@ namespace Hexa_Hub.Controllers
     public class UserProfilesController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IWebHostEnvironment _environment;
         private readonly IUserProfileRepo _userProfile;
 
-        public UserProfilesController(DataContext context, IUserProfileRepo userProfileRepo)
+        public UserProfilesController(DataContext context, IUserProfileRepo userProfileRepo, IWebHostEnvironment environment)
         {
             _context = context;
             _userProfile = userProfileRepo;
+            _environment = environment;
         }
 
         //// GET: api/UserProfiles
@@ -28,7 +31,7 @@ namespace Hexa_Hub.Controllers
 
         // GET: api/UserProfiles/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserProfile>> GetUserProfile(int id)
         {
             //var userProfile = await _context.UserProfiles.FindAsync(id);
@@ -76,10 +79,11 @@ namespace Hexa_Hub.Controllers
             {
                 user.User_Type = newRole;
             }
-
+            
             try
             {
-                await _context.SaveChangesAsync();
+                await _userProfile.UpdateProfiles(existingProfile);
+                await _userProfile.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -96,7 +100,7 @@ namespace Hexa_Hub.Controllers
             return NoContent();
         }
         //[HttpPost("{userId}/UplaodImage")]
-        //public async Task<IActionResult> UploadProfileImage(int userId, IFormFile)
+        ////public async Task<IActionResult> UploadProfileImage(int userId, IFormFile)
 
         //// POST: api/UserProfiles
         //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -143,5 +147,23 @@ namespace Hexa_Hub.Controllers
         {
             return _context.UserProfiles.Any(e => e.UserId == id);
         }
+
+        [HttpPut("{userId}/upload")]
+        public async Task<IActionResult> UploadProfileImage(int userId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            var fileName = await _userProfile.UploadProfileImageAsync(userId, file);
+            if (fileName == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { FileName = fileName });
+        }
+
     }
 }

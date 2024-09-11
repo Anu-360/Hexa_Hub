@@ -8,7 +8,7 @@
         Task<UserProfile> UpdateProfiles(UserProfile userProfile);
         Task DeleteProfiles(int id);
         Task Save();
-        //Task<string?> UploadProfileImageAsync(int userId, IFormFile file);
+        Task<string?> UploadProfileImageAsync(int userId, IFormFile file);
         //Task<string?> GetProfileImageAsync(int userId);
         //Task<bool> SetDefaultProfileImageAsync(int userId);
     }

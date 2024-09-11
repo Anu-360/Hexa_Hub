@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,89 +16,55 @@ namespace Hexa_Hub.Controllers
     public class AssetAllocationsController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IAssetAllocation _assetallocation;
 
-        public AssetAllocationsController(DataContext context)
+        public AssetAllocationsController(DataContext context, IAssetAllocation assetAllocation)
         {
             _context = context;
+            _assetallocation = assetAllocation;
         }
 
         // GET: api/AssetAllocations
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<AssetAllocation>>> GetAssetAllocations()
         {
-            return await _context.AssetAllocations.ToListAsync();
+            
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if(userRole == "Admin")
+            {
+                return await _assetallocation.GetAllAllocations();
+            }
+            else
+            {
+                var userRequests = await _assetallocation.GetAllocationListById(userId);
+                if (userRequests == null || !userRequests.Any()) {
+                    return NotFound();
+                }
+                return Ok(userRequests);
+            }
         }
 
-        // GET: api/AssetAllocations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AssetAllocation>> GetAssetAllocation(int id)
+     
+        // DELETE: api/AssetAllocations/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAssetAllocation(int id)
         {
-            var assetAllocation = await _context.AssetAllocations.FindAsync(id);
-
-            if (assetAllocation == null)
-            {
-                return NotFound();
-            }
-
-            return assetAllocation;
-        }
-
-        // PUT: api/AssetAllocations/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAssetAllocation(int id, AssetAllocation assetAllocation)
-        {
-            if (id != assetAllocation.AllocationId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(assetAllocation).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _assetallocation.DeleteAllocation(id);
+                await _assetallocation.Save();
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!AssetAllocationExists(id))
-                {
+                if (id == null)
                     return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
-
-            return NoContent();
-        }
-
-        // POST: api/AssetAllocations
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<AssetAllocation>> PostAssetAllocation(AssetAllocation assetAllocation)
-        {
-            _context.AssetAllocations.Add(assetAllocation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAssetAllocation", new { id = assetAllocation.AllocationId }, assetAllocation);
-        }
-
-        // DELETE: api/AssetAllocations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAssetAllocation(int id)
-        {
-            var assetAllocation = await _context.AssetAllocations.FindAsync(id);
-            if (assetAllocation == null)
-            {
-                return NotFound();
-            }
-
-            _context.AssetAllocations.Remove(assetAllocation);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool AssetAllocationExists(int id)

@@ -4,9 +4,11 @@
     {
         Task<List<AssetRequest>> GetAllAssetRequests();
         Task<AssetRequest?> GetAssetRequestById(int id);
-        Task<AssetRequest> AddAssetRequest(AssetRequest assetRequest);
+        Task AddAssetRequest(AssetRequest assetRequest);
         Task<AssetRequest> UpdateAssetRequest(AssetRequest assetRequest);
-        Task<bool> DeleteAssetRequest(int id);
+        Task DeleteAssetRequest(int id);
+        Task Save();
+        Task<List<AssetRequest>> GetAssetRequestsByUserId(int userId);
     }
 
 }

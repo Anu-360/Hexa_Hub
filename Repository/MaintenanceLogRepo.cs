@@ -54,5 +54,15 @@ namespace Hexa_Hub.Repository
             _context.MaintenanceLogs.Update(maintenanceLog);
             return Task.FromResult(maintenanceLog);
         }
+
+
+        public async Task<List<MaintenanceLog>> GetMaintenanceLogByUserId(int userId)
+        {
+            return await _context.MaintenanceLogs
+                .Where(ml => ml.UserId == userId)
+                .Include(ml => ml.Asset)
+                .Include(ml => ml.User)
+                .ToListAsync();
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 using System.ComponentModel;
 
 

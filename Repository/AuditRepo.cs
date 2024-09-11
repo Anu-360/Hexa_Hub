@@ -1,4 +1,5 @@
 ﻿using Hexa_Hub.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hexa_Hub.Repository
@@ -13,7 +14,7 @@ namespace Hexa_Hub.Repository
         }
         public async Task AddAuditReq(Audit audit)
         {
-            _context.Audits.Add(audit);
+            _context.Audits.AddAsync(audit);
         }
 
         public async Task DeleteAuditReq(int id)
@@ -22,6 +23,10 @@ namespace Hexa_Hub.Repository
             if(aId == null)
             {
                 throw new Exception("Audit Not Found");
+            }
+            if(aId.Audit_Status == Models.MultiValues.AuditStatus.Completed)
+            {
+                throw new InvalidOperationException("Cannot Delete an Completed Audit");
             }
             _context.Audits.Remove(aId);
         }
@@ -40,6 +45,15 @@ namespace Hexa_Hub.Repository
                     .Include(a => a.User)
                     .Include(a => a.Asset)
                     .FirstOrDefaultAsync(a=>a.AuditId == id);
+        }
+
+        public async Task<List<Audit>> GetAuditsByUserId(int userId)
+        {
+            return await _context.Audits
+                .Where(a => a.UserId == userId)
+                .Include(a => a.Asset)
+                .Include(a => a.User)
+                .ToListAsync();
         }
 
         public async Task Save()

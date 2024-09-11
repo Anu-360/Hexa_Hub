@@ -1,8 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MultiValues;
-
+using static Hexa_Hub.Models.MultiValues;
 public class ServiceRequest
 {
     [Required]
@@ -27,7 +27,8 @@ public class ServiceRequest
     public string? ServiceDescription { get; set; }
 
     [Required]
-    public ServiceReqStatus ServiceReqStatus { get; set; }
+    [DefaultValue(ServiceReqStatus.UnderReview)]
+    public ServiceReqStatus ServiceReqStatus { get; set; } = ServiceReqStatus.UnderReview;
 
     //Navigation Properties
     // 1 - 1 Relation

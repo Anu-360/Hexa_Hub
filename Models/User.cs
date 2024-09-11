@@ -4,9 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using System.Text.Json.Serialization;
-
-
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
 
 public class User

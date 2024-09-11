@@ -30,7 +30,7 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<Audit>>> GetAudits()
         {
-            //return await _context.Audits.ToListAsync();
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (userRole == "Admin")
             {
@@ -38,22 +38,20 @@ namespace Hexa_Hub.Controllers
             }
             else
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var audit = await _auditRepo.GetAuditById(userId);
-                if (audit == null)
+                var req = await _auditRepo.GetAuditsByUserId(userId);
+                if (req == null)
                 {
                     return NotFound();
                 }
-                return Ok(new List<Audit> { audit });
+                return Ok(req);
             }
         }
 
         // GET: api/Audits/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Audit>> GetAudit(int id)
         {
-            //var audit = await _context.Audits.FindAsync(id);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (userRole == "Admin")
             {
@@ -79,29 +77,29 @@ namespace Hexa_Hub.Controllers
         // PUT: api/Audits/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> PutAudit(int id, Audit audit)
         {
             if (id != audit.AuditId)
             {
                 return BadRequest();
             }
-
-            //_context.Entry(audit).State = EntityState.Modified;
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var existingId = await _auditRepo.GetAuditById(id);
             if(existingId == null)
             {
                 return NotFound();
             }
-            if (existingId.UserId != userId && !User.IsInRole("Admin"))
+            if (existingId.UserId != userId )
             {
                 return Forbid();
             }
-            _auditRepo.UpdateAudit(audit);
+            existingId.AuditDate = audit.AuditDate;
+            existingId.AuditMessage = audit.AuditMessage;
+            existingId.Audit_Status = audit.Audit_Status;
             try
             {
-                //await _context.SaveChangesAsync();
+                _auditRepo.UpdateAudit(existingId);
                 await _auditRepo.Save();
             }
             catch (DbUpdateConcurrencyException)
@@ -125,8 +123,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles ="Admin")]
         public async Task<ActionResult<Audit>> PostAudit(Audit audit)
         {
-            //_context.Audits.Add(audit);
-            //await _context.SaveChangesAsync();
             _auditRepo.AddAuditReq(audit);
             await _auditRepo.Save();
 
@@ -138,16 +134,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteAudit(int id)
         {
-            //var audit = await _context.Audits.FindAsync(id);
-            //if (audit == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.Audits.Remove(audit);
-            //await _context.SaveChangesAsync();
-
-            //return NoContent();
             try
             {
                 await _auditRepo.DeleteAuditReq(id);

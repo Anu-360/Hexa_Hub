@@ -1,7 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
 public class Audit
 {
@@ -24,7 +25,8 @@ public class Audit
     public string? AuditMessage { get; set; }
 
     [Required]
-    public AuditStatus Audit_Status { get; set; }
+    [DefaultValue(AuditStatus.Sent)]
+    public AuditStatus Audit_Status { get; set; } = AuditStatus.Sent;
 
     //Navigation Properties
     // 1 - 1 Relation

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Interface;
+using Hexa_Hub.Repository;
 
 namespace Hexa_Hub.Controllers
 {
@@ -13,48 +16,39 @@ namespace Hexa_Hub.Controllers
     public class AssetsController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IAsset _asset;
 
-        public AssetsController(DataContext context)
+        public AssetsController(DataContext context, IAsset asset)
+
         {
             _context = context;
+            _asset = asset;
         }
 
         // GET: api/Assets
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Asset>>> GetAssets()
         {
-            return await _context.Assets.ToListAsync();
-        }
-
-        // GET: api/Assets/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Asset>> GetAsset(int id)
-        {
-            var asset = await _context.Assets.FindAsync(id);
-
-            if (asset == null)
-            {
-                return NotFound();
-            }
-
-            return asset;
+            return await _asset.GetAllAssets();
         }
 
         // PUT: api/Assets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAsset(int id, Asset asset)
         {
             if (id != asset.AssetId)
             {
                 return BadRequest();
             }
-
-            _context.Entry(asset).State = EntityState.Modified;
-
+            _asset.UpdateAsset(asset);
             try
             {
-                await _context.SaveChangesAsync();
+                ////await _context.SaveChangesAsync();
+                await _asset.Save();
+                _asset.UpdateAsset(asset);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -74,28 +68,32 @@ namespace Hexa_Hub.Controllers
         // POST: api/Assets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Asset>> PostAsset(Asset asset)
         {
-            _context.Assets.Add(asset);
-            await _context.SaveChangesAsync();
+            _asset.AddAsset(asset);
+            await _asset.Save();
 
-            return CreatedAtAction("GetAsset", new { id = asset.AssetId }, asset);
+            return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
         }
 
         // DELETE: api/Assets/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAsset(int id)
         {
-            var asset = await _context.Assets.FindAsync(id);
-            if (asset == null)
+            try
             {
-                return NotFound();
+                await _asset.DeleteAsset(id);
+                await _asset.Save();
+                return NoContent();
             }
-
-            _context.Assets.Remove(asset);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception)
+            {
+                if (id == null)
+                    return NotFound();
+                return BadRequest();
+            }
         }
 
         private bool AssetExists(int id)

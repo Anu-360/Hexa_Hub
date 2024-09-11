@@ -49,7 +49,7 @@ namespace JWT_Application.Controllers
                     subject.Add(new Claim(ClaimTypes.Role, dbUser.User_Type.ToString()));
                 }
 
-                var expires = DateTime.UtcNow.AddMinutes(10);
+                var expires = DateTime.UtcNow.AddDays(10);
                 var tokenDesc = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(subject),

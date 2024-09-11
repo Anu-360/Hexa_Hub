@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
@@ -28,16 +29,29 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<MaintenanceLog>>> GetMaintenanceLogs()
         {
-            //return await _context.MaintenanceLogs.ToListAsync();
-            return await _maintenanceLogRepo.GetAllMaintenanceLog();
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            if (userRole == "Admin")
+            {
+                return await _maintenanceLogRepo.GetAllMaintenanceLog();
+            }
+            else
+            {
+                var req = await _maintenanceLogRepo.GetMaintenanceLogByUserId(userId);
+                if (req == null)
+                {
+                    return NotFound();
+                }
+                return Ok(req);
+            }
         }
 
         // GET: api/MaintenanceLogs/5
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles ="Admin")]
         public async Task<ActionResult<MaintenanceLog>> GetMaintenanceLog(int id)
         {
-            //var maintenanceLog = await _context.MaintenanceLogs.FindAsync(id);
+
             var maintenanceLog = await _maintenanceLogRepo.GetMaintenanceLogById(id);
 
             if (maintenanceLog == null)
@@ -88,8 +102,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MaintenanceLog>> PostMaintenanceLog(MaintenanceLog maintenanceLog)
         {
-            //_context.MaintenanceLogs.Add(maintenanceLog);
-            //await _context.SaveChangesAsync();
             _maintenanceLogRepo.AddMaintenanceLog(maintenanceLog);
             await _maintenanceLogRepo.Save();
 
@@ -101,16 +113,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMaintenanceLog(int id)
         {
-            //var maintenanceLog = await _context.MaintenanceLogs.FindAsync(id);
-            //if (maintenanceLog == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.MaintenanceLogs.Remove(maintenanceLog);
-            //await _context.SaveChangesAsync();
-
-            //return NoContent();
             try
             {
                 await _maintenanceLogRepo.DeleteMaintenanceLog(id);

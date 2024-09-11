@@ -8,5 +8,7 @@
         Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog);
         Task DeleteMaintenanceLog(int id);
         Task Save();
+
+        Task<List<MaintenanceLog>> GetMaintenanceLogByUserId(int userId);
     }
 }

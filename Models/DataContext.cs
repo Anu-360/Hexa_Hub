@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
-    public class DataContext : DbContext
+public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -19,7 +19,49 @@ using static MultiValues;
         public DbSet<UserProfile> UserProfiles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .Property(r => r.User_Type)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<UserType>(v));
+
+            modelBuilder.Entity<Asset>()
+                .Property(r => r.Asset_Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<AssetStatus>(v));
+
+            modelBuilder.Entity<AssetRequest>()
+                .Property(r => r.Request_Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<RequestStatus>(v));
+
+            modelBuilder.Entity<ReturnRequest>()
+                .Property(r => r.ReturnStatus)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<ReturnReqStatus>(v));
+
+            modelBuilder.Entity<ServiceRequest>()
+                .Property(r => r.ServiceReqStatus)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<ServiceReqStatus>(v));
+
+            modelBuilder.Entity<Audit>()
+                .Property(r => r.Audit_Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<AuditStatus>(v));
+
+            modelBuilder.Entity<ServiceRequest>()
+                .Property(r => r.Issue_Type)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<IssueType>(v));
+
+        base.OnModelCreating(modelBuilder);
 
             //User Configuration
             modelBuilder.Entity<User>()

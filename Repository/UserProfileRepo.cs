@@ -14,7 +14,12 @@ namespace Hexa_Hub.Repository
         }
         public async Task AddProfiles(UserProfile userProfile)
         {
-            _context.AddAsync(userProfile);
+            if (userProfile.ProfileImage == null)
+            {
+                string defaultImagePath = GetDefaultImagePath();
+                userProfile.ProfileImage = await GetImageBytesAsync(defaultImagePath);
+            }
+            await _context.AddAsync(userProfile);
         }
 
         public async Task DeleteProfiles(int id)
@@ -51,72 +56,67 @@ namespace Hexa_Hub.Repository
             _context.UserProfiles.Update(userProfile);
             return Task.FromResult(userProfile);
         }
-        //public async Task<string?> UploadProfileImageAsync(int userId, IFormFile file)
-        //{
-        //    var userProfile = await _context.UserProfiles.FindAsync(userId);
-        //    if (userProfile == null) return null;
 
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "images");
 
-        //    if (!Directory.Exists(imagePath))
-        //    {
-        //        Directory.CreateDirectory(imagePath);
-        //    }
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        public async Task<string?> UploadProfileImageAsync(int userId, IFormFile file)
+        {
+            var userProfile = await _context.UserProfiles.FindAsync(userId);
+            if (userProfile == null) return null;
 
-        //    // Set a default image if the profile image is null
-        //    if (userProfile.ProfileImage == null && file == null)
-        //    {
-        //        string defaultImagePath = Path.Combine(imagePath, "default.png");
-        //        userProfile.ProfileImage = await File.ReadAllBytesAsync(defaultImagePath);
-        //    }
-        //    else if (file != null)
-        //    {
-        //        string fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
-        //        string fullPath = Path.Combine(imagePath, fileName);
+            string imagePath = Path.Combine(_environment.ContentRootPath, "Images");
 
-        //        using (var stream = new FileStream(fullPath, FileMode.Create))
-        //        {
-        //            await file.CopyToAsync(stream);
-        //        }
+            if (!Directory.Exists(imagePath))
+            {
+                Directory.CreateDirectory(imagePath);
+            }
 
-        //        userProfile.ProfileImage = await File.ReadAllBytesAsync(fullPath);
-        //    }
+            // Set a default image if the profile image is null
+            if (userProfile.ProfileImage == null && file == null)
+            {
+                string defaultImagePath = GetDefaultImagePath();
+                userProfile.ProfileImage = await GetImageBytesAsync(defaultImagePath);
+            }
+            else if (file != null)
+            {
+                string fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
+                string fullPath = Path.Combine(imagePath, fileName);
 
-        //    await _context.SaveChangesAsync();
-        //    return file?.FileName ?? "default.png";
-        //}
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                userProfile.ProfileImage = await File.ReadAllBytesAsync(fullPath);
+            }
+
+            await _context.SaveChangesAsync();
+            return file?.FileName ?? "profile-img.jpg";
+        }
 
         //public async Task<string?> GetProfileImageAsync(int userId)
         //{
         //    var userProfile = await _context.UserProfiles.FindAsync(userId);
         //    if (userProfile?.ProfileImage == null) return null;
 
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "images");
+        //    string imagePath = Path.Combine(_environment.ContentRootPath, "Images");
+        //    string defaultImagePath = GetDefaultImagePath();
 
-        //    string imageName = userProfile.ProfileImage == await File.ReadAllBytesAsync(Path.Combine(imagePath, "default.png"))
-        //        ? "default.png"
-        //        : $"{userId}.png";
+        //    string imageName = userProfile.ProfileImage.SequenceEqual(await GetImageBytesAsync(defaultImagePath))
+        //        ? "profile-img.jpg"
+        //        : $"{userId}.jpg";
 
-        //    return Path.Combine("images", imageName);
+        //    return Path.Combine("Images", imageName);
         //}
 
-        //public async Task<bool> SetDefaultProfileImageAsync(int userId)
-        //{
-        //    var userProfile = await _context.UserProfiles.FindAsync(userId);
-        //    if (userProfile == null) return false;
 
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "images");
-        //    string defaultImagePath = Path.Combine(imagePath, "default.png");
-
-        //    if (!File.Exists(defaultImagePath))
-        //    {
-        //        return false; // Default image file does not exist
-        //    }
-
-        //    userProfile.ProfileImage = await File.ReadAllBytesAsync(defaultImagePath);
-
-        //    await _context.SaveChangesAsync();
-        //    return true;
-        //}
+        private string GetDefaultImagePath()
+        {
+            return Path.Combine(_environment.ContentRootPath, "Images", "profile-img.jpg");
+        }
+        private async Task<byte[]> GetImageBytesAsync(string path)
+        {
+            return await File.ReadAllBytesAsync(path);
+        }
     }
 }
