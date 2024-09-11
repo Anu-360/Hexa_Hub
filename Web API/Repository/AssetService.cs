@@ -70,9 +70,9 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<string?> UploadAssetImageAsync(int userId, IFormFile file)
+        public async Task<string?> UploadAssetImageAsync(int assetId, IFormFile file)
         {
-            var assetData = await _context.Assets.FindAsync(userId);
+            var assetData = await _context.Assets.FindAsync(assetId);
             if(assetData == null) 
             { 
                 return null; 
@@ -89,8 +89,8 @@ namespace Hexa_Hub.Repository
             }
             else if(file != null)
             {
-                string fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
-                string fullPath = Path.Combine(imagePath, fileName);
+                string fileName = $"{assetId}_{Path.GetFileName(file.FileName)}";
+                string fullPath = Path.GetFullPath(fileName);
 
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {

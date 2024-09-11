@@ -3,7 +3,8 @@
     public interface IMaintenanceLogRepo
     {
         Task<List<MaintenanceLog>> GetAllMaintenanceLog();
-        Task<MaintenanceLog?> GetMaintenanceLogById(int id);
+        //Task<MaintenanceLog?> GetMaintenanceLogById(int id);
+        Task<List<MaintenanceLog>> GetMaintenanceLogById(int userId);
         Task AddMaintenanceLog(MaintenanceLog maintenanceLog);
         Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog);
         Task DeleteMaintenanceLog(int id);

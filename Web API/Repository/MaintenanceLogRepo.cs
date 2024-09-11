@@ -20,12 +20,20 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
-        public async Task<MaintenanceLog?> GetMaintenanceLogById(int id)
+        //public async Task<MaintenanceLog?> GetMaintenanceLogById(int id)
+        //{
+        //    return await _context.MaintenanceLogs
+        //        .Include(ml => ml.Asset)
+        //        .Include(ml => ml.User)
+        //        .FirstOrDefaultAsync(ml=>ml.MaintenanceId==id);
+        //}
+        public async Task<List<MaintenanceLog>> GetMaintenanceLogById(int userId)
         {
             return await _context.MaintenanceLogs
                 .Include(ml => ml.Asset)
                 .Include(ml => ml.User)
-                .FirstOrDefaultAsync(ml=>ml.MaintenanceId==id);
+                .Where(ml => ml.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task AddMaintenanceLog(MaintenanceLog maintenanceLog)

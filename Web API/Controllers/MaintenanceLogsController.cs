@@ -47,19 +47,20 @@ namespace Hexa_Hub.Controllers
         }
 
         // GET: api/MaintenanceLogs/5
-        [HttpGet("{id}")]
+        [HttpGet("{userId}")]
         [Authorize(Roles ="Admin")]
-        public async Task<ActionResult<MaintenanceLog>> GetMaintenanceLog(int id)
+        public async Task<ActionResult<MaintenanceLog>> GetMaintenanceLog(int userId)
         {
 
-            var maintenanceLog = await _maintenanceLogRepo.GetMaintenanceLogById(id);
+            var maintenanceLogs = await _maintenanceLogRepo.GetMaintenanceLogById(userId);
 
-            if (maintenanceLog == null)
+
+            if (maintenanceLogs == null)
             {
                 return NotFound();
             }
 
-            return maintenanceLog;
+            return Ok(maintenanceLogs);
         }
 
         // PUT: api/MaintenanceLogs/5

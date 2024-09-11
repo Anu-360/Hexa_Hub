@@ -28,17 +28,7 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
             builder.Services.AddScoped<IUserProfileRepo, UserProfileRepo>();
 
-            //var userProfile = new UserProfile
-            //{
-            //    User = new User()
-            //};
-            //userProfile.User.UserProfile = userProfile;
-
-            //var options = new JsonSerializerOptions
-            //{
-            //    ReferenceHandler = ReferenceHandler.Preserve,
-            //    WriteIndented = true
-            //};
+            
             builder.Services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
@@ -73,7 +63,7 @@ namespace Hexa_Hub
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "User_Api", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Hexa Hub", Version = "v1" });
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
