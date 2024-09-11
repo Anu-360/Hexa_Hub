@@ -1,4 +1,5 @@
-﻿using Hexa_Hub.Interface;
+﻿using Hexa_Hub.Exceptions;
+using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace Hexa_Hub.Repository
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
-                throw new Exception("User Not Found");
+                throw new UserNotFoundException($"User with ID {id} Not Found");
             _context.Users.Remove(user);
         }
 

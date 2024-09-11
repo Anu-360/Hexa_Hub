@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -38,7 +39,7 @@ namespace Hexa_Hub.Repository
             var log = await _context.MaintenanceLogs.FindAsync(id);
             if (log == null)
             {
-                throw new Exception("Log Not Found");
+                throw new MaintenanceLogNotFoundException($"Maintenance Log with ID {id} Not Found");
             }
             _context.MaintenanceLogs.Remove(log);
 

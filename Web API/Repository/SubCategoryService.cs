@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -38,7 +39,7 @@ namespace Hexa_Hub.Repository
             if (subCategory == null)
             {
 
-                throw new Exception("SubCategory not Found");
+                throw new SubCategoryNotFoundException($"SubCategory with ID {subCategoryId} Not Found");
             }
             _context.SubCategories.Remove(subCategory);
         }

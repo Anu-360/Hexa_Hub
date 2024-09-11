@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -32,7 +33,7 @@ namespace Hexa_Hub.Repository
             var allocation = await GetAllocationById(id);
             if (allocation == null)
             {
-                throw new Exception("Allocation not found");
+                throw new AllocationNotFoundException($"Allocation with ID {id} Not Found");
             }
             _context.AssetAllocations.Remove(allocation);
         }

@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -59,7 +60,7 @@ namespace Hexa_Hub.Repository
             var asset = await _context.Assets.FindAsync(id);
             if (asset == null)
             {
-            throw new Exception("Asset not Found");
+            throw new AssetNotFoundException($"Asset with ID {id} Not Found");
             }
 
             _context.Assets.Remove(asset);

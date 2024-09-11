@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 namespace Hexa_Hub.Repository
 {
     public class CategoryService : ICategory
@@ -43,7 +44,7 @@ namespace Hexa_Hub.Repository
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                throw new Exception("Category not Found");
+                throw new CategoryNotFoundException($"Category with ID {id} Not Found");
             }
 
             _context.Categories.Remove(category);
