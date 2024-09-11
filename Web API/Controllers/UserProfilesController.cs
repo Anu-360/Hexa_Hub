@@ -74,11 +74,15 @@ namespace Hexa_Hub.Controllers
             {
                 return NotFound("Associated User not found.");
             }
-
-            if (user.User_Type != newRole)
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            if(currentUserRole == "Admin")
             {
-                user.User_Type = newRole;
+                if (user.User_Type != newRole)
+                {
+                    user.User_Type = newRole;
+                }
             }
+            
             
             try
             {

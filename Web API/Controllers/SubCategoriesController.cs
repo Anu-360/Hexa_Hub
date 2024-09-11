@@ -44,7 +44,6 @@ namespace Hexa_Hub.Controllers
                 return BadRequest();
             }
 
-
             _subcategory.UpdateSubCategory(subCategory);
 
             try
@@ -77,7 +76,7 @@ namespace Hexa_Hub.Controllers
             _subcategory.AddSubCategory(subCategory);
             await _subcategory.Save();
 
-            return CreatedAtAction("GetSubCategory", new { id = subCategory.SubCategoryId }, subCategory);
+            return CreatedAtAction("GetSubCategories", new { id = subCategory.SubCategoryId }, subCategory);
         }
 
         // DELETE: api/SubCategories/5

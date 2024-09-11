@@ -73,10 +73,9 @@ namespace Hexa_Hub.Controllers
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
 
-            _category.AddCategory(category);
+            await _category.AddCategory(category);
             await _category.Save();
-
-            return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
+            return CreatedAtAction("GetCategories", new { id = category.CategoryId }, category);
         }
 
         // DELETE: api/Categories/5

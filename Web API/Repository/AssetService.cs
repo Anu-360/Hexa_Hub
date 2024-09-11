@@ -46,7 +46,13 @@ namespace Hexa_Hub.Repository
 
         public async Task AddAsset(Asset asset)
         {
-            _context.Assets.Add(asset);
+            if(asset.AssetImage == null)
+            {
+                string defaultImagePath = GetDefaultAssetImagePath();
+                asset.AssetImage = await GetImageBytesAsync(defaultImagePath);
+            }
+
+            await _context.AddAsync(asset);
         }
 
         public async Task<Asset> UpdateAsset(Asset asset)
@@ -91,7 +97,7 @@ namespace Hexa_Hub.Repository
             else if(file != null)
             {
                 string fileName = $"{assetId}_{Path.GetFileName(file.FileName)}";
-                string fullPath = Path.GetFullPath(fileName);
+                string fullPath = Path.GetFullPath(imagePath, fileName);
 
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
@@ -101,12 +107,11 @@ namespace Hexa_Hub.Repository
             }
             await _context.SaveChangesAsync();
             return file?.FileName ?? "AssetDefault.jpg";
-
         }
 
         public string GetDefaultAssetImagePath()
         {
-            return Path.Combine(_environment.ContentRootPath, "Images", "AssetDefault.jpg");
+            return Path.Combine(_environment.ContentRootPath, "AssetImages", "AssetDefault.jpg");
         }
         private async Task<byte[]> GetImageBytesAsync(string path)
         {
