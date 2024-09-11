@@ -1,6 +1,0 @@
-C:\Users\anumi\source\repos\Hexa_HubTests\bin\Debug\net8.0\CoverletSourceRootsMapping_Hexa_HubTests
-C:\Users\anumi\source\repos\Hexa_HubTests\obj\Debug\net8.0\Hexa_HubTests.csproj.AssemblyReference.cache
-C:\Users\anumi\source\repos\Hexa_HubTests\obj\Debug\net8.0\Hexa_HubTests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\anumi\source\repos\Hexa_HubTests\obj\Debug\net8.0\Hexa_HubTests.AssemblyInfoInputs.cache
-C:\Users\anumi\source\repos\Hexa_HubTests\obj\Debug\net8.0\Hexa_HubTests.AssemblyInfo.cs
-C:\Users\anumi\source\repos\Hexa_HubTests\obj\Debug\net8.0\Hexa_HubTests.csproj.CoreCompileInputs.cache
