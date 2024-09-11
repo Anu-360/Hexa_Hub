@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
 public class AssetAllocation
 {
@@ -21,7 +21,7 @@ public class AssetAllocation
     [Required]
     [DataType(DataType.Date)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-    public DateTime AllocatedDate { get; set; }
+    public DateTime AllocatedDate { get; set; } = DateTime.Now;
 
     //Navigation Properties
     // 1 - 1 Relation

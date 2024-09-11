@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel;
-using static MultiValues;
+using static Hexa_Hub.Models.MultiValues;
 
 public class Asset
 {

@@ -38,18 +38,22 @@ namespace Hexa_Hub.Repository
             return category;
         }
 
-        public async Task<bool> DeleteCategory(int id)
+        public async Task DeleteCategory(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return false;
+                throw new Exception("Category not Found");
             }
 
             _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-    }
 
+        }
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+    }
 }
+

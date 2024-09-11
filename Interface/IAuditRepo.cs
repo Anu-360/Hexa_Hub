@@ -8,6 +8,6 @@
         Task<Audit> UpdateAudit(Audit audit);
         Task DeleteAuditReq(int id);
         Task Save();
-
+        Task<List<Audit>> GetAuditsByUserId(int userId);
     }
 }

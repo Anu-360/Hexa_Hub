@@ -105,7 +105,6 @@ namespace Hexa_Hub.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             //_context.Users.Add(user);
@@ -124,7 +123,7 @@ namespace Hexa_Hub.Controllers
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address
             };
-             _userProfileRepo.AddProfiles(userProfile);
+             await _userProfileRepo.AddProfiles(userProfile);
             await _userProfileRepo.Save();
 
             return CreatedAtAction("GetUser", new { id = user.UserId }, user);
@@ -133,7 +132,7 @@ namespace Hexa_Hub.Controllers
         // DELETE: api/Users/5
 
         [HttpDelete("{id}")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _userRepo.GetUserById(id);
@@ -161,35 +160,6 @@ namespace Hexa_Hub.Controllers
 
             return NoContent();
         }
-
-        //[HttpPut("{userId}/upload")]
-        //public async Task<IActionResult> UploadProfileImage(int userId, IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //    {
-        //        return BadRequest("No file uploaded.");
-        //    }
-
-        //    var fileName = await _userProfileRepo.UploadProfileImageAsync(userId, file);
-        //    if (fileName == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(new { FileName = fileName });
-        //}
-
-        //[HttpPut("{userId}/default-image")]
-        //public async Task<IActionResult> SetDefaultProfileImage(int userId)
-        //{
-        //    var success = await _userProfileRepo.SetDefaultProfileImageAsync(userId);
-        //    if (!success)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok("Default profile image set successfully.");
-        //}
 
         private bool UserExists(int id)
         {

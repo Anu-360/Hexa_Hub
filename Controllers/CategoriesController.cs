@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hexa_Hub.Interface;
+using Hexa_Hub.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,36 +16,27 @@ namespace Hexa_Hub.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly ICategory _category;
 
-        public CategoriesController(DataContext context)
+        public CategoriesController(DataContext context, ICategory category)
         {
             _context = context;
+            _category = category;
         }
 
         // GET: api/Categories
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
-        }
 
-        // GET: api/Categories/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return category;
+            return await _category.GetAllCategories();
         }
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutCategory(int id, Category category)
         {
             if (id != category.CategoryId)
@@ -50,11 +44,12 @@ namespace Hexa_Hub.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            _category.UpdateCategory(category);
 
             try
             {
-                await _context.SaveChangesAsync();
+
+                await _category.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -74,28 +69,34 @@ namespace Hexa_Hub.Controllers
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+
+            _category.AddCategory(category);
+            await _category.Save();
 
             return CreatedAtAction("GetCategory", new { id = category.CategoryId }, category);
         }
 
         // DELETE: api/Categories/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+
+            try
             {
-                return NotFound();
+                await _category.DeleteCategory(id);
+                await _category.Save();
+                return NoContent();
             }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception)
+            {
+                if (id == null)
+                    return NotFound();
+                return BadRequest();
+            }
         }
 
         private bool CategoryExists(int id)

@@ -1,4 +1,5 @@
 ﻿using Hexa_Hub.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hexa_Hub.Repository
@@ -40,31 +41,32 @@ namespace Hexa_Hub.Repository
                                  .FirstOrDefaultAsync(a => a.AssetId == id);
         }
 
-        public async Task<Asset> AddAsset(Asset asset)
+        public async Task AddAsset(Asset asset)
         {
             _context.Assets.Add(asset);
-            await _context.SaveChangesAsync();
-            return asset;
         }
 
         public async Task<Asset> UpdateAsset(Asset asset)
         {
             _context.Assets.Update(asset);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
             return asset;
         }
 
-        public async Task<bool> DeleteAsset(int id)
+        public async Task DeleteAsset(int id)
         {
             var asset = await _context.Assets.FindAsync(id);
             if (asset == null)
             {
-                return false;
+            throw new Exception("Asset not Found");
             }
 
             _context.Assets.Remove(asset);
+
+        }
+        public async Task Save()
+        {
             await _context.SaveChangesAsync();
-            return true;
         }
     }
 

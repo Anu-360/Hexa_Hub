@@ -4,9 +4,10 @@
     {
         Task<List<Asset>> GetAllAssets();
         Task<Asset?> GetAssetById(int id);
-        Task<Asset> AddAsset(Asset asset);
+        Task AddAsset(Asset asset);
         Task<Asset> UpdateAsset(Asset asset);
-        Task<bool> DeleteAsset(int id);
+        Task DeleteAsset(int id);
+        Task Save();
     }
 
 }

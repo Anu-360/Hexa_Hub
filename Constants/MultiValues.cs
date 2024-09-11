@@ -1,5 +1,5 @@
 ﻿using System;
-
+namespace Hexa_Hub.Models;
 public class MultiValues
 {
     public enum AssetStatus
@@ -8,6 +8,7 @@ public class MultiValues
         Allocated,
         UnderMaintenance
     }
+
     public enum UserType
     {
         Employee,
@@ -31,7 +32,6 @@ public class MultiValues
     public enum AuditStatus
     {
         Sent,
-        Pending,
         Completed
     }
 
@@ -46,8 +46,8 @@ public class MultiValues
     {
         Sent,
         Approved,
-        Rejected,
-        Returned
+        Returned,
+        Rejected
     }
 
 }
