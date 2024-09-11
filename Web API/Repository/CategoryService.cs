@@ -28,14 +28,12 @@ namespace Hexa_Hub.Repository
         public async Task<Category> AddCategory(Category category)
         {
             _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
             return category;
         }
 
         public async Task<Category>UpdateCategory(Category category)
         {
             _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
             return category;
         }
 
