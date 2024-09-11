@@ -113,7 +113,7 @@ namespace Hexa_Hub.Controllers
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             serviceRequest.UserId = loggedInUserId;
 
-            _serviceRequest.AddServiceRequest(serviceRequest);
+           await _serviceRequest.AddServiceRequest(serviceRequest);
             await _serviceRequest.Save();
 
             var maintenanceLog = new MaintenanceLog
