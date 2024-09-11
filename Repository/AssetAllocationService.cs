@@ -64,6 +64,14 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
+        public Task<AssetAllocation> UpdateAllocation(AssetAllocation allocation)
+        {
+            _context.AssetAllocations.Update(allocation);
+            return Task.FromResult(allocation);
+
+        }
+
+
     }
 
 }

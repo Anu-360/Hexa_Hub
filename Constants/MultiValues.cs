@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Hexa_Hub.Models;
 public class MultiValues
 {
