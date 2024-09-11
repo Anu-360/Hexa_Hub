@@ -57,12 +57,13 @@ namespace Hexa_Hub.Repository
             return Task.FromResult(userProfile);
         }
 
-
-        //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
         public async Task<string?> UploadProfileImageAsync(int userId, IFormFile file)
         {
             var userProfile = await _context.UserProfiles.FindAsync(userId);
-            if (userProfile == null) return null;
+            if (userProfile == null) 
+            { 
+                return null; 
+            }
 
             string imagePath = Path.Combine(_environment.ContentRootPath, "Images");
 
@@ -70,8 +71,6 @@ namespace Hexa_Hub.Repository
             {
                 Directory.CreateDirectory(imagePath);
             }
-
-            // Set a default image if the profile image is null
             if (userProfile.ProfileImage == null && file == null)
             {
                 string defaultImagePath = GetDefaultImagePath();
@@ -94,23 +93,7 @@ namespace Hexa_Hub.Repository
             return file?.FileName ?? "profile-img.jpg";
         }
 
-        //public async Task<string?> GetProfileImageAsync(int userId)
-        //{
-        //    var userProfile = await _context.UserProfiles.FindAsync(userId);
-        //    if (userProfile?.ProfileImage == null) return null;
-
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "Images");
-        //    string defaultImagePath = GetDefaultImagePath();
-
-        //    string imageName = userProfile.ProfileImage.SequenceEqual(await GetImageBytesAsync(defaultImagePath))
-        //        ? "profile-img.jpg"
-        //        : $"{userId}.jpg";
-
-        //    return Path.Combine("Images", imageName);
-        //}
-
-
-        private string GetDefaultImagePath()
+        public string GetDefaultImagePath()
         {
             return Path.Combine(_environment.ContentRootPath, "Images", "profile-img.jpg");
         }

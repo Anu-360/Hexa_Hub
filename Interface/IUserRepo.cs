@@ -11,5 +11,6 @@ namespace Hexa_Hub.Interface
         Task DeleteUser(int id);
         Task Save();
         Task<User?> validateUser(string email, string password);
+        
     }
 }

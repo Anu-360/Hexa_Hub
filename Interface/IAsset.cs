@@ -8,6 +8,8 @@
         Task<Asset> UpdateAsset(Asset asset);
         Task DeleteAsset(int id);
         Task Save();
+        Task<string?> UploadAssetImageAsync(int assetId, IFormFile file);
+        string GetDefaultAssetImagePath();
     }
 
 }

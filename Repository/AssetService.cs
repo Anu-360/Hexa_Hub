@@ -7,10 +7,12 @@ namespace Hexa_Hub.Repository
     public class AssetService : IAsset
     {
         private readonly DataContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public AssetService(DataContext context)
+        public AssetService(DataContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         public async Task<List<Asset>> GetAllAssets()
@@ -49,7 +51,6 @@ namespace Hexa_Hub.Repository
         public async Task<Asset> UpdateAsset(Asset asset)
         {
             _context.Assets.Update(asset);
-            //await _context.SaveChangesAsync();
             return asset;
         }
 
@@ -67,6 +68,48 @@ namespace Hexa_Hub.Repository
         public async Task Save()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<string?> UploadAssetImageAsync(int userId, IFormFile file)
+        {
+            var assetData = await _context.Assets.FindAsync(userId);
+            if(assetData == null) 
+            { 
+                return null; 
+            }
+            string imagePath = Path.Combine(_environment.ContentRootPath, "AssetImages");
+            if (!Directory.Exists(imagePath))
+            {
+                Directory.CreateDirectory(imagePath);
+            }
+            if (assetData.AssetImage == null && file == null)
+            {
+                string defaultImagePath = GetDefaultAssetImagePath();
+                assetData.AssetImage = await GetImageBytesAsync(defaultImagePath);
+            }
+            else if(file != null)
+            {
+                string fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
+                string fullPath = Path.Combine(imagePath, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                assetData.AssetImage = await File.ReadAllBytesAsync(fullPath);
+            }
+            await _context.SaveChangesAsync();
+            return file?.FileName ?? "AssetDefault.jpg";
+
+        }
+
+        public string GetDefaultAssetImagePath()
+        {
+            return Path.Combine(_environment.ContentRootPath, "Images", "AssetDefault.jpg");
+        }
+        private async Task<byte[]> GetImageBytesAsync(string path)
+        {
+            return await File.ReadAllBytesAsync(path);
         }
     }
 

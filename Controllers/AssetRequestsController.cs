@@ -34,6 +34,8 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<AssetRequest>>> GetAssetRequests()
         {
+            //User can see his own details whereas Admin can see all users details
+
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (userRole == "Admin")
@@ -59,6 +61,7 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, AssetRequest assetRequest)
         {
+            //when an asset is being set to allocated by admin it automaticaly sets data to AssetAllocation Table
             if (id != assetRequest.AssetReqId)
             {
                 return BadRequest();
@@ -113,6 +116,7 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<ActionResult<AssetRequest>> PostAssetRequest(AssetRequest assetRequest)
         {
+            //logged user can only create an post req for himself
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             assetRequest.UserId = loggedInUserId;
             _assetRequest.AddAssetRequest(assetRequest);
@@ -136,6 +140,10 @@ namespace Hexa_Hub.Controllers
                     return NotFound();
                 }
                 if (assetRequest.UserId != loggedInUserId)
+                {
+                    return Forbid();
+                }
+                if(assetRequest.Request_Status == RequestStatus.Allocated)
                 {
                     return Forbid();
                 }

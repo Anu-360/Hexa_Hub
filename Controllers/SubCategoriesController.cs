@@ -26,8 +26,7 @@ namespace Hexa_Hub.Controllers
 
         // GET: api/SubCategories
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        [Authorize(Roles = "Employee")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<SubCategory>>> GetSubCategories()
         {
             return await _subcategory.GetAllSubCategories();

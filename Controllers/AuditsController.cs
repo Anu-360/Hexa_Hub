@@ -52,6 +52,7 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Audit>> GetAudit(int id)
         {
+            //User can see his own details whereas Admin can see all users details
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (userRole == "Admin")
             {
@@ -80,6 +81,7 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> PutAudit(int id, Audit audit)
         {
+            
             if (id != audit.AuditId)
             {
                 return BadRequest();
