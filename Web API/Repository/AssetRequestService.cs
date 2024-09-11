@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -54,7 +55,7 @@ namespace Hexa_Hub.Repository
             var assetRequest = await _context.AssetRequests.FindAsync(id);
             if (assetRequest == null)
             {
-                throw new Exception("Request not found");
+                throw new AssetRequestNotFoundException($"Request with ID {id} Not Found");
             }
 
             _context.AssetRequests.Remove(assetRequest);

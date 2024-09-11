@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -22,7 +23,7 @@ namespace Hexa_Hub.Repository
             var aId = await _context.Audits.FindAsync(id);
             if(aId == null)
             {
-                throw new Exception("Audit Not Found");
+                throw new AuditNotFoundException($"Audit with ID {id} Not Found");
             }
             if(aId.Audit_Status == Models.MultiValues.AuditStatus.Completed)
             {

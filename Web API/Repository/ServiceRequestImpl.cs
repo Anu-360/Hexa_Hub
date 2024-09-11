@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -33,7 +34,7 @@ namespace Hexa_Hub.Repository
             var assetExists = await _context.Assets.AnyAsync(a => a.AssetId == serviceRequest.AssetId);
             if (!assetExists)
             {
-                throw new ArgumentException("Invalid AssetId. The asset does not exist.");
+                throw new AssetNotFoundException("Invalid Asset. Asset Not Found");
             }
 
             _context.ServiceRequests.Add(serviceRequest);
@@ -50,7 +51,7 @@ namespace Hexa_Hub.Repository
             var serviceRequest = await _context.ServiceRequests.FindAsync(id);
             if (serviceRequest == null)
             {
-                throw new Exception("Service Request not Found");
+                throw new ServiceRequestNotFoundException($"Service Request with ID {id} Not Found");
             }
             _context.ServiceRequests.Remove(serviceRequest);
         }

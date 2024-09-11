@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -27,17 +28,12 @@ namespace Hexa_Hub.Repository
             var profile = await _context.UserProfiles.FindAsync(id);
             if (profile == null)
             {
-                throw new Exception("Profile Not Found");
+                throw new ProfileNotFoundException($"Profile with ID {id} Not Found");
             }
             _context.UserProfiles.Update(profile);
         }
 
-        //public async Task<List<UserProfile>> GetAllProfiles()
-        //{
-        //    return await _context.UserProfiles
-        //        .Include(up=>up.User)
-        //        .ToListAsync();
-        //}
+      
 
         public async Task<UserProfile?> GetProfilesById(int id)
         {

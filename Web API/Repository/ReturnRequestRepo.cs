@@ -1,5 +1,6 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
+using Hexa_Hub.Exceptions;
 
 namespace Hexa_Hub.Repository
 {
@@ -19,7 +20,7 @@ namespace Hexa_Hub.Repository
         {
             var req = await _context.ReturnRequests.FindAsync(id);
             if (req == null)
-                throw new Exception("Id Not Found");
+                throw new ReturnRequestNotFoundException($"Return Request with ID {id} Not Found");
             _context.ReturnRequests.Remove(req);
         }
 
@@ -46,8 +47,7 @@ namespace Hexa_Hub.Repository
 
         public void UpdateReturnRequest(ReturnRequest returnRequest)
         {
-            //_context.ReturnRequests.Update(returnRequest);
-            //return Task.FromResult(returnRequest);
+           
             _context.Attach(returnRequest);
             _context.Entry(returnRequest).State = EntityState.Modified;
         }
