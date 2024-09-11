@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hexa_Hub", "Hexa_Hub.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hexa_HubTests", "..\Hexa_HubTests\Hexa_HubTests.csproj", "{46EA47B9-7406-479D-9F83-DE930382A885}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetHubTests", "..\AssetHubTests\AssetHubTests.csproj", "{0613D0C2-5DEF-4186-97BA-D42ED7FBB77E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{46EA47B9-7406-479D-9F83-DE930382A885}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46EA47B9-7406-479D-9F83-DE930382A885}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46EA47B9-7406-479D-9F83-DE930382A885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0613D0C2-5DEF-4186-97BA-D42ED7FBB77E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0613D0C2-5DEF-4186-97BA-D42ED7FBB77E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0613D0C2-5DEF-4186-97BA-D42ED7FBB77E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0613D0C2-5DEF-4186-97BA-D42ED7FBB77E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

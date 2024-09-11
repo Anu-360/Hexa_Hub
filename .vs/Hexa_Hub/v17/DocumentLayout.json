@@ -1,42 +1,33 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\",
+  "WorkspaceRootPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\maintenancelogscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\maintenancelogscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\MaintenanceLogsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetRequestsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\servicerequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\servicerequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\AssetRequestService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\repository\\servicerequestimpl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:repository\\servicerequestimpl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\ServiceRequestImpl.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\repository\\assetrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:repository\\assetrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ServiceRequestsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\assetallocationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\assetallocationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AuthController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\assetrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\assetrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ReturnRequestsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|d:\\ganesh raaj\\hexaware segue\\coe\\tech\\project\\hexa_hub\\controllers\\returnrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0274251F-001B-4F26-A26D-CB71730E98F2}|Hexa_Hub.csproj|solutionrelative:controllers\\returnrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetAllocationsController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,8 +37,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
@@ -61,34 +56,26 @@
               "DocumentIndex": 0,
               "Title": "MaintenanceLogsController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\MaintenanceLogsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\MaintenanceLogsController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\MaintenanceLogsController.cs",
-              "RelativeToolTip": "Controllers\\MaintenanceLogsController.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAABAAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-11T06:54:46.446Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-11T06:54:46.446Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 1,
               "Title": "AssetRequestsController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetRequestsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AssetRequestsController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetRequestsController.cs",
-              "RelativeToolTip": "Controllers\\AssetRequestsController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:54:40.524Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "AssetRequestService.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\AssetRequestService.cs",
-              "RelativeDocumentMoniker": "Repository\\AssetRequestService.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\AssetRequestService.cs",
-              "RelativeToolTip": "Repository\\AssetRequestService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:54:37.771Z"
@@ -98,69 +85,57 @@
               "DocumentIndex": 3,
               "Title": "ServiceRequestImpl.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\ServiceRequestImpl.cs",
-              "RelativeDocumentMoniker": "Repository\\ServiceRequestImpl.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Repository\\ServiceRequestImpl.cs",
-              "RelativeToolTip": "Repository\\ServiceRequestImpl.cs",
               "ViewState": "AgIAABUAAAAAAAAAAAAowCcAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:53:19.454Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "ServiceRequestsController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ServiceRequestsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\ServiceRequestsController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ServiceRequestsController.cs",
-              "RelativeToolTip": "Controllers\\ServiceRequestsController.cs",
               "ViewState": "AgIAAJEAAAAAAAAAAADwv6oAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:53:02.449Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Program.cs",
-              "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAYwBYAAABLAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:42:32.727Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "AuthController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "Controllers\\AuthController.cs",
               "ViewState": "AgIAAB4AAAAAAAAAAAAowDMAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:55:55.303Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "ReturnRequestsController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ReturnRequestsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\ReturnRequestsController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\ReturnRequestsController.cs",
-              "RelativeToolTip": "Controllers\\ReturnRequestsController.cs",
               "ViewState": "AgIAAGsAAAAAAAAAAADwv04AAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:52:42.116Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "AssetAllocationsController.cs",
               "DocumentMoniker": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetAllocationsController.cs",
-              "RelativeDocumentMoniker": "Controllers\\AssetAllocationsController.cs",
               "ToolTip": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Controllers\\AssetAllocationsController.cs",
-              "RelativeToolTip": "Controllers\\AssetAllocationsController.cs",
               "ViewState": "AgIAAAEAAAAAAAAAAMBXwB4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-11T06:42:16.709Z"
