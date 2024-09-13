@@ -78,7 +78,8 @@ namespace Hexa_Hub.Repository
                 PhoneNumber = dto.PhoneNumber,
                 Address = dto.Address,
                 Password = dto.Password,
-                Branch = dto.Branch
+                Branch = dto.Branch,
+                User_Type = Models.MultiValues.UserType.Employee
             };
 
             await _context.Users.AddAsync(user);
@@ -93,7 +94,6 @@ namespace Hexa_Hub.Repository
                 Directory.CreateDirectory(imagePath);
             }
 
-            // Check if the default image file exists, if not copy it
             if (!File.Exists(defaultImagePath))
             {
                 string sourcePath = GetDefaultImageSourcePath();

@@ -188,6 +188,13 @@ namespace Hexa_Hub.Controllers
             {
                 return Forbid("You can only create a request for yourself.");
             }
+            var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+            
+            if (asset.Asset_Status == Models.MultiValues.AssetStatus.Allocated || asset.Asset_Status == Models.MultiValues.AssetStatus.UnderMaintenance)
+            {
+                return StatusCode(403, "The Requested Asset is currently locked (Allocated to another user)");
+            }
+
             await _assetRequest.AddAssetRequest(assetRequestDto);
             await _assetRequest.Save();
 
