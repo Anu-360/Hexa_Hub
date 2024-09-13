@@ -50,6 +50,7 @@ namespace Hexa_Hub.Repository
                 AssetReqDate = dto.AssetReqDate,
                 AssetReqReason = dto.AssetReqReason
             };
+
             _context.AssetRequests.Add(req);
         }
 

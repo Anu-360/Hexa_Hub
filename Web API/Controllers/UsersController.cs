@@ -113,6 +113,15 @@ namespace Hexa_Hub.Controllers
             user.Branch = userDto.Branch;
             user.ProfileImage = userDto.ProfileImage;
 
+            if (User.IsInRole("Admin"))
+            {
+                user.User_Type = userDto.User_Type;
+            }
+            else
+            {
+                user.User_Type = user.User_Type;
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -131,6 +140,7 @@ namespace Hexa_Hub.Controllers
 
             return NoContent();
         }
+
         [HttpPatch("{id}/password")]
         [Authorize]
         public async Task<IActionResult> ChangeUserPassword(int id, PasswordDto passwordChangeDto)
