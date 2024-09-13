@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -77,9 +78,9 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutReturnRequest(int id, ReturnRequest returnRequest)
+        public async Task<IActionResult> PutReturnRequest(int id, ReturnRequestDto returnRequestDto)
         {
-            if (id != returnRequest.ReturnId)
+            if (id != returnRequestDto.ReturnId)
             {
                 return BadRequest();
             }
@@ -88,13 +89,22 @@ namespace Hexa_Hub.Controllers
             {
                 return NotFound();
             }
-            _context.Entry(exisitingRequest).CurrentValues.SetValues(returnRequest);
 
-            if (returnRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved)
+            exisitingRequest.UserId = returnRequestDto.UserId;
+            exisitingRequest.AssetId = returnRequestDto.AssetId;
+            exisitingRequest.CategoryId = returnRequestDto.CategoryId;
+            exisitingRequest.ReturnDate = returnRequestDto.ReturnDate;
+            exisitingRequest.Reason = returnRequestDto.Reason;
+            exisitingRequest.Condition = returnRequestDto.Condition;
+            exisitingRequest.ReturnStatus = returnRequestDto.ReturnStatus;
+
+            _context.Entry(exisitingRequest).CurrentValues.SetValues(returnRequestDto);
+
+            if (returnRequestDto.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved)
             {
                 exisitingRequest.ReturnDate = DateTime.Now;
             }
-            if (returnRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+            if (returnRequestDto.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
             {
                 exisitingRequest.ReturnDate = DateTime.Now;
                 var asset = await _context.Assets.FindAsync(exisitingRequest.AssetId);
@@ -161,22 +171,24 @@ namespace Hexa_Hub.Controllers
         }
 
         // POST: api/ReturnRequests
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles ="Employee")]
-        public async Task<ActionResult<ReturnRequest>> PostReturnRequest(ReturnRequest returnRequest)
+        [Authorize(Roles = "Employee")]
+        public async Task<ActionResult<ReturnRequest>> PostReturnRequest(ReturnRequestDto returnRequestDto)
         {
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var userhasAsset = await _returnRequestRepo.UserHasAsset(loggedInUserId);
-            if (!userhasAsset)
+
+            var userHasAsset = await _returnRequestRepo.UserHasAsset(loggedInUserId);
+            if (!userHasAsset)
             {
-                return BadRequest();
+                return BadRequest("User does not have an asset to return.");
             }
-            returnRequest.UserId = loggedInUserId;
-            _returnRequestRepo.AddReturnRequest(returnRequest);
+
+            returnRequestDto.UserId = loggedInUserId;
+
+            var createdRequest = await _returnRequestRepo.AddReturnRequest(returnRequestDto);
             await _returnRequestRepo.Save();
 
-            return CreatedAtAction("GetReturnRequest", new { id = returnRequest.ReturnId }, returnRequest);
+            return CreatedAtAction("GetReturnRequest", new { id = createdRequest.ReturnId }, createdRequest);
         }
 
         // DELETE: api/ReturnRequests/5

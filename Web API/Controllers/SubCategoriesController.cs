@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -37,18 +38,28 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutSubCategory(int id, SubCategory subCategory)
+        public async Task<IActionResult> PutSubCategory(int id, SubCategoriesDto subCategoriesDto)
         {
-            if (id != subCategory.SubCategoryId)
+            if (id != subCategoriesDto.SubCategoryId)
             {
                 return BadRequest();
             }
 
-            _subcategory.UpdateSubCategory(subCategory);
+            var existingSubCategory = await _subcategory.GetSubCategoryById(id);
+            if (existingSubCategory == null)
+            {
+                return NotFound();
+            }
+
+            // Map DTO to model
+            existingSubCategory.SubCategoryName = subCategoriesDto.SubCategoryName;
+            existingSubCategory.CategoryId = subCategoriesDto.CategoryId;
+            existingSubCategory.Quantity = subCategoriesDto.Quantity;
+
+            _subcategory.UpdateSubCategory(existingSubCategory);
 
             try
             {
-
                 await _subcategory.Save();
             }
             catch (DbUpdateConcurrencyException)
@@ -70,8 +81,15 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<SubCategory>> PostSubCategory(SubCategory subCategory)
+        public async Task<ActionResult<SubCategory>> PostSubCategory(SubCategoriesDto subCategoriesDto)
         {
+            // Map DTO to model
+            var subCategory = new SubCategory
+            {
+                SubCategoryName = subCategoriesDto.SubCategoryName,
+                CategoryId = subCategoriesDto.CategoryId,
+                Quantity = subCategoriesDto.Quantity
+            };
 
             _subcategory.AddSubCategory(subCategory);
             await _subcategory.Save();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -63,20 +64,53 @@ namespace Hexa_Hub.Controllers
             return Ok(maintenanceLogs);
         }
 
+        //// PUT: api/MaintenanceLogs/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutMaintenanceLog(int id, MaintenanceLog maintenanceLog)
+        //{
+        //    if (id != maintenanceLog.MaintenanceId)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    _maintenanceLogRepo.UpdateMaintenanceLog(maintenanceLog);
+
+        //    try
+        //    {
+        //        await _maintenanceLogRepo.Save();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!MaintenanceLogExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
         // PUT: api/MaintenanceLogs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutMaintenanceLog(int id, MaintenanceLog maintenanceLog)
+        public async Task<IActionResult> PutMaintenanceLog(int id, [FromBody] MaintenanceDto maintenanceDto)
         {
-            if (id != maintenanceLog.MaintenanceId)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-            _maintenanceLogRepo.UpdateMaintenanceLog(maintenanceLog);
 
             try
             {
+                var result = await _maintenanceLogRepo.UpdateMaintenanceLog(id, maintenanceDto);
+                if (!result)
+                {
+                    return NotFound("Maintenance log not found.");
+                }
                 await _maintenanceLogRepo.Save();
             }
             catch (DbUpdateConcurrencyException)
@@ -93,6 +127,7 @@ namespace Hexa_Hub.Controllers
 
             return NoContent();
         }
+
 
         //// POST: api/MaintenanceLogs
         //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

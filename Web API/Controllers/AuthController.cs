@@ -1,5 +1,5 @@
-﻿using Hexa_Hub.Interface;
-using Hexa_Hub.Models;
+﻿using Hexa_Hub.DTO;
+using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

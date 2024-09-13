@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
 
 namespace Hexa_Hub.Repository
 {
@@ -38,9 +39,18 @@ namespace Hexa_Hub.Repository
                 .FirstOrDefaultAsync(u => u.AssetReqId == id);
         }
 
-        public async Task AddAssetRequest(AssetRequest assetRequest)
+        public async Task AddAssetRequest(AssetRequestDto dto)
         {
-            _context.AssetRequests.Add(assetRequest);
+            var req = new AssetRequest
+            {
+                AssetReqId = dto.AssetReqId,
+                UserId = dto.UserId,
+                AssetId = dto.AssetId,
+                CategoryId = dto.CategoryId,
+                AssetReqDate = dto.AssetReqDate,
+                AssetReqReason = dto.AssetReqReason
+            };
+            _context.AssetRequests.Add(req);
         }
 
         public Task<AssetRequest> UpdateAssetRequest(AssetRequest assetRequest)

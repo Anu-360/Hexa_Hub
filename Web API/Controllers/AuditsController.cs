@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -75,33 +76,83 @@ namespace Hexa_Hub.Controllers
             }
         }
 
+        //// PUT: api/Audits/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Employee")]
+        //public async Task<IActionResult> PutAudit(int id, AuditsDto auditDto)
+        //{
+
+        //    if (id != auditDto.AuditId)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //    var existingId = await _auditRepo.GetAuditById(id);
+        //    if(existingId == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    if (existingId.UserId != userId )
+        //    {
+        //        return Forbid();
+        //    }
+        //    existingId.AuditDate = auditDto.AuditDate;
+        //    existingId.AuditMessage = auditDto.AuditMessage;
+        //    existingId.Audit_Status = auditDto.Audit_Status;
+        //    try
+        //    {
+        //        _auditRepo.UpdateAudit(existingId);
+        //        await _auditRepo.Save();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!AuditExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
         // PUT: api/Audits/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Employee")]
-        public async Task<IActionResult> PutAudit(int id, Audit audit)
+        public async Task<IActionResult> PutAudit(int id, [FromBody] AuditsDto auditDto)
         {
-            
-            if (id != audit.AuditId)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
+
+            if (id != auditDto.AuditId)
+            {
+                return BadRequest("Audit ID mismatch.");
+            }
+
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var existingId = await _auditRepo.GetAuditById(id);
-            if(existingId == null)
+            var existingAudit = await _auditRepo.GetAuditById(id);
+            if (existingAudit == null)
             {
                 return NotFound();
             }
-            if (existingId.UserId != userId )
+
+            if (existingAudit.UserId != userId)
             {
                 return Forbid();
             }
-            existingId.AuditDate = audit.AuditDate;
-            existingId.AuditMessage = audit.AuditMessage;
-            existingId.Audit_Status = audit.Audit_Status;
+            existingAudit.AuditDate = auditDto.AuditDate;
+            existingAudit.AuditMessage = auditDto.AuditMessage;
+            existingAudit.Audit_Status = auditDto.Audit_Status;
+
             try
             {
-                _auditRepo.UpdateAudit(existingId);
+                await _auditRepo.UpdateAudit(existingAudit);
                 await _auditRepo.Save();
             }
             catch (DbUpdateConcurrencyException)
@@ -119,13 +170,27 @@ namespace Hexa_Hub.Controllers
             return NoContent();
         }
 
+
         // POST: api/Audits
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //[Authorize(Roles ="Admin")]
+        //public async Task<ActionResult<Audit>> PostAudit(Audit audit)
+        //{
+        //    _auditRepo.AddAuditReq(audit);
+        //    await _auditRepo.Save();
+
+        //    return CreatedAtAction("GetAudit", new { id = audit.AuditId }, audit);
+        //}
         [HttpPost]
         [Authorize(Roles ="Admin")]
-        public async Task<ActionResult<Audit>> PostAudit(Audit audit)
+        public async Task<ActionResult<Audit>> PostAudit(AuditsDto auditDto)
         {
-            _auditRepo.AddAuditReq(audit);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var audit = await _auditRepo.AddAduit(auditDto);
             await _auditRepo.Save();
 
             return CreatedAtAction("GetAudit", new { id = audit.AuditId }, audit);

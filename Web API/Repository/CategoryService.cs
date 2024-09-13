@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
 namespace Hexa_Hub.Repository
 {
     public class CategoryService : ICategory
@@ -25,16 +26,36 @@ namespace Hexa_Hub.Repository
                                  .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
-        public async Task<Category> AddCategory(Category category)
+        public async Task<Category> AddCategory(CategoriesDto categoryDto)
         {
-            _context.Categories.Add(category);
+            var category = new Category
+            {
+                CategoryId = categoryDto.CategoryId,
+                CategoryName = categoryDto.CategoryName
+            };
+            await _context.AddAsync(category);
             return category;
         }
 
-        public async Task<Category>UpdateCategory(Category category)
+        //public async Task<Category>UpdateCategory(Category category)
+        //{
+        //    _context.Categories.Update(category);
+        //    return category;
+        //}
+        public async Task<bool> UpdateCategoryAsync(int id, CategoriesDto categoryDto)
         {
-            _context.Categories.Update(category);
-            return category;
+            var existingCategory = await _context.Categories.FindAsync(id);
+            if (existingCategory == null)
+            {
+                return false;
+            }
+
+            existingCategory.CategoryName = categoryDto.CategoryName;
+
+            _context.Categories.Update(existingCategory);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task DeleteCategory(int id)

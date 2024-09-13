@@ -16,46 +16,43 @@ public class User
 
     [Required]
     [MaxLength(55)]
-    public string? UserName { get; set; }
+    public string UserName { get; set; }
 
     [Required]
     [EmailAddress]
-    public string? UserMail { get; set; }
+    public string UserMail { get; set; }
 
     [Required]
-    public string? Gender { get; set; }
+    public string Gender { get; set; }
 
     [Required]
-    public string? Dept { get; set; }
+    public string Dept { get; set; }
 
     [Required]
-    public string? Designation { get; set; }
+    public string Designation { get; set; }
 
     [Required]
     [Phone(ErrorMessage = "Please enter a valid phone number")]
-    public string? PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; }
 
     [Required]
-    public string? Address { get; set; }
+    public string Address { get; set; }
 
     [Required]
-    public string? Branch { get; set; }
+    public string Branch { get; set; }
 
     [Required]
     [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
     [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
         ErrorMessage = "Password must contain Uppercase, alphanumeric and special characters")]
+    public string Password { get; set; }
 
-    public string? Password { get; set; }
-
-    [Required]
     [DefaultValue(UserType.Employee)]
-    public UserType User_Type { get; set; } = UserType.Employee;
+    public UserType? User_Type { get; set; } = UserType.Employee;
+
+    public byte[]? ProfileImage { get; set; }
 
     //Navigation Properties
-    // 1 - 1 Relation
-    [JsonIgnore]
-    public UserProfile? UserProfile { get; set; }
 
     // 1 - * Relation
 

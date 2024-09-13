@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -55,45 +56,110 @@ namespace Hexa_Hub.Controllers
 
 
 
-        // PUT: api/AssetRequests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //// PUT: api/AssetRequests/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutAssetRequest(int id, AssetRequest assetRequest)
+        //{
+        //    //when an asset is being set to allocated by admin it automaticaly sets data to AssetAllocation Table
+        //    if (id != assetRequest.AssetReqId)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    _assetRequest.UpdateAssetRequest(assetRequest);
+        //    if (assetRequest.Request_Status == RequestStatus.Allocated)
+        //    {
+        //        var exisitingAllocId = await _context.AssetAllocations
+        //            .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequest.AssetReqId);
+        //        if (exisitingAllocId == null)
+        //        {
+        //            var assetAllocation = new AssetAllocation
+        //            {
+        //                AssetId = assetRequest.AssetId,
+        //                UserId = assetRequest.UserId,
+        //                AssetReqId = assetRequest.AssetReqId,
+        //                AllocatedDate = DateTime.Now
+        //            };
+        //            await _assetAlloc.AddAllocation(assetAllocation);
+
+        //            var asset = await _context.Assets.FindAsync(assetRequest.AssetId);
+        //            if (asset != null)
+        //            {
+        //                asset.Asset_Status = AssetStatus.Allocated;
+        //                _asset.UpdateAsset(asset);
+        //            }
+        //        }
+        //    }
+        //    try
+        //    {
+        //        _assetAlloc.Save();
+        //        _asset.Save();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!AssetRequestExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutAssetRequest(int id, AssetRequest assetRequest)
+        public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
         {
-            //when an asset is being set to allocated by admin it automaticaly sets data to AssetAllocation Table
-            if (id != assetRequest.AssetReqId)
+            if (id != assetRequestDto.AssetReqId)
             {
                 return BadRequest();
             }
-            _assetRequest.UpdateAssetRequest(assetRequest);
-            if(assetRequest.Request_Status == RequestStatus.Allocated) 
-            {
-                var exisitingAllocId = await _context.AssetAllocations
-                    .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequest.AssetReqId);
-                if (exisitingAllocId == null)
-                {
-                    var assetAllocation = new AssetAllocation
-                    {
-                        AssetId = assetRequest.AssetId,
-                        UserId = assetRequest.UserId,
-                        AssetReqId = assetRequest.AssetReqId,
-                        AllocatedDate = DateTime.Now
-                    };
-                    await _assetAlloc.AddAllocation(assetAllocation);
 
-                    var asset = await _context.Assets.FindAsync(assetRequest.AssetId);
-                    if (asset != null)
+            var existingRequest = await _assetRequest.GetAssetRequestById(id);
+            if (existingRequest == null)
+            {
+                return NotFound();
+            }
+            if (assetRequestDto.Request_Status != existingRequest.Request_Status)
+            {
+                existingRequest.Request_Status = assetRequestDto.Request_Status;
+
+                if (assetRequestDto.Request_Status == RequestStatus.Allocated)
+                {
+                    var existingAllocId = await _context.AssetAllocations
+                        .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
+
+                    if (existingAllocId == null)
                     {
-                        asset.Asset_Status = AssetStatus.Allocated;
-                        _asset.UpdateAsset(asset);
+                        var assetAllocation = new AssetAllocation
+                        {
+                            AssetId = assetRequestDto.AssetId,
+                            UserId = assetRequestDto.UserId,
+                            AssetReqId = assetRequestDto.AssetReqId,
+                            AllocatedDate = DateTime.Now
+                        };
+                        await _assetAlloc.AddAllocation(assetAllocation);
+
+                        var asset = await _context.Assets.FindAsync(assetRequestDto.AssetId);
+                        if (asset != null)
+                        {
+                            asset.Asset_Status = AssetStatus.Allocated;
+                            _asset.UpdateAsset(asset);
+                        }
                     }
                 }
             }
+
             try
             {
-                _assetAlloc.Save();
-                _asset.Save();
+                await _assetRequest.Save();
+                await _assetAlloc.Save();
+                await _asset.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -114,16 +180,18 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Employee")]
-        public async Task<ActionResult<AssetRequest>> PostAssetRequest(AssetRequest assetRequest)
+        public async Task<ActionResult<AssetRequest>> PostAssetRequest(AssetRequestDto assetRequestDto)
         {
-            //logged user can only create an post req for himself
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            assetRequest.UserId = loggedInUserId;
-            _assetRequest.AddAssetRequest(assetRequest);
+            assetRequestDto.UserId = loggedInUserId;
+            if (assetRequestDto.UserId != loggedInUserId)
+            {
+                return Forbid("You can only create a request for yourself.");
+            }
+            await _assetRequest.AddAssetRequest(assetRequestDto);
             await _assetRequest.Save();
 
-
-            return CreatedAtAction("GetAssetRequests", new { id = assetRequest.AssetReqId }, assetRequest);
+            return CreatedAtAction("GetAssetRequests", new { id = assetRequestDto.AssetReqId }, assetRequestDto);
         }
 
         // DELETE: api/AssetRequests/5

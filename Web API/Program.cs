@@ -26,7 +26,6 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IMaintenanceLogRepo, MaintenanceLogRepo>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
-            builder.Services.AddScoped<IUserProfileRepo, UserProfileRepo>();
 
             
             builder.Services.AddControllers()
