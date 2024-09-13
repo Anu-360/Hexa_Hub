@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
+using NuGet.ContentModel;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Repository
 {
@@ -13,10 +16,27 @@ namespace Hexa_Hub.Repository
         {
             _context = context;
         }
-        public async Task AddAuditReq(Audit audit)
+
+        public async Task<Audit> AddAduit(AuditsDto auditDto)
         {
-            _context.Audits.AddAsync(audit);
+            var audit = new Audit
+            {
+                AuditId = auditDto.AuditId,
+                AssetId = auditDto.AssetId,
+                UserId = auditDto.UserId,
+                AuditDate = auditDto.AuditDate,
+                AuditMessage = auditDto.AuditMessage
+            };
+            await _context.AddAsync(audit);
+            return audit;
         }
+
+
+        //public async Task AddAuditReq(Audit audit)
+        //{
+        //    _context.Audits.AddAsync(audit);
+        //}
+
 
         public async Task DeleteAuditReq(int id)
         {

@@ -12,7 +12,7 @@ public class Asset
 
     [Required]
     [MaxLength(55)]
-    public string ? AssetName { get; set; }
+    public string AssetName { get; set; }
 
     public string? AssetDescription { get; set; }
 
@@ -25,10 +25,10 @@ public class Asset
     public byte[]? AssetImage { get; set; }
 
     [Required]
-    public string? SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
 
     [Required]
-    public string? Model { get; set; }
+    public string Model { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -37,7 +37,7 @@ public class Asset
 
     [Required]
     [MaxLength(55)]
-    public string? Location { get; set; }
+    public string Location { get; set; }
 
     [Required]
     public decimal Value { get; set; }
@@ -46,9 +46,8 @@ public class Asset
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
     public DateTime? Expiry_Date { get; set; }
 
-    [Required]
     [DefaultValue(AssetStatus.OpenToRequest)]
-    public AssetStatus Asset_Status { get; set; } = AssetStatus.OpenToRequest;
+    public AssetStatus? Asset_Status { get; set; } = AssetStatus.OpenToRequest;
 
     //Navigation Properties
     // 1 - 1 Relations

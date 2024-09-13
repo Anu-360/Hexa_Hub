@@ -16,17 +16,14 @@ public class Audit
     [Required]
     public int UserId { get; set; }
 
-    [Required]
     [DataType(DataType.Date)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-    public DateTime AuditDate { get; set; }
+    public DateTime? AuditDate { get; set; }
 
-    [Required]
     public string? AuditMessage { get; set; }
 
-    [Required]
     [DefaultValue(AuditStatus.Sent)]
-    public AuditStatus Audit_Status { get; set; } = AuditStatus.Sent;
+    public AuditStatus? Audit_Status { get; set; } = AuditStatus.Sent;
 
     //Navigation Properties
     // 1 - 1 Relation

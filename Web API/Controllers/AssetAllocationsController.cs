@@ -43,29 +43,5 @@ namespace Hexa_Hub.Controllers
             }
         }
 
-     
-        // DELETE: api/AssetAllocations/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAssetAllocation(int id)
-        {
-            try
-            {
-                await _assetallocation.DeleteAllocation(id);
-                await _assetallocation.Save();
-                return NoContent();
-            }
-            catch (Exception)
-            {
-                if (id == null)
-                    return NotFound();
-                return BadRequest();
-            }
-        }
-
-        private bool AssetAllocationExists(int id)
-        {
-            return _context.AssetAllocations.Any(e => e.AllocationId == id);
-        }
     }
 }

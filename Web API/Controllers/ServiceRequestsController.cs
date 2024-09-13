@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -56,27 +57,32 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutServiceRequest(int id, ServiceRequest serviceRequest)
+        public async Task<IActionResult> PutServiceRequest(int id, ServiceRequestDto serviceRequestDto)
         {
-            if (id != serviceRequest.ServiceId)
+            if (id != serviceRequestDto.ServiceId)
             {
                 return BadRequest();
             }
             var existingRequest = await _serviceRequest.GetServiceRequestById(id);
-            existingRequest.ServiceReqStatus = serviceRequest.ServiceReqStatus;
-            if (serviceRequest.ServiceReqStatus == ServiceReqStatus.Approved )
+            existingRequest.AssetId = serviceRequestDto.AssetId;
+            existingRequest.UserId = serviceRequestDto.UserId;
+            existingRequest.ServiceRequestDate = serviceRequestDto.ServiceRequestDate;
+            existingRequest.Issue_Type = serviceRequestDto.Issue_Type;
+            existingRequest.ServiceDescription = serviceRequestDto.ServiceDescription;
+            existingRequest.ServiceReqStatus = serviceRequestDto.ServiceReqStatus;
+            if (serviceRequestDto.ServiceReqStatus == ServiceReqStatus.Approved )
             {
-                var asset = await _context.Assets.FindAsync(serviceRequest.AssetId);
+                var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
                 if (asset != null)
                 {
                     asset.Asset_Status = AssetStatus.UnderMaintenance;
                     _context.Entry(asset).State = EntityState.Modified;
                 }
             }
-            else if (serviceRequest.ServiceReqStatus == ServiceReqStatus.Completed)
+            else if (serviceRequestDto.ServiceReqStatus == ServiceReqStatus.Completed)
             {
 
-                var asset = await _context.Assets.FindAsync(serviceRequest.AssetId);
+                var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
                 if (asset != null)
                 {
                     asset.Asset_Status = AssetStatus.Allocated;
@@ -108,12 +114,19 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Employee")]
-        public async Task<ActionResult<ServiceRequest>> PostServiceRequest(ServiceRequest serviceRequest)
+        public async Task<ActionResult<ServiceRequest>> PostServiceRequest(ServiceRequestDto serviceRequestDto)
         {
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            serviceRequest.UserId = loggedInUserId;
-
-           await _serviceRequest.AddServiceRequest(serviceRequest);
+            serviceRequestDto.UserId = loggedInUserId;
+            var serviceRequest = new ServiceRequest
+            {
+                AssetId = serviceRequestDto.AssetId,
+                UserId = loggedInUserId,
+                ServiceRequestDate = serviceRequestDto.ServiceRequestDate,
+                Issue_Type = serviceRequestDto.Issue_Type,
+                ServiceDescription = serviceRequestDto.ServiceDescription
+            };
+            await _serviceRequest.AddServiceRequest(serviceRequest);
             await _serviceRequest.Save();
 
             var maintenanceLog = new MaintenanceLog

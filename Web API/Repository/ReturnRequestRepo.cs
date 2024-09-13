@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
 
 namespace Hexa_Hub.Repository
 {
@@ -11,9 +12,20 @@ namespace Hexa_Hub.Repository
         {
             _context = context;
         }
-        public async Task AddReturnRequest(ReturnRequest returnRequest)
+        public async Task<ReturnRequest> AddReturnRequest(ReturnRequestDto returnRequestDto)
         {
-             _context.ReturnRequests.AddAsync(returnRequest);
+            var req = new ReturnRequest
+            {
+                ReturnId = returnRequestDto.ReturnId,
+                UserId = returnRequestDto.UserId,
+                AssetId = returnRequestDto.AssetId,
+                CategoryId = returnRequestDto.CategoryId,
+                ReturnDate = returnRequestDto.ReturnDate,
+                Reason = returnRequestDto.Reason,
+                Condition = returnRequestDto.Condition
+            };
+            await _context.AddAsync(req);
+            return req;
         }
 
         public async Task DeleteReturnRequest(int id)

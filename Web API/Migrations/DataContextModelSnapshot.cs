@@ -40,8 +40,8 @@ namespace Hexa_Hub.Migrations
                         .HasMaxLength(55)
                         .HasColumnType("nvarchar(55)");
 
-                    b.Property<int>("Asset_Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Asset_Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -134,8 +134,8 @@ namespace Hexa_Hub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Request_Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Request_Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -160,15 +160,14 @@ namespace Hexa_Hub.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("AuditDate")
+                    b.Property<DateTime?>("AuditDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("AuditMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Audit_Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Audit_Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -257,8 +256,8 @@ namespace Hexa_Hub.Migrations
                     b.Property<DateTime>("ReturnDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ReturnStatus")
-                        .HasColumnType("int");
+                    b.Property<string>("ReturnStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -283,15 +282,16 @@ namespace Hexa_Hub.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Issue_Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Issue_Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ServiceDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ServiceReqStatus")
-                        .HasColumnType("int");
+                    b.Property<string>("ServiceReqStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ServiceRequestDate")
                         .HasColumnType("datetime2");
@@ -370,48 +370,6 @@ namespace Hexa_Hub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserMail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(55)
-                        .HasColumnType("nvarchar(55)");
-
-                    b.Property<int>("User_Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("UserProfile", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Dept")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Designation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<byte[]>("ProfileImage")
                         .HasColumnType("varbinary(max)");
 
@@ -424,9 +382,12 @@ namespace Hexa_Hub.Migrations
                         .HasMaxLength(55)
                         .HasColumnType("nvarchar(55)");
 
+                    b.Property<string>("User_Type")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserId");
 
-                    b.ToTable("UserProfiles");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Asset", b =>
@@ -581,17 +542,6 @@ namespace Hexa_Hub.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("UserProfile", b =>
-                {
-                    b.HasOne("User", "User")
-                        .WithOne("UserProfile")
-                        .HasForeignKey("UserProfile", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Asset", b =>
                 {
                     b.Navigation("AssetAllocations");
@@ -637,8 +587,6 @@ namespace Hexa_Hub.Migrations
                     b.Navigation("ReturnRequests");
 
                     b.Navigation("ServiceRequests");
-
-                    b.Navigation("UserProfile");
                 });
 #pragma warning restore 612, 618
         }

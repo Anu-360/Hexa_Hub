@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hexa_Hub.DTO;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -35,21 +36,52 @@ namespace Hexa_Hub.Controllers
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutCategory(int id, Category category)
+        //{
+        //    if (id != category.CategoryId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _category.UpdateCategory(category);
+
+        //    try
+        //    {
+
+        //        await _category.Save();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!CategoryExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> PutCategory(int id, [FromBody] CategoriesDto categoryDto)
         {
-            if (id != category.CategoryId)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-
-            _category.UpdateCategory(category);
 
             try
             {
-
-                await _category.Save();
+                var result = await _category.UpdateCategoryAsync(id, categoryDto);
+                if (!result)
+                {
+                    return NotFound("Category not found.");
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -70,10 +102,10 @@ namespace Hexa_Hub.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<Category>> PostCategory(CategoriesDto categoryDto)
         {
 
-            await _category.AddCategory(category);
+            var category = await _category.AddCategory(categoryDto);
             await _category.Save();
             return CreatedAtAction("GetCategories", new { id = category.CategoryId }, category);
         }

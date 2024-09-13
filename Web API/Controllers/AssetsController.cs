@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using System.Security.Claims;
+using Hexa_Hub.DTO;
+using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hexa_Hub.Controllers
 {
@@ -33,22 +36,57 @@ namespace Hexa_Hub.Controllers
         {
             return await _asset.GetAllAssets();
         }
+        [HttpGet("Details")]
+        [Authorize]
+        public async Task<List<Asset>> GetAllDetailsOfAssets()
+        {
+            return await _asset.GetAllDetailsOfAssets();
+        }
 
-        // PUT: api/Assets/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //// PUT: api/Assets/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutAsset(int id, Asset asset)
+        //{
+        //    if (id != asset.AssetId)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    _asset.UpdateAsset(asset);
+        //    try
+        //    {
+        //        await _asset.Save();
+        //        _asset.UpdateAsset(asset);
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!AssetExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutAsset(int id, Asset asset)
+        public async Task<IActionResult> PutAsset(int id, [FromBody] AssetDto assetDto)
         {
-            if (id != asset.AssetId)
+            if (id != assetDto.AssetId)
             {
                 return BadRequest();
             }
-            _asset.UpdateAsset(asset);
+
             try
             {
+                var existingAsset = await _asset.UpdateAssetDto(id, assetDto);
                 await _asset.Save();
-                _asset.UpdateAsset(asset);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -65,36 +103,50 @@ namespace Hexa_Hub.Controllers
             return NoContent();
         }
 
+
         // POST: api/Assets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<Asset>> PostAsset(Asset asset)
+        //{
+        //    _asset.AddAsset(asset);
+        //    await _asset.Save();
+
+        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+        //}
+
+        //// DELETE: api/Assets/5
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> DeleteAsset(int id)
+        //{
+        //    try
+        //    {
+        //        await _asset.DeleteAsset(id);
+        //        await _asset.Save();
+        //        return NoContent();
+        //    }
+        //    catch (Exception)
+        //    {
+        //        if (id == null)
+        //            return NotFound();
+        //        return BadRequest();
+        //    }
+        //}
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Asset>> PostAsset(Asset asset)
+        public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto)
         {
-            _asset.AddAsset(asset);
-            await _asset.Save();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var asset = await _asset.AddAsset(assetDto);
             return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
         }
 
-        // DELETE: api/Assets/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAsset(int id)
-        {
-            try
-            {
-                await _asset.DeleteAsset(id);
-                await _asset.Save();
-                return NoContent();
-            }
-            catch (Exception)
-            {
-                if (id == null)
-                    return NotFound();
-                return BadRequest();
-            }
-        }
 
         private bool AssetExists(int id)
         {
@@ -131,20 +183,25 @@ namespace Hexa_Hub.Controllers
             var asset = await _asset.GetAssetById(assetId);
             if (asset == null || asset.AssetImage == null)
             {
-                var defualtImagePath = _asset.GetDefaultAssetImagePath();
-                return PhysicalFile(defualtImagePath, "image/jpeg");
+                var defualtImagePath = _asset.GetImagePath("AssetDefault.jpg");
+                return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), defualtImagePath), "image/jpeg");
             }
-            using (var memoryStream = new MemoryStream(asset.AssetImage))
+            string fileName = Encoding.UTF8.GetString(asset.AssetImage);
+            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), _asset.GetImagePath(fileName));
+
+            if (!System.IO.File.Exists(imagePath))
             {
-                var fileExtensions = Path.GetExtension("AssetDefault.jpg").ToLowerInvariant();
-                var contentType = fileExtensions switch
-                {
-                    ".jpg" or ".jpeg" => "image/jpeg",
-                    ".png" => "image/png",
-                    _ => "application/octet-stream"
-                };
-                return File(memoryStream.ToArray(), contentType);
+                return NotFound("Image file not found.");
             }
+
+            string contentType = Path.GetExtension(fileName).ToLowerInvariant() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
+
+            return PhysicalFile(imagePath, contentType);
         }
     }
 }

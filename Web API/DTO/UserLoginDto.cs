@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Hexa_Hub.Models
+namespace Hexa_Hub.DTO
 {
     public class UserLoginDto
     {

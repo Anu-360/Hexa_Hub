@@ -1,6 +1,7 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
 
 namespace Hexa_Hub.Repository
 {
@@ -58,11 +59,29 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        public Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog)
+        //public Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog)
+        //{
+        //    _context.MaintenanceLogs.Update(maintenanceLog);
+        //    return Task.FromResult(maintenanceLog);
+        //}
+        public async Task<bool> UpdateMaintenanceLog(int id, MaintenanceDto maintenanceDto)
         {
-            _context.MaintenanceLogs.Update(maintenanceLog);
-            return Task.FromResult(maintenanceLog);
+            var existingLog = await _context.MaintenanceLogs.FindAsync(id);
+            if (existingLog == null)
+            {
+                return false;
+            }
+
+            existingLog.Maintenance_date = maintenanceDto.Maintenance_date;
+            existingLog.Cost = maintenanceDto.Cost;
+            existingLog.Maintenance_Description = maintenanceDto.Maintenance_Description;
+
+            _context.MaintenanceLogs.Update(existingLog);
+
+            return true;
         }
+
+
 
 
         public async Task<List<MaintenanceLog>> GetMaintenanceLogByUserId(int userId)

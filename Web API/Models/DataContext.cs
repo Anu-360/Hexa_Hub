@@ -16,7 +16,6 @@ public class DataContext : DbContext
         public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
-        public DbSet<UserProfile> UserProfiles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -62,13 +61,6 @@ public class DataContext : DbContext
                     v => Enum.Parse<IssueType>(v));
 
         base.OnModelCreating(modelBuilder);
-
-            //User Configuration
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.UserProfile)
-                .WithOne(up => up.User)
-                .HasForeignKey<UserProfile>(up => up.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             //Asset Configuration
             modelBuilder.Entity<Asset>()

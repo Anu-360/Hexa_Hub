@@ -25,14 +25,13 @@ public class ReturnRequest
     public DateTime ReturnDate { get; set; }
 
     [Required]
-    public string? Reason { get; set; }
+    public string Reason { get; set; }
 
     [Required]
-    public string? Condition { get; set; }
+    public string Condition { get; set; }
 
-    [Required]
     [DefaultValue(ReturnReqStatus.Sent)]
-    public ReturnReqStatus ReturnStatus { get; set; } = ReturnReqStatus.Sent;
+    public ReturnReqStatus? ReturnStatus { get; set; } = ReturnReqStatus.Sent;
 
     //Navigation Properties
     // * - 1 Relation

@@ -18,8 +18,10 @@ namespace Hexa_Hub.Repository
             return await _context.SubCategories.ToListAsync();
         }
 
-
-
+        public async Task<SubCategory> GetSubCategoryById(int id)
+        {
+            return await _context.SubCategories.FirstOrDefaultAsync();
+        }
 
         public async Task AddSubCategory(SubCategory subCategory)
         {

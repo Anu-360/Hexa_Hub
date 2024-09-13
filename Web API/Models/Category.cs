@@ -11,7 +11,7 @@ public class Category
 
     [Required]
     [MaxLength(55)]
-    public string? CategoryName { get; set; }
+    public string CategoryName { get; set; }
 
     //Navigation Properties
     // 1 - * Relation

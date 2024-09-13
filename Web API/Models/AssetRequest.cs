@@ -18,7 +18,7 @@ public class AssetRequest
     public int AssetId { get; set; }
 
     [Required]
-    public string? CategoryId { get; set; }
+    public string CategoryId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]
@@ -26,11 +26,10 @@ public class AssetRequest
     public DateTime AssetReqDate { get; set; }
 
     [Required]
-    public string? AssetReqReason { get; set; }
+    public string AssetReqReason { get; set; }
 
-    [Required]
     [DefaultValue(RequestStatus.Pending)]
-    public RequestStatus Request_Status { get; set; } = RequestStatus.Pending;
+    public RequestStatus? Request_Status { get; set; } = RequestStatus.Pending;
 
     //Navigation Properties
     // 1 - 1 Relation
