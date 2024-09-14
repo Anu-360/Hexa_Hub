@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -42,13 +43,13 @@ namespace Hexa_Hub.Controllers
         {
             if (id != subCategoriesDto.SubCategoryId)
             {
-                return BadRequest();
+                return BadRequest("Not Found");
             }
 
             var existingSubCategory = await _subcategory.GetSubCategoryById(id);
             if (existingSubCategory == null)
             {
-                return NotFound();
+                return NotFound("Id Not Found");
             }
 
             // Map DTO to model
@@ -66,7 +67,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!SubCategoryExists(id))
                 {
-                    return NotFound();
+                    return NotFound("Id Not Found");
                 }
                 else
                 {
@@ -74,7 +75,7 @@ namespace Hexa_Hub.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Updation Success");
         }
 
         // POST: api/SubCategories
@@ -109,11 +110,9 @@ namespace Hexa_Hub.Controllers
                 await _subcategory.Save();
                 return NoContent();
             }
-            catch (Exception)
+            catch (SubCategoryNotFoundException ex)
             {
-                if (id == null)
-                    return NotFound();
-                return BadRequest();
+                return NotFound(ex.Message);
             }
         }
 

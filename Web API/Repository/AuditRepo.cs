@@ -5,6 +5,7 @@ using Hexa_Hub.Exceptions;
 using Hexa_Hub.DTO;
 using NuGet.ContentModel;
 using static Hexa_Hub.Models.MultiValues;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Hexa_Hub.Repository
 {
@@ -31,25 +32,21 @@ namespace Hexa_Hub.Repository
             return audit;
         }
 
-
-        //public async Task AddAuditReq(Audit audit)
-        //{
-        //    _context.Audits.AddAsync(audit);
-        //}
-
-
         public async Task DeleteAuditReq(int id)
         {
+            
             var aId = await _context.Audits.FindAsync(id);
-            if(aId == null)
+            if (aId == null)
             {
                 throw new AuditNotFoundException($"Audit with ID {id} Not Found");
             }
-            if(aId.Audit_Status == Models.MultiValues.AuditStatus.Completed)
+
+            if (aId.Audit_Status == Models.MultiValues.AuditStatus.Completed)
             {
                 throw new InvalidOperationException("Cannot Delete an Completed Audit");
             }
             _context.Audits.Remove(aId);
+            
         }
 
         public async Task<List<Audit>> GetAllAudits()

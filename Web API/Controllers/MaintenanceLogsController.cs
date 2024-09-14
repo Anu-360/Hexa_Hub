@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -41,7 +42,7 @@ namespace Hexa_Hub.Controllers
                 var req = await _maintenanceLogRepo.GetMaintenanceLogByUserId(userId);
                 if (req == null)
                 {
-                    return NotFound();
+                    return NotFound($"No maintenance has been for for user {userId}");
                 }
                 return Ok(req);
             }
@@ -58,42 +59,12 @@ namespace Hexa_Hub.Controllers
 
             if (maintenanceLogs == null)
             {
-                return NotFound();
+                return NotFound($"No maintenance has been for for user {userId}");
             }
 
             return Ok(maintenanceLogs);
         }
 
-        //// PUT: api/MaintenanceLogs/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutMaintenanceLog(int id, MaintenanceLog maintenanceLog)
-        //{
-        //    if (id != maintenanceLog.MaintenanceId)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    _maintenanceLogRepo.UpdateMaintenanceLog(maintenanceLog);
-
-        //    try
-        //    {
-        //        await _maintenanceLogRepo.Save();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!MaintenanceLogExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
         // PUT: api/MaintenanceLogs/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -109,7 +80,7 @@ namespace Hexa_Hub.Controllers
                 var result = await _maintenanceLogRepo.UpdateMaintenanceLog(id, maintenanceDto);
                 if (!result)
                 {
-                    return NotFound("Maintenance log not found.");
+                    return NotFound($"No maintenance has been for for user {id}");
                 }
                 await _maintenanceLogRepo.Save();
             }
@@ -117,7 +88,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!MaintenanceLogExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"No maintenance has been for for user {id}");
                 }
                 else
                 {
@@ -125,21 +96,8 @@ namespace Hexa_Hub.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Updation Success");
         }
-
-
-        //// POST: api/MaintenanceLogs
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<ActionResult<MaintenanceLog>> PostMaintenanceLog(MaintenanceLog maintenanceLog)
-        //{
-        //    _maintenanceLogRepo.AddMaintenanceLog(maintenanceLog);
-        //    await _maintenanceLogRepo.Save();
-
-        //    return CreatedAtAction("GetMaintenanceLog", new { id = maintenanceLog.MaintenanceId }, maintenanceLog);
-        //}
 
         // DELETE: api/MaintenanceLogs/5
         [HttpDelete("{id}")]
@@ -150,13 +108,15 @@ namespace Hexa_Hub.Controllers
             {
                 await _maintenanceLogRepo.DeleteMaintenanceLog(id);
                 await _maintenanceLogRepo.Save();
-                return NoContent();
+                return Ok($"Deletion Occured for id {id}");
             }
-            catch (Exception)
+            catch (MaintenanceLogNotFoundException ex)
             {
-                if (id == null)
-                    return NotFound();
-                return BadRequest();
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 

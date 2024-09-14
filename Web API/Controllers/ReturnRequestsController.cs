@@ -82,12 +82,12 @@ namespace Hexa_Hub.Controllers
         {
             if (id != returnRequestDto.ReturnId)
             {
-                return BadRequest();
+                return BadRequest("Return Id Mismatch");
             }
             var exisitingRequest = await _returnRequestRepo.GetReturnRequestById(id);
             if (exisitingRequest == null)
             {
-                return NotFound();
+                return NotFound($"Details For the Request id {id} is not found");
             }
 
             exisitingRequest.UserId = returnRequestDto.UserId;
@@ -159,7 +159,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!ReturnRequestExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"Details For the Request id {id} is not found");
                 }
                 else
                 {
@@ -202,20 +202,20 @@ namespace Hexa_Hub.Controllers
                 var returnRequest = await _returnRequestRepo.GetReturnRequestById(id);
                 if (returnRequest == null)
                 {
-                    return NotFound();
+                    return NotFound($"Details For the Request id {id} is not found");
                 }
                 if (returnRequest.UserId != loggedInUserId)
                 {
-                    return Forbid();
+                    return Forbid("You are not allowed to delete other records");
                 }
                 await _returnRequestRepo.DeleteReturnRequest(id);
                 await _returnRequestRepo.Save();
 
-                return NoContent();
+                return Ok($"Deletion Occured for { id }");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest($"Failed to delete return request: {ex.Message}");
             }
         }
 

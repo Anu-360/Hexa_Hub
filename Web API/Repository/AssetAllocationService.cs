@@ -25,17 +25,35 @@ namespace Hexa_Hub.Repository
 
         public async Task AddAllocation(AssetAllocation allocation)
         {
-            _context.AssetAllocations.Add(allocation);
-
+            try
+            {
+                _context.AssetAllocations.Add(allocation);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Error Adding Exception {ex.Message}");
+            }
         }
+
         public async Task DeleteAllocation(int id)
         {
-            var allocation = await GetAllocationById(id);
-            if (allocation == null)
+            try
             {
-                throw new AllocationNotFoundException($"Allocation with ID {id} Not Found");
+                var allocation = await GetAllocationById(id);
+                if (allocation == null)
+                {
+                    throw new AllocationNotFoundException($"Allocation with ID {id} Not Found");
+                }
+                _context.AssetAllocations.Remove(allocation);
             }
-            _context.AssetAllocations.Remove(allocation);
+            catch (AllocationNotFoundException ex)
+            {
+                throw new AllocationNotFoundException(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Error Deleting the Allocation{ex.Message}");
+            }
         }
 
         public async Task Save()
@@ -65,12 +83,12 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
-        public Task<AssetAllocation> UpdateAllocation(AssetAllocation allocation)
-        {
-            _context.AssetAllocations.Update(allocation);
-            return Task.FromResult(allocation);
+        //public Task<AssetAllocation> UpdateAllocation(AssetAllocation allocation)
+        //{
+        //    _context.AssetAllocations.Update(allocation);
+        //    return Task.FromResult(allocation);
 
-        }
+        //}
 
 
     }

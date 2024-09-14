@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -55,125 +56,40 @@ namespace Hexa_Hub.Controllers
         }
 
 
-
-        //// PUT: api/AssetRequests/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutAssetRequest(int id, AssetRequest assetRequest)
-        //{
-        //    //when an asset is being set to allocated by admin it automaticaly sets data to AssetAllocation Table
-        //    if (id != assetRequest.AssetReqId)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    _assetRequest.UpdateAssetRequest(assetRequest);
-        //    if (assetRequest.Request_Status == RequestStatus.Allocated)
-        //    {
-        //        var exisitingAllocId = await _context.AssetAllocations
-        //            .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequest.AssetReqId);
-        //        if (exisitingAllocId == null)
-        //        {
-        //            var assetAllocation = new AssetAllocation
-        //            {
-        //                AssetId = assetRequest.AssetId,
-        //                UserId = assetRequest.UserId,
-        //                AssetReqId = assetRequest.AssetReqId,
-        //                AllocatedDate = DateTime.Now
-        //            };
-        //            await _assetAlloc.AddAllocation(assetAllocation);
-
-        //            var asset = await _context.Assets.FindAsync(assetRequest.AssetId);
-        //            if (asset != null)
-        //            {
-        //                asset.Asset_Status = AssetStatus.Allocated;
-        //                _asset.UpdateAsset(asset);
-        //            }
-        //        }
-        //    }
-        //    try
-        //    {
-        //        _assetAlloc.Save();
-        //        _asset.Save();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!AssetRequestExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
         {
+            
             if (id != assetRequestDto.AssetReqId)
             {
-                return BadRequest();
+                return BadRequest("Id doesn't Match");
+            }
+
+            if (assetRequestDto.Request_Status == RequestStatus.Allocated || assetRequestDto.Request_Status == RequestStatus.Rejected)
+            {
+                return BadRequest($"The Request ID {id} has been {assetRequestDto.Request_Status}");
             }
 
             var existingRequest = await _assetRequest.GetAssetRequestById(id);
             if (existingRequest == null)
             {
-                return NotFound();
-            }
-            if (assetRequestDto.Request_Status != existingRequest.Request_Status)
-            {
-                existingRequest.Request_Status = assetRequestDto.Request_Status;
-
-                if (assetRequestDto.Request_Status == RequestStatus.Allocated)
-                {
-                    var existingAllocId = await _context.AssetAllocations
-                        .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
-
-                    if (existingAllocId == null)
-                    {
-                        var assetAllocation = new AssetAllocation
-                        {
-                            AssetId = assetRequestDto.AssetId,
-                            UserId = assetRequestDto.UserId,
-                            AssetReqId = assetRequestDto.AssetReqId,
-                            AllocatedDate = DateTime.Now
-                        };
-                        await _assetAlloc.AddAllocation(assetAllocation);
-
-                        var asset = await _context.Assets.FindAsync(assetRequestDto.AssetId);
-                        if (asset != null)
-                        {
-                            asset.Asset_Status = AssetStatus.Allocated;
-                            _asset.UpdateAsset(asset);
-                        }
-                    }
-                }
+                return NotFound("Request Not Found");
             }
 
             try
             {
-                await _assetRequest.Save();
-                await _assetAlloc.Save();
-                await _asset.Save();
+                await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
+                return Ok($"{assetRequestDto.Request_Status} has been Updated");
             }
-            catch (DbUpdateConcurrencyException)
+            catch (AssetRequestNotFoundException)
             {
-                if (!AssetRequestExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound($"AssetRequest for user {id} Not Found.");
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // POST: api/AssetRequests
@@ -212,23 +128,27 @@ namespace Hexa_Hub.Controllers
                 var assetRequest = await _assetRequest.GetAssetRequestById(id);
                 if (assetRequest == null)
                 {
-                    return NotFound();
+                    throw new AssetRequestNotFoundException($"AssetRequest for id {assetRequest} not found");
                 }
                 if (assetRequest.UserId != loggedInUserId)
                 {
-                    return Forbid();
+                    return Forbid("You are not allowed to Delete Request");
                 }
                 if(assetRequest.Request_Status == RequestStatus.Allocated)
                 {
-                    return Forbid();
+                    return Forbid("The Request has already been Allocated. Please raise an ticket in Return Section if the asset is not needed.");
                 }
                 await _assetRequest.DeleteAssetRequest(id);
                 await _assetRequest.Save();
-                return NoContent();
+                return Ok("The Request Has Been Successfully Deleted");
             }
-            catch (Exception)
+            catch (AssetRequestNotFoundException ex)
             {
-                return BadRequest();
+                throw new AssetRequestNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
 

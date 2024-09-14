@@ -2,16 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.DTO;
+using static Hexa_Hub.Models.MultiValues;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Hexa_Hub.Repository
 {
     public class AssetRequestService : IAssetRequest
     {
         private readonly DataContext _context;
+        private readonly IAssetAllocation _assetAlloc;
+        private readonly IAsset _asset;
 
-        public AssetRequestService(DataContext context)
+        public AssetRequestService(DataContext context, IAssetAllocation assetAlloc, IAsset asset)
         {
             _context = context;
+            _assetAlloc = assetAlloc;
+            _asset = asset;
         }
 
         public async Task<List<AssetRequest>> GetAllAssetRequests()
@@ -54,11 +60,46 @@ namespace Hexa_Hub.Repository
             _context.AssetRequests.Add(req);
         }
 
-        public Task<AssetRequest> UpdateAssetRequest(AssetRequest assetRequest)
+        public async Task<AssetRequest> UpdateAssetRequest(int id, AssetRequestDto assetRequestDto)
         {
-            _context.AssetRequests.Update(assetRequest);
-            return Task.FromResult(assetRequest);
+            var existingRequest = await GetAssetRequestById(id);
+            if (existingRequest == null)
+            {
+                throw new AssetRequestNotFoundException($"Asset request with ID {id} not found.");
+            }
 
+            if (assetRequestDto.Request_Status != existingRequest.Request_Status)
+            {
+                existingRequest.Request_Status = assetRequestDto.Request_Status;
+
+                if (assetRequestDto.Request_Status == RequestStatus.Allocated)
+                {
+                    var existingAllocId = await _context.AssetAllocations
+                        .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
+
+                    if (existingAllocId == null)
+                    {
+                        var assetAllocation = new AssetAllocation
+                        {
+                            AssetId = assetRequestDto.AssetId,
+                            UserId = assetRequestDto.UserId,
+                            AssetReqId = assetRequestDto.AssetReqId,
+                            AllocatedDate = DateTime.Now
+                        };
+                        await _assetAlloc.AddAllocation(assetAllocation);
+
+                        var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+                        if (asset != null)
+                        {
+                            asset.Asset_Status = AssetStatus.Allocated;
+                            _asset.UpdateAsset(asset);
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return existingRequest;
         }
 
         public async Task DeleteAssetRequest(int id)

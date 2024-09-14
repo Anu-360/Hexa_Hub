@@ -17,54 +17,6 @@ namespace Hexa_Hub.Repository
             _context = context;
             _environment = environment;
         }
-        //public async Task<User> RegisterUser(UserRegisterDto dto)
-        //{
-        //    var user = new User
-        //    {
-        //        UserName = dto.UserName,
-        //        UserMail = dto.UserMail,
-        //        Gender = dto.Gender,
-        //        Dept = dto.Dept,
-        //        Designation = dto.Designation,
-        //        PhoneNumber = dto.PhoneNumber,
-        //        Address = dto.Address,
-        //        Password = dto.Password,
-        //        Branch = dto.Branch
-        //    };
-
-        //    await _context.Users.AddAsync(user);
-        //    await _context.SaveChangesAsync();
-
-        //    const string defaultImageFileName = "profile-img.jpg";
-        //    const string imagesFolder = "Images";
-        //    string imagePath = Path.Combine(Directory.GetCurrentDirectory(), imagesFolder);
-        //    string defaultImagePath = Path.Combine(imagePath, defaultImageFileName);
-        //    if (!Directory.Exists(imagePath))
-        //    {
-        //        Directory.CreateDirectory(imagePath);
-        //    }
-
-        //    // Check if the default image file exists, if not copy it
-        //    if (!File.Exists(defaultImagePath))
-        //    {
-        //        string sourcePath = GetDefaultImageSourcePath();
-        //        if (!File.Exists(sourcePath))
-        //        {
-        //            throw new FileNotFoundException("Source default image file not found.", sourcePath);
-        //        }
-        //        File.Copy(sourcePath, defaultImagePath);
-        //    }
-
-        //    // Save default image reference in user profile
-        //    var defaultImageBytes = Encoding.UTF8.GetBytes(defaultImageFileName);
-        //    user.ProfileImage = defaultImageBytes;
-
-        //    // Update user with default profile image
-        //    _context.Users.Update(user);
-        //    await _context.SaveChangesAsync();
-
-        //    return user;
-        //}
 
         public async Task<User> RegisterUser(UserRegisterDto dto)
         {
@@ -212,49 +164,6 @@ namespace Hexa_Hub.Repository
         {
             return Path.Combine("Images", fileName);
         }
-        //public async Task<string?> UploadProfileImageAsync(int userId, IFormFile file)
-        //{
-        //    var userProfile = await _context.Users.FindAsync(userId);
-        //    if (userProfile == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "Images");
-
-        //    if (!Directory.Exists(imagePath))
-        //    {
-        //        Directory.CreateDirectory(imagePath);
-        //    }
-        //    if (userProfile.ProfileImage == null && file == null)
-        //    {
-        //        string defaultImagePath = GetDefaultImagePath();
-        //        userProfile.ProfileImage = await GetImageBytesAsync(defaultImagePath);
-        //    }
-        //    else if (file != null)
-        //    {
-        //        string fileName = $"{userId}_{Path.GetFileName(file.FileName)}";
-        //        string fullPath = Path.Combine(imagePath, fileName);
-
-        //        using (var stream = new FileStream(fullPath, FileMode.Create))
-        //        {
-        //            await file.CopyToAsync(stream);
-        //        }
-
-        //        userProfile.ProfileImage = await File.ReadAllBytesAsync(fullPath);
-        //    }
-
-        //    await _context.SaveChangesAsync();
-        //    return file?.FileName ?? "profile-img.jpg";
-        //}
-
-        //public string GetDefaultImagePath()
-        //{
-        //    return Path.Combine(_environment.ContentRootPath, "Images", "profile-img.jpg");
-        //}
-        //private async Task<byte[]> GetImageBytesAsync(string path)
-        //{
-        //    return await File.ReadAllBytesAsync(path);
-        //}
+      
     }
 }
