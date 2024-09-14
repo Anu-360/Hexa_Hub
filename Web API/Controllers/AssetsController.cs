@@ -43,36 +43,6 @@ namespace Hexa_Hub.Controllers
             return await _asset.GetAllDetailsOfAssets();
         }
 
-        //// PUT: api/Assets/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutAsset(int id, Asset asset)
-        //{
-        //    if (id != asset.AssetId)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    _asset.UpdateAsset(asset);
-        //    try
-        //    {
-        //        await _asset.Save();
-        //        _asset.UpdateAsset(asset);
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!AssetExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -104,36 +74,7 @@ namespace Hexa_Hub.Controllers
         }
 
 
-        // POST: api/Assets
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<ActionResult<Asset>> PostAsset(Asset asset)
-        //{
-        //    _asset.AddAsset(asset);
-        //    await _asset.Save();
-
-        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
-        //}
-
-        //// DELETE: api/Assets/5
-        //[HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> DeleteAsset(int id)
-        //{
-        //    try
-        //    {
-        //        await _asset.DeleteAsset(id);
-        //        await _asset.Save();
-        //        return NoContent();
-        //    }
-        //    catch (Exception)
-        //    {
-        //        if (id == null)
-        //            return NotFound();
-        //        return BadRequest();
-        //    }
-        //}
+      
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto)

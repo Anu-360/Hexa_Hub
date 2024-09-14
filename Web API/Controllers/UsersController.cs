@@ -1,4 +1,5 @@
 ﻿using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace Hexa_Hub.Controllers
                 var user = await _userRepo.GetUserById(userId);
                 if (user == null)
                 {
-                    return NotFound();
+                    return NotFound("User not Found");
                 }
                 var userDto = new UserDto
                 {
@@ -76,31 +77,30 @@ namespace Hexa_Hub.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not Found");
             }
 
             return user;
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Employee,Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateUserDetails(int id, UserDto userDto)
         {
             if (id != userDto.UserId)
             {
-                return BadRequest();
+                return BadRequest("Check Id");
             }
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (id.ToString() != currentUserId)
+            if (id.ToString() != currentUserId && !User.IsInRole("Admin"))
             {
-                return Forbid();
+                return Forbid("You do not have permission to update this user.");
             }
-
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not Found");
             }
 
             user.UserName = userDto.UserName;
@@ -119,9 +119,8 @@ namespace Hexa_Hub.Controllers
             }
             else
             {
-                user.User_Type = user.User_Type;
+                user.User_Type = user.User_Type; // No change to role
             }
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -130,7 +129,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!UserExists(id))
                 {
-                    return NotFound();
+                    return NotFound("User not Found");
                 }
                 else
                 {
@@ -138,7 +137,7 @@ namespace Hexa_Hub.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Updation Successfull");
         }
 
         [HttpPatch("{id}/password")]
@@ -147,19 +146,19 @@ namespace Hexa_Hub.Controllers
         {
             if (id != passwordChangeDto.UserId)
             {
-                return BadRequest();
+                return BadRequest("Check Your Id");
             }
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (id.ToString() != currentUserId)
             {
-                return Forbid();
+                return Forbid("Check your Id ");
             }
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not Found");
             }
 
             if (user.Password != passwordChangeDto.CurrentPassword)
@@ -177,7 +176,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!UserExists(id))
                 {
-                    return NotFound();
+                    return NotFound("Id not Found");
                 }
                 else
                 {
@@ -185,64 +184,10 @@ namespace Hexa_Hub.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Password Changed Successfully");
         }
 
-        //// PUT: api/Users/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[Authorize]
-        //public async Task<IActionResult> PutUser(int id, User user)
-        //{
-        //    var userRole = User.FindFirstValue(ClaimTypes.Role);
-        //    if (id != user.UserId)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (userRole != "Admin")
-        //    {
-        //        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        //        if (id != userId)
-        //        {
-        //            return Forbid();
-        //        }
-        //    }
-
-        //    _userRepo.UpdateUser(user);
-
-        //    var userProfile = await _userProfileRepo.GetProfilesById(id);
-        //    if (userProfile != null)
-        //    {
-        //        userProfile.UserName = user.UserName;
-        //        userProfile.UserMail = user.UserMail;
-        //        userProfile.Gender = user.Gender;
-        //        userProfile.Dept = user.Dept;
-        //        userProfile.Designation = user.Designation;
-        //        userProfile.PhoneNumber = user.PhoneNumber;
-        //        userProfile.Address = user.Address;
-
-        //        _userProfileRepo.UpdateProfiles(userProfile);
-        //    }
-
-        //    try
-        //    {
-        //        await _userRepo.Save();
-        //        await _userProfileRepo.Save();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!UserExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
+       
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -269,7 +214,7 @@ namespace Hexa_Hub.Controllers
             var user = await _userRepo.GetUserById(id);
             if (user == null)
             {
-                return NotFound();
+                return NotFound("Id Not Found");
             }
 
             try
@@ -277,12 +222,12 @@ namespace Hexa_Hub.Controllers
                 await _userRepo.DeleteUser(id);
                 await _userRepo.Save();
             }
-            catch (Exception)
+            catch (UserNotFoundException ex)
             {
-                return NotFound("Error deleting the user");
+                return NotFound(ex.Message);
             }
 
-            return NoContent();
+            return Ok($"{id} Has been deleted");
         }
 
         private bool UserExists(int id)
@@ -323,54 +268,6 @@ namespace Hexa_Hub.Controllers
         }
 
 
-        //[HttpPut("{userId}/upload")]
-        //[Authorize]
-        //public async Task<IActionResult> UploadProfileImage(int userId, IFormFile file)
-        //{
-        //    var loggedUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-        //    if (loggedUser != userId)
-        //    {
-        //        return Unauthorized("You are not Authorized to Update the Image");
-        //    }
-        //    if (file == null || file.Length == 0)
-        //    {
-        //        return BadRequest("No file uploaded.");
-        //    }
-        //    var supportedFiles = new[] { "image/jpeg", "image/png" };
-        //    if (!supportedFiles.Contains(file.ContentType))
-        //    {
-        //        return BadRequest("Only JPEG or PNG format are allowed");
-        //    }
-        //    var fileName = await _userRepo.UploadProfileImageAsync(userId, file);
-        //    if (fileName == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(new { FileName = fileName });
-        //}
-        //[Authorize]
-        //[HttpGet("{userId}/profileImage")]
-        //public async Task<IActionResult> GetProfileImage(int userId)
-        //{
-        //    var userProfile = await _userRepo.GetUserById(userId);
-        //    if (userProfile == null || userProfile.ProfileImage == null)
-        //    {
-        //        var defualtImagePath = _userRepo.GetDefaultImagePath();
-        //        return PhysicalFile(defualtImagePath, "image/jpeg");
-        //    }
-        //    using (var memoryStream = new MemoryStream(userProfile.ProfileImage))
-        //    {
-        //        var fileExtensions = Path.GetExtension("profile-img.jpg").ToLowerInvariant();
-        //        var contentType = fileExtensions switch
-        //        {
-        //            ".jpg" or ".jpeg" => "image/jpeg",
-        //            ".png" => "image/png",
-        //            _ => "application/octet-stream"
-        //        };
-        //        return File(memoryStream.ToArray(), contentType);
-        //    }
-        //}
         [Authorize]
         [HttpGet("{userId}/profileImage")]
         public async Task<IActionResult> GetProfileImage(int userId)

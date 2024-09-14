@@ -22,13 +22,6 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
-        //public async Task<MaintenanceLog?> GetMaintenanceLogById(int id)
-        //{
-        //    return await _context.MaintenanceLogs
-        //        .Include(ml => ml.Asset)
-        //        .Include(ml => ml.User)
-        //        .FirstOrDefaultAsync(ml=>ml.MaintenanceId==id);
-        //}
         public async Task<List<MaintenanceLog>> GetMaintenanceLogById(int userId)
         {
             return await _context.MaintenanceLogs
@@ -59,11 +52,6 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        //public Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog)
-        //{
-        //    _context.MaintenanceLogs.Update(maintenanceLog);
-        //    return Task.FromResult(maintenanceLog);
-        //}
         public async Task<bool> UpdateMaintenanceLog(int id, MaintenanceDto maintenanceDto)
         {
             var existingLog = await _context.MaintenanceLogs.FindAsync(id);

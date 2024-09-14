@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,19 +28,27 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<AssetAllocation>>> GetAssetAllocations()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-            if(userRole == "Admin")
+            try
             {
-                return await _assetallocation.GetAllAllocations();
-            }
-            else
-            {
-                var userRequests = await _assetallocation.GetAllocationListById(userId);
-                if (userRequests == null || !userRequests.Any()) {
-                    return NotFound();
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var userRole = User.FindFirstValue(ClaimTypes.Role);
+                if (userRole == "Admin")
+                {
+                    return await _assetallocation.GetAllAllocations();
                 }
-                return Ok(userRequests);
+                else
+                {
+                    var userRequests = await _assetallocation.GetAllocationListById(userId);
+                    if (userRequests == null || !userRequests.Any())
+                    {
+                        throw new AllocationNotFoundException($"No Allocation can be found for the User {userId}");
+                    }
+                    return Ok(userRequests);
+                }
+            }
+            catch (AllocationNotFoundException ex)
+            {
+                throw new AllocationNotFoundException(ex.Message);
             }
         }
 

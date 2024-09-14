@@ -37,11 +37,6 @@ namespace Hexa_Hub.Repository
             return category;
         }
 
-        //public async Task<Category>UpdateCategory(Category category)
-        //{
-        //    _context.Categories.Update(category);
-        //    return category;
-        //}
         public async Task<bool> UpdateCategoryAsync(int id, CategoriesDto categoryDto)
         {
             var existingCategory = await _context.Categories.FindAsync(id);

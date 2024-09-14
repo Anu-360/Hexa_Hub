@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AssetHubTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70cafa168215aa1e79de6ae66ded66ab7d26a3a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03412c790100513a17fc0b6568954524abccf46c")]
 [assembly: System.Reflection.AssemblyProductAttribute("AssetHubTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AssetHubTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

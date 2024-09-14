@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -34,38 +35,7 @@ namespace Hexa_Hub.Controllers
             return await _category.GetAllCategories();
         }
 
-        // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutCategory(int id, Category category)
-        //{
-        //    if (id != category.CategoryId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _category.UpdateCategory(category);
-
-        //    try
-        //    {
-
-        //        await _category.Save();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!CategoryExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
+      
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutCategory(int id, [FromBody] CategoriesDto categoryDto)
@@ -87,7 +57,7 @@ namespace Hexa_Hub.Controllers
             {
                 if (!CategoryExists(id))
                 {
-                    return NotFound();
+                    return NotFound("No Category Found");
                 }
                 else
                 {
@@ -95,7 +65,7 @@ namespace Hexa_Hub.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Category Updation Success");
         }
 
         // POST: api/Categories
@@ -104,7 +74,6 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Category>> PostCategory(CategoriesDto categoryDto)
         {
-
             var category = await _category.AddCategory(categoryDto);
             await _category.Save();
             return CreatedAtAction("GetCategories", new { id = category.CategoryId }, category);
@@ -115,18 +84,15 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-
             try
             {
                 await _category.DeleteCategory(id);
                 await _category.Save();
                 return NoContent();
             }
-            catch (Exception)
+            catch (CategoryNotFoundException ex)
             {
-                if (id == null)
-                    return NotFound();
-                return BadRequest();
+                return NotFound(ex.Message);
             }
         }
 

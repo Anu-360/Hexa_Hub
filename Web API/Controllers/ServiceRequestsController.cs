@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Hexa_Hub.DTO;
+using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,7 @@ namespace Hexa_Hub.Controllers
                 var userRequests = await _serviceRequest.GetServiceRequestsByUserId(userId);
                 if (userRequests == null || !userRequests.Any())
                 {
-                    return NotFound("No service requests found for the logged-in user.");
+                    return NotFound($"No service requests found for the logged-in user {userId}.");
                 }
                 return Ok(userRequests);
             }
@@ -61,7 +62,7 @@ namespace Hexa_Hub.Controllers
         {
             if (id != serviceRequestDto.ServiceId)
             {
-                return BadRequest();
+                return BadRequest($"Given Id's {id} and {serviceRequestDto.ServiceId} Doesnt Match");
             }
             var existingRequest = await _serviceRequest.GetServiceRequestById(id);
             existingRequest.AssetId = serviceRequestDto.AssetId;
@@ -100,14 +101,14 @@ namespace Hexa_Hub.Controllers
             {
                 if (!ServiceRequestExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"Details For the Request id {id} is not found");
                 }
                 else
                 {
                     throw;
                 }
             }
-            return NoContent();
+            return Ok($"Data Modified");
         }
 
         // POST: api/ServiceRequests
@@ -155,21 +156,25 @@ namespace Hexa_Hub.Controllers
                 var serviceRequest = await _serviceRequest.GetServiceRequestById(id);
                 if (serviceRequest == null)
                 {
-                    return NotFound(); 
+                    return NotFound("Id's Mismatch"); 
                 }
-                if (serviceRequest.UserId != loggedInUserId)
+                if (serviceRequest.UserId != loggedInUserId )
                 {
-                    return Forbid(); 
+                    return Forbid("You are not able to Delete"); 
+                }
+                if(serviceRequest.ServiceReqStatus == ServiceReqStatus.Approved || serviceRequest.ServiceReqStatus == ServiceReqStatus.Completed)
+                {
+                    return BadRequest($"The Service Id {id} for USer {loggedInUserId} is already been {serviceRequest.ServiceReqStatus}");
                 }
 
                 await _serviceRequest.DeleteServiceRequest(id);
                 await _serviceRequest.Save();
 
-                return NoContent();
+                return Ok("Deletion Of Data Occured");
             }
-            catch (Exception ex)
+            catch (AssetNotFoundException ex)
             {
-                return BadRequest($"An error occurred: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 

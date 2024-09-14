@@ -53,16 +53,6 @@ namespace Hexa_Hub.Repository
                                  .FirstOrDefaultAsync(a => a.AssetId == id);
         }
 
-        //public async Task AddAsset(Asset asset)
-        //{
-        //    if(asset.AssetImage == null)
-        //    {
-        //        string defaultImagePath = GetDefaultAssetImagePath();
-        //        asset.AssetImage = await GetImageBytesAsync(defaultImagePath);
-        //    }
-
-        //    await _context.AddAsync(asset);
-        //}
         public async Task<Asset> AddAsset(AssetDto assetDto)
         {
             var asset = new Asset
@@ -83,8 +73,6 @@ namespace Hexa_Hub.Repository
             await _context.AddAsync(asset);
             await _context.SaveChangesAsync();
 
-            //const string defaultImg = "AssetDefault.jpg";
-            //asset.AssetImage = Encoding.UTF8.GetBytes(defaultImg);
             const string defaultImageFileName = "profile-img.jpg";
             const string imagesFolder = "Images";
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), imagesFolder);
@@ -204,48 +192,6 @@ namespace Hexa_Hub.Repository
         }
 
 
-
-
-        //public async Task<string?> UploadAssetImageAsync(int assetId, IFormFile file)
-        //{
-        //    var assetData = await _context.Assets.FindAsync(assetId);
-        //    if(assetData == null) 
-        //    { 
-        //        return null; 
-        //    }
-        //    string imagePath = Path.Combine(_environment.ContentRootPath, "AssetImages");
-        //    if (!Directory.Exists(imagePath))
-        //    {
-        //        Directory.CreateDirectory(imagePath);
-        //    }
-        //    if (assetData.AssetImage == null && file == null)
-        //    {
-        //        string defaultImagePath = GetDefaultAssetImagePath();
-        //        assetData.AssetImage = await GetImageBytesAsync(defaultImagePath);
-        //    }
-        //    else if(file != null)
-        //    {
-        //        string fileName = $"{assetId}_{Path.GetFileName(file.FileName)}";
-        //        string fullPath = Path.GetFullPath(imagePath, fileName);
-
-        //        using (var stream = new FileStream(fullPath, FileMode.Create))
-        //        {
-        //            await file.CopyToAsync(stream);
-        //        }
-        //        assetData.AssetImage = await File.ReadAllBytesAsync(fullPath);
-        //    }
-        //    await _context.SaveChangesAsync();
-        //    return file?.FileName ?? "AssetDefault.jpg";
-        //}
-
-        //public string GetDefaultAssetImagePath()
-        //{
-        //    return Path.Combine(_environment.ContentRootPath, "AssetImages", "AssetDefault.jpg");
-        //}
-        //private async Task<byte[]> GetImageBytesAsync(string path)
-        //{
-        //    return await File.ReadAllBytesAsync(path);
-        //}
     }
 
 }
