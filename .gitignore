@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/AssetHubTests/obj/Debug/net8.0/AssetHubTests.AssemblyInfoInputs.cache
+/AssetHubTests/obj/Debug/net8.0/AssetHubTests.AssemblyInfo.cs
