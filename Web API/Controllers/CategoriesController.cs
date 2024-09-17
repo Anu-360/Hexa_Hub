@@ -26,16 +26,34 @@ namespace Hexa_Hub.Controllers
             _category = category;
         }
 
-        // GET: api/Categories
-        [HttpGet]
+        [HttpGet("all-categories")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<IActionResult> GetAllCategories()
         {
+            var categories = await _category.GetAllCategories();
 
-            return await _category.GetAllCategories();
+            if (categories == null || !categories.Any())
+            {
+                throw new CategoryNotFoundException("No categories available.");
+            }
+
+            return Ok(categories);
         }
 
-      
+        // Endpoint to get all category names for the dropdown
+        [HttpGet("category-names")]
+        public async Task<IActionResult> GetCategoryNames()
+        {
+            var categoryNames = await _category.GetAllCategoryNamesAsync();
+
+            if (categoryNames == null || !categoryNames.Any())
+            {
+                return NotFound("No categories available.");
+            }
+
+            return Ok(categoryNames);
+        }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutCategory(int id, [FromBody] CategoriesDto categoryDto)

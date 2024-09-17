@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj": {}
+    "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj": {}
   },
   "projects": {
-    "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj": {
+    "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj",
+        "projectUniqueName": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj",
         "projectName": "AssetHubTests",
-        "projectPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj",
-        "packagesPath": "C:\\Users\\rahav\\.nuget\\packages\\",
-        "outputPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\AssetHubTests\\obj\\",
+        "projectPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\AssetHubTests\\AssetHubTests.csproj",
+        "packagesPath": "C:\\Users\\anumi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\AssetHubTests\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "F:\\Studies\\MS Visual Studio\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\rahav\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\anumi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,15 +22,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\Hexa_Hub.csproj": {
-                "projectPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\Hexa_Hub.csproj"
+              "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\Hexa_Hub.csproj": {
+                "projectPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\Hexa_Hub.csproj"
               }
             }
           }
@@ -95,25 +90,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\Hexa_Hub.csproj": {
+    "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\Hexa_Hub.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\Hexa_Hub.csproj",
+        "projectUniqueName": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\Hexa_Hub.csproj",
         "projectName": "Hexa_Hub",
-        "projectPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\Hexa_Hub.csproj",
-        "packagesPath": "C:\\Users\\rahav\\.nuget\\packages\\",
-        "outputPath": "D:\\Ganesh Raaj\\HEXAWARE segue\\COE\\Tech\\Project\\Hexa_Hub\\Web API\\obj\\",
+        "projectPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\Hexa_Hub.csproj",
+        "packagesPath": "C:\\Users\\anumi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\anumi\\source\\repos\\Hexa_Hub\\Web API\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "F:\\Studies\\MS Visual Studio\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\rahav\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\anumi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -121,7 +112,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -170,6 +160,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
+            },
+            "itext7": {
+              "target": "Package",
+              "version": "[8.0.5, )"
             }
           },
           "imports": [
@@ -191,7 +185,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

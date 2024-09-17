@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Interface;
-using Hexa_Hub.Repository;
-using System.Security.Claims;
 using Hexa_Hub.DTO;
 using System.Text;
-using System.Diagnostics.CodeAnalysis;
+using Hexa_Hub.Repository;
+using Hexa_Hub.Exceptions;
+using static Hexa_Hub.Models.MultiValues;
+
 
 namespace Hexa_Hub.Controllers
 {
@@ -36,12 +32,80 @@ namespace Hexa_Hub.Controllers
         {
             return await _asset.GetAllAssets();
         }
+
         [HttpGet("Details")]
         [Authorize]
         public async Task<List<Asset>> GetAllDetailsOfAssets()
         {
             return await _asset.GetAllDetailsOfAssets();
         }
+
+        // GET: api/Assets/ByAssetName/{name}
+        [HttpGet("ByAssetName/{name}")]
+        [Authorize]
+        public async Task<ActionResult<AssetDto>> GetAssetByName(string name)
+        {
+            var assetDtos = await _asset.GetAssetByName(name);
+
+
+            if (assetDtos == null || !assetDtos.Any())
+            {
+                throw new AssetNotFoundException($"No assets found containing '{name}'.");
+            }
+            return Ok(assetDtos);
+        }
+
+        // GET: api/Assets/PriceRange?minPrice=1000&maxPrice=5000
+        [HttpGet("PriceRange")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetDto>>> GetAssetsByValue([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        {
+            if (minPrice < 0 || maxPrice < 0 || minPrice > maxPrice)
+            {
+                return BadRequest(" Invalid price range ");
+            }
+
+            var assetDtos = await _asset.GetAssetsByValue(minPrice, maxPrice);
+
+            if (assetDtos == null || !assetDtos.Any())
+            {
+                return NotFound($" No assets found in the price range {minPrice} to {maxPrice} ");
+            }
+
+            return Ok(assetDtos);
+        }
+
+
+        // GET: api/Assets/ByAssetLocation/{location}
+        [HttpGet("ByAssetLocation/{location}")]
+        [Authorize]
+        public async Task<ActionResult<AssetDto>> GetAssetsByLocation(string location)
+        {
+            var assetDtos = await _asset.GetAssetsByLocation(location);
+
+
+            if (assetDtos == null || !assetDtos.Any())
+            {
+                throw new AssetNotFoundException($"No assets found containing '{location}'.");
+            }
+            return Ok(assetDtos);
+        }
+
+        // GET: api/Assets/Status?status=OpenToRequest
+        [HttpGet("Status")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetDto>>> GetAssetsByStatus([FromQuery] AssetStatus status)
+        {
+            var assetDtos = await _asset.GetAssetsByStatus(status);
+
+            if (assetDtos == null || !assetDtos.Any())
+            {
+                return NotFound($"No assets found with status '{status}'.");
+            }
+
+            return Ok(assetDtos);
+        }
+
 
 
         [HttpPut("{id}")]

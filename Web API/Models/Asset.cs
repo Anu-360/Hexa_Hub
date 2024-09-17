@@ -33,8 +33,8 @@ public class Asset
     [Required]
     [DataType(DataType.Date)]
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-    public DateTime ManufacturingDate { get; set; }
-
+    public DateTime ManufacturingDate {  get; set; }    
+   
     [Required]
     [MaxLength(55)]
     public string Location { get; set; }

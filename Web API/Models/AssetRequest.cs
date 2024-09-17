@@ -18,7 +18,7 @@ public class AssetRequest
     public int AssetId { get; set; }
 
     [Required]
-    public string CategoryId { get; set; }
+    public int CategoryId { get; set; }
 
     [Required]
     [DataType(DataType.Date)]

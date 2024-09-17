@@ -42,8 +42,8 @@ namespace Hexa_Hub.DTO
         [Required]
         public string Branch { get; set; }
 
-        [DefaultValue(UserType.Employee)]
-        public UserType? User_Type { get; set; } = UserType.Employee;
+        
+        public string User_Type { get; set; } 
 
         public byte[]? ProfileImage { get; set; }
     }

@@ -5,10 +5,11 @@ namespace Hexa_Hub.Interface
     public interface IMaintenanceLogRepo
     {
         Task<List<MaintenanceLog>> GetAllMaintenanceLog();
-        //Task<MaintenanceLog?> GetMaintenanceLogById(int id);
+        
+        Task<byte[]> GenerateMaintenanceInvoicePdfAsync(int maintenanceId);
         Task<List<MaintenanceLog>> GetMaintenanceLogById(int userId);
         Task AddMaintenanceLog(MaintenanceLog maintenanceLog);
-        //Task<MaintenanceLog> UpdateMaintenanceLog(MaintenanceLog maintenanceLog);
+       
         Task<bool> UpdateMaintenanceLog(int id, MaintenanceDto maintenanceDto);
         Task DeleteMaintenanceLog(int id);
         Task Save();

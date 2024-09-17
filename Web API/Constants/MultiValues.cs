@@ -5,50 +5,50 @@ public class MultiValues
 {
     public enum AssetStatus
     {
-        OpenToRequest,
-        Allocated,
-        UnderMaintenance
+        OpenToRequest=0,
+        Allocated=1,
+        UnderMaintenance=2
     }
 
     public enum UserType
     {
-        Employee,
-        Admin
+        Employee=0,
+        Admin=1
     }
 
     public enum RequestStatus
     {
-        Pending,
-        Allocated,
-        Rejected
+        Pending=0,
+        Allocated=1,
+        Rejected=2
     }
 
     public enum IssueType
     {
-        Malfunction,
-        Repair,
-        Installation
+        Malfunction=0,
+        Repair=1,
+        Installation=2
     }
 
     public enum AuditStatus
     {
-        Sent,
-        Completed
+        Sent=0,
+        Completed=1
     }
 
     public enum ServiceReqStatus
     {
-        UnderReview,
-        Approved,
-        Completed
+        UnderReview=0,
+        Approved=1,
+        Completed=2
     }
 
     public enum ReturnReqStatus
     {
-        Sent,
-        Approved,
-        Returned,
-        Rejected
+        Sent=0,
+        Approved=1,
+        Returned=2,
+        Rejected=3
     }
 
 }

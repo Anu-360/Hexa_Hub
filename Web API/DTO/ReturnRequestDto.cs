@@ -30,7 +30,7 @@ namespace Hexa_Hub.DTO
         [Required]
         public string Condition { get; set; }
 
-        [DefaultValue(ReturnReqStatus.Sent)]
-        public ReturnReqStatus? ReturnStatus { get; set; } = ReturnReqStatus.Sent;
+     
+        public string ReturnStatus { get; set; } 
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.DTO;
 using System.Text;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Repository
 {
@@ -127,6 +128,103 @@ namespace Hexa_Hub.Repository
             _context.Assets.Update(asset);
             return asset;
         }
+
+        public async Task<IEnumerable<AssetDto>> GetAssetByName(string name)
+        {
+            var assetDetails = await (from asset in _context.Assets
+                                      where EF.Functions.Like(asset.AssetName, $"%{name}%")
+                                      select new AssetDto
+                                      {
+                                          AssetId = asset.AssetId,
+                                          AssetName = asset.AssetName,
+                                          AssetDescription = asset.AssetDescription,
+                                          AssetImage = asset.AssetImage,
+                                          ManufacturingDate = asset.ManufacturingDate,
+                                          Location = asset.Location,
+                                          Value = asset.Value,
+                                          Expiry_Date = asset.Expiry_Date,
+                                          Asset_Status = asset.Asset_Status.ToString(),
+                                          CategoryId = asset.CategoryId,
+                                          SubCategoryId = asset.SubCategoryId,
+                                          SerialNumber = asset.SerialNumber,
+                                          Model = asset.Model
+                                      }).ToListAsync();
+
+            return assetDetails;
+        }
+
+        public async Task<IEnumerable<AssetDto>> GetAssetsByValue(decimal minPrice, decimal maxPrice)
+        {
+            var assetsInRange = await (from asset in _context.Assets
+                                       where asset.Value >= minPrice && asset.Value <= maxPrice
+                                       select new AssetDto
+                                       {
+                                           AssetId = asset.AssetId,
+                                           AssetName = asset.AssetName,
+                                           AssetDescription = asset.AssetDescription,
+                                           AssetImage = asset.AssetImage,
+                                           ManufacturingDate = asset.ManufacturingDate,
+                                           Location = asset.Location,
+                                           Value = asset.Value,
+                                           Expiry_Date = asset.Expiry_Date,
+                                           Asset_Status = asset.Asset_Status.ToString(),
+                                           CategoryId = asset.CategoryId,
+                                           SubCategoryId = asset.SubCategoryId,
+                                           SerialNumber = asset.SerialNumber,
+                                           Model = asset.Model
+                                       }).ToListAsync();
+
+            return assetsInRange;
+        }
+
+        public async Task<IEnumerable<AssetDto>> GetAssetsByLocation(string location)
+        {
+            var assetDetails = await (from asset in _context.Assets
+                                      where EF.Functions.Like(asset.Location, $"%{location}%")
+                                      select new AssetDto
+                                      {
+                                          AssetId = asset.AssetId,
+                                          AssetName = asset.AssetName,
+                                          AssetDescription = asset.AssetDescription,
+                                          AssetImage = asset.AssetImage,
+                                          ManufacturingDate = asset.ManufacturingDate,
+                                          Location = asset.Location,
+                                          Value = asset.Value,
+                                          Expiry_Date = asset.Expiry_Date,
+                                          Asset_Status = asset.Asset_Status.ToString(),
+                                          CategoryId = asset.CategoryId,
+                                          SubCategoryId = asset.SubCategoryId,
+                                          SerialNumber = asset.SerialNumber,
+                                          Model = asset.Model
+                                      }).ToListAsync();
+
+            return assetDetails;
+        }
+
+        public async Task<IEnumerable<AssetDto>> GetAssetsByStatus(AssetStatus status)
+        {
+            var assetsByStatus = await (from asset in _context.Assets
+                                        where asset.Asset_Status == status
+                                        select new AssetDto
+                                        {
+                                            AssetId = asset.AssetId,
+                                            AssetName = asset.AssetName,
+                                            AssetDescription = asset.AssetDescription,
+                                            AssetImage = asset.AssetImage,
+                                            ManufacturingDate = asset.ManufacturingDate,
+                                            Location = asset.Location,
+                                            Value = asset.Value,
+                                            Expiry_Date = asset.Expiry_Date,
+                                            Asset_Status = asset.Asset_Status.ToString(),
+                                            CategoryId = asset.CategoryId,
+                                            SubCategoryId = asset.SubCategoryId,
+                                            SerialNumber = asset.SerialNumber,
+                                            Model = asset.Model
+                                        }).ToListAsync();
+
+            return assetsByStatus;
+        }
+
 
         public async Task DeleteAsset(int id)
         {
