@@ -14,18 +14,22 @@ namespace Hexa_Hub.Repository
             _configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string fromEmail, string fromName, string toEmail, string subject, string message)
+        public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
-            var smtpClient = new SmtpClient(_configuration["EmailSettings:SMTPServer"])
+            var smtpServer = _configuration["Email:SmtpServer"];
+            var smtpPort = int.Parse(_configuration["Email:SmtpPort"]);
+            var smtpUsername = _configuration["Email:SmtpUsername"];
+            var smtpPassword = _configuration["Email:SmtpPassword"];
+
+            using var smtpClient = new SmtpClient(smtpServer, smtpPort)
             {
-                Port = int.Parse(_configuration["EmailSettings:Port"]),
-                Credentials = new NetworkCredential(_configuration["EmailSettings:Username"], _configuration["EmailSettings:Password"]),
-                EnableSsl = true,
+                Credentials = new NetworkCredential(smtpUsername, smtpPassword),
+                EnableSsl = true
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(fromEmail, fromName),  // Use dynamic sender
+                From = new MailAddress(smtpUsername),  // Use dynamic sender
                 Subject = subject,
                 Body = message,
                 IsBodyHtml = true,

@@ -29,6 +29,8 @@ namespace Hexa_Hub.Repository
                 AuditMessage = auditDto.AuditMessage
             };
             await _context.AddAsync(audit);
+
+
             return audit;
         }
 

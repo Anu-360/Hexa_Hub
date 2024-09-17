@@ -665,3 +665,16 @@ D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\obj\Debug\
 D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\obj\Debug\net8.0\AssetHubTests.pdb
 D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\obj\Debug\net8.0\AssetHubTests.genruntimeconfig.cache
 D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\obj\Debug\net8.0\ref\AssetHubTests.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.barcodes.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.bouncy-castle-connector.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.forms.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.io.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.kernel.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.layout.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.pdfa.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.pdfua.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.sign.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.styledxmlparser.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.svg.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\itext.commons.dll
+D:\Ganesh Raaj\HEXAWARE segue\COE\Tech\Project\Hexa_Hub\AssetHubTests\bin\Debug\net8.0\Microsoft.DotNet.PlatformAbstractions.dll

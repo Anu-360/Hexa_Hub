@@ -1,10 +1,12 @@
 ﻿using Hexa_Hub.DTO;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
+using Hexa_Hub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Repository
 {
@@ -80,6 +82,11 @@ namespace Hexa_Hub.Repository
                 .Include(u => u.Audits)
                 .Include(u => u.MaintenanceLogs)
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetUsersByRole(UserType role)
+        {
+            return await _context.Users.Where(u => u.User_Type == role).ToListAsync();
         }
 
         public async Task<User?> GetUserId(int id)
@@ -164,6 +171,13 @@ namespace Hexa_Hub.Repository
         {
             return Path.Combine("Images", fileName);
         }
-      
+
+        public async Task<List<User>> GetUsersByAdmin()
+        {
+            var adminUserType = MultiValues.UserType.Admin;
+            return await _context.Users
+                .Where(u => u.User_Type == adminUserType)
+                    .ToListAsync();
+        }
     }
 }

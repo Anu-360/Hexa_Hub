@@ -12,12 +12,17 @@ namespace Hexa_Hub.Repository
         private readonly DataContext _context;
         private readonly IAssetAllocation _assetAlloc;
         private readonly IAsset _asset;
-
-        public AssetRequestService(DataContext context, IAssetAllocation assetAlloc, IAsset asset)
+        private readonly IEmail _email;
+        private readonly INotificationService _notificationService;
+        private readonly IUserRepo _userRepo;
+        public AssetRequestService(DataContext context, IAssetAllocation assetAlloc, IAsset asset, IEmail email, INotificationService notificationService, IUserRepo userRepo)
         {
             _context = context;
             _assetAlloc = assetAlloc;
             _asset = asset;
+            _email = email;
+            _notificationService = notificationService;
+            _userRepo = userRepo;
         }
 
         public async Task<List<AssetRequest>> GetAllAssetRequests()
@@ -107,6 +112,13 @@ namespace Hexa_Hub.Repository
             };
 
             _context.AssetRequests.Add(req);
+            var adminUsers = await _userRepo.GetUsersByAdmin();
+
+            foreach (var admin in adminUsers)
+            {
+
+                await _notificationService.AssetRequestSent(admin.UserMail, admin.UserName, req.AssetId);
+            }
         }
 
         public async Task<AssetRequest> UpdateAssetRequest(int id, AssetRequestDto assetRequestDto)
@@ -117,23 +129,19 @@ namespace Hexa_Hub.Repository
                 throw new AssetRequestNotFoundException($"Asset request with ID {id} not found.");
             }
 
-            // Check if the status has changed
             if (assetRequestDto.Request_Status != existingRequest.Request_Status.ToString())
             {
-                // Parse the status from the DTO to the enum
                 if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
                 {
                     existingRequest.Request_Status = parsedStatus;
 
-                    // If status changes to Allocated, handle the asset allocation logic
                     if (parsedStatus == RequestStatus.Allocated)
-                    {
+                     {
                         var existingAllocId = await _context.AssetAllocations
                             .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
 
                         if (existingAllocId == null)
                         {
-                            // Create new asset allocation
                             var assetAllocation = new AssetAllocation
                             {
                                 AssetId = assetRequestDto.AssetId,
@@ -143,12 +151,44 @@ namespace Hexa_Hub.Repository
                             };
                             await _assetAlloc.AddAllocation(assetAllocation);
 
-                            // Update the asset status to Allocated
                             var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
                             if (asset != null)
                             {
                                 asset.Asset_Status = AssetStatus.Allocated;
                                 _asset.UpdateAsset(asset);
+                            }
+                            var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+                            if (user == null)
+                            {
+                                throw new ArgumentException("User not found.");
+                            }
+                            else
+                            {
+                                await _notificationService.SendAllocationApproved(
+                                    user.UserMail,
+                                    user.UserName,
+                                    asset.AssetName,
+                                    asset.AssetId);
+                            }
+                        }
+                    }
+                    else if(parsedStatus == RequestStatus.Rejected)
+                    {
+                        var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+                        if (asset != null)
+                        {
+                            var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+                            if (user == null)
+                            {
+                                throw new ArgumentException("User not found.");
+                            }
+                            else
+                            {
+                                await _notificationService.SendAllocationRejected(
+                                    user.UserMail,
+                                    user.UserName,
+                                    asset.AssetName,
+                                    asset.AssetId);
                             }
                         }
                     }
@@ -158,8 +198,6 @@ namespace Hexa_Hub.Repository
                     throw new ArgumentException("Invalid Request Status provided.");
                 }
             }
-
-            // Save changes to the context
             await _context.SaveChangesAsync();
             return existingRequest;
         }

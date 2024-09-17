@@ -31,7 +31,8 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IMaintenanceLogRepo, MaintenanceLogRepo>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
-            builder.Services.AddTransient<IEmail, EmailService>();
+            builder.Services.AddScoped<IEmail, EmailService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
       

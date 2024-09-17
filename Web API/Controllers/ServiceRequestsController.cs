@@ -22,16 +22,18 @@ namespace Hexa_Hub.Controllers
         private readonly DataContext _context;
         private readonly IServiceRequest _serviceRequest;
         private readonly IMaintenanceLogRepo _maintenanceLog;
+        private readonly INotificationService _notificationService;
 
-        public ServiceRequestsController(DataContext context, IServiceRequest serviceRequest, IMaintenanceLogRepo maintenanceLog)
+        public ServiceRequestsController(DataContext context, IServiceRequest serviceRequest, IMaintenanceLogRepo maintenanceLog, INotificationService notificationService)
         {
             _context = context;
             _serviceRequest = serviceRequest;
             _maintenanceLog = maintenanceLog;
+            _notificationService = notificationService;
         }
 
         //// GET: api/ServiceRequests
-        
+
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetServiceRequests()
@@ -77,7 +79,6 @@ namespace Hexa_Hub.Controllers
             existingRequest.Issue_Type = serviceRequestDto.Issue_Type;
             existingRequest.ServiceDescription = serviceRequestDto.ServiceDescription;
 
-            // Parse the string status from the DTO into the enum
             if (Enum.TryParse(serviceRequestDto.ServiceReqStatus, out ServiceReqStatus parsedStatus))
             {
                 existingRequest.ServiceReqStatus = parsedStatus;
@@ -90,6 +91,11 @@ namespace Hexa_Hub.Controllers
                         asset.Asset_Status = AssetStatus.UnderMaintenance;
                         _context.Entry(asset).State = EntityState.Modified;
                     }
+                    var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
+                    if (user != null)
+                    {
+                        await _notificationService.ServiceRequestApproved(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
+                    }
                 }
                 else if (parsedStatus == ServiceReqStatus.Completed)
                 {
@@ -98,6 +104,11 @@ namespace Hexa_Hub.Controllers
                     {
                         asset.Asset_Status = AssetStatus.Allocated;
                         _context.Entry(asset).State = EntityState.Modified;
+                    }
+                    var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
+                    if (user != null)
+                    {
+                        await _notificationService.ServiceRequestCompleted(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
                     }
                 }
             }
