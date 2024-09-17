@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Controllers
 {
@@ -55,7 +56,7 @@ namespace Hexa_Hub.Controllers
                     PhoneNumber = user.PhoneNumber,
                     Address = user.Address,
                     Branch = user.Branch,
-                    User_Type = user.User_Type,
+                    User_Type = user.User_Type?.ToString(),
                     ProfileImage = user.ProfileImage
                 };
 
@@ -115,8 +116,18 @@ namespace Hexa_Hub.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                user.User_Type = userDto.User_Type;
+                // Try to parse the string value from userDto to the UserType enum
+                if (Enum.TryParse<UserType>(userDto.User_Type, out var parsedUserType))
+                {
+                    user.User_Type = parsedUserType;
+                }
+                else
+                {
+                    // Handle the case where the string cannot be parsed
+                    return BadRequest($"Invalid User_Type value: {userDto.User_Type}");
+                }
             }
+
             else
             {
                 user.User_Type = user.User_Type; // No change to role

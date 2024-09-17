@@ -75,8 +75,12 @@ public class DataContext : DbContext
                 .HasForeignKey(a => a.SubCategoryId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            //AssetAlocation Configuration
-            modelBuilder.Entity<AssetAllocation>()
+            modelBuilder.Entity<Asset>()
+                .Property(e => e.ManufacturingDate)
+                .HasColumnType("date");
+
+        //AssetAlocation Configuration
+        modelBuilder.Entity<AssetAllocation>()
                 .HasOne(aa => aa.Asset)
                 .WithMany(a => a.AssetAllocations)
                 .HasForeignKey(aa => aa.AssetId)

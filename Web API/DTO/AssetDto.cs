@@ -46,7 +46,7 @@ namespace Hexa_Hub.DTO
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime? Expiry_Date { get; set; }
 
-        [DefaultValue(AssetStatus.OpenToRequest)]
-        public AssetStatus Asset_Status { get; set; } = AssetStatus.OpenToRequest;
+
+        public string Asset_Status { get; set; } 
     }
 }

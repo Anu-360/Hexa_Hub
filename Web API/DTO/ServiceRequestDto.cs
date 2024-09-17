@@ -28,7 +28,7 @@ namespace Hexa_Hub.DTO
         [Required]
         public string ServiceDescription { get; set; }
 
-        [DefaultValue(Hexa_Hub.Models.MultiValues.ServiceReqStatus.UnderReview)]
-        public ServiceReqStatus? ServiceReqStatus { get; set; } = Hexa_Hub.Models.MultiValues.ServiceReqStatus.UnderReview;
+        
+        public string ServiceReqStatus { get; set; }
     }
 }

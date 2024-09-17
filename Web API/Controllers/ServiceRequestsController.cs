@@ -62,33 +62,48 @@ namespace Hexa_Hub.Controllers
         {
             if (id != serviceRequestDto.ServiceId)
             {
-                return BadRequest($"Given Id's {id} and {serviceRequestDto.ServiceId} Doesnt Match");
+                return BadRequest($"Given Id's {id} and {serviceRequestDto.ServiceId} don't match");
             }
+
             var existingRequest = await _serviceRequest.GetServiceRequestById(id);
+            if (existingRequest == null)
+            {
+                return NotFound($"Service request with ID {id} not found.");
+            }
+
             existingRequest.AssetId = serviceRequestDto.AssetId;
             existingRequest.UserId = serviceRequestDto.UserId;
             existingRequest.ServiceRequestDate = serviceRequestDto.ServiceRequestDate;
             existingRequest.Issue_Type = serviceRequestDto.Issue_Type;
             existingRequest.ServiceDescription = serviceRequestDto.ServiceDescription;
-            existingRequest.ServiceReqStatus = serviceRequestDto.ServiceReqStatus;
-            if (serviceRequestDto.ServiceReqStatus == ServiceReqStatus.Approved )
+
+            // Parse the string status from the DTO into the enum
+            if (Enum.TryParse(serviceRequestDto.ServiceReqStatus, out ServiceReqStatus parsedStatus))
             {
-                var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
-                if (asset != null)
+                existingRequest.ServiceReqStatus = parsedStatus;
+
+                if (parsedStatus == ServiceReqStatus.Approved)
                 {
-                    asset.Asset_Status = AssetStatus.UnderMaintenance;
-                    _context.Entry(asset).State = EntityState.Modified;
+                    var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
+                    if (asset != null)
+                    {
+                        asset.Asset_Status = AssetStatus.UnderMaintenance;
+                        _context.Entry(asset).State = EntityState.Modified;
+                    }
+                }
+                else if (parsedStatus == ServiceReqStatus.Completed)
+                {
+                    var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
+                    if (asset != null)
+                    {
+                        asset.Asset_Status = AssetStatus.Allocated;
+                        _context.Entry(asset).State = EntityState.Modified;
+                    }
                 }
             }
-            else if (serviceRequestDto.ServiceReqStatus == ServiceReqStatus.Completed)
+            else
             {
-
-                var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
-                if (asset != null)
-                {
-                    asset.Asset_Status = AssetStatus.Allocated;
-                    _context.Entry(asset).State = EntityState.Modified;
-                }
+                return BadRequest("Invalid ServiceReqStatus value");
             }
 
             try
@@ -101,15 +116,17 @@ namespace Hexa_Hub.Controllers
             {
                 if (!ServiceRequestExists(id))
                 {
-                    return NotFound($"Details For the Request id {id} is not found");
+                    return NotFound($"Details for the request ID {id} not found.");
                 }
                 else
                 {
                     throw;
                 }
             }
-            return Ok($"Data Modified");
+
+            return Ok("Data modified successfully");
         }
+
 
         // POST: api/ServiceRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

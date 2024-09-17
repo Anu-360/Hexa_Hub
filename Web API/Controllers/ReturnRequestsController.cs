@@ -84,76 +84,84 @@ namespace Hexa_Hub.Controllers
             {
                 return BadRequest("Return Id Mismatch");
             }
-            var exisitingRequest = await _returnRequestRepo.GetReturnRequestById(id);
-            if (exisitingRequest == null)
+
+            var existingRequest = await _returnRequestRepo.GetReturnRequestById(id);
+            if (existingRequest == null)
             {
                 return NotFound($"Details For the Request id {id} is not found");
             }
 
-            exisitingRequest.UserId = returnRequestDto.UserId;
-            exisitingRequest.AssetId = returnRequestDto.AssetId;
-            exisitingRequest.CategoryId = returnRequestDto.CategoryId;
-            exisitingRequest.ReturnDate = returnRequestDto.ReturnDate;
-            exisitingRequest.Reason = returnRequestDto.Reason;
-            exisitingRequest.Condition = returnRequestDto.Condition;
-            exisitingRequest.ReturnStatus = returnRequestDto.ReturnStatus;
+            // Update request properties
+            existingRequest.UserId = returnRequestDto.UserId;
+            existingRequest.AssetId = returnRequestDto.AssetId;
+            existingRequest.CategoryId = returnRequestDto.CategoryId;
+            existingRequest.ReturnDate = returnRequestDto.ReturnDate;
+            existingRequest.Reason = returnRequestDto.Reason;
+            existingRequest.Condition = returnRequestDto.Condition;
 
-            _context.Entry(exisitingRequest).CurrentValues.SetValues(returnRequestDto);
-
-            if (returnRequestDto.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved)
+            // Parse the ReturnStatus from the DTO
+            if (Enum.TryParse(returnRequestDto.ReturnStatus, out Models.MultiValues.ReturnReqStatus parsedStatus))
             {
-                exisitingRequest.ReturnDate = DateTime.Now;
+                existingRequest.ReturnStatus = parsedStatus;
             }
-            if (returnRequestDto.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+            else
             {
-                exisitingRequest.ReturnDate = DateTime.Now;
-                var asset = await _context.Assets.FindAsync(exisitingRequest.AssetId);
+                return BadRequest("Invalid Return Status provided.");
+            }
+
+            // If status is Approved or Returned, handle related logic
+            if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved || parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
+            {
+                existingRequest.ReturnDate = DateTime.Now;
+
+                var asset = await _context.Assets.FindAsync(existingRequest.AssetId);
                 if (asset != null)
                 {
-                    asset.Asset_Status = Models.MultiValues.AssetStatus.OpenToRequest;
-                    await _asset.UpdateAsset(asset);
-                    await _asset.Save();
-
-                    var allocation = await _context.AssetAllocations
-                       .Where(a => a.AssetId == exisitingRequest.AssetId && a.UserId == exisitingRequest.UserId)
-                       .FirstOrDefaultAsync();
-
-                    if (allocation != null)
+                    if (parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
                     {
-                        try
+                        asset.Asset_Status = Models.MultiValues.AssetStatus.OpenToRequest;
+                        _context.Entry(asset).State = EntityState.Modified;
+
+                        var allocation = await _context.AssetAllocations
+                            .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId)
+                            .FirstOrDefaultAsync();
+
+                        if (allocation != null)
                         {
-                            await _assetAlloc.DeleteAllocation(allocation.AllocationId);
-                            await _assetAlloc.Save();
+                            try
+                            {
+                                await _assetAlloc.DeleteAllocation(allocation.AllocationId);
+                                await _assetAlloc.Save();
+                            }
+                            catch (Exception ex)
+                            {
+                                return BadRequest($"Failed to delete allocation with ID {allocation.AllocationId}: {ex.Message}");
+                            }
                         }
-                        catch (Exception ex)
+
+                        var assetRequest = await _context.AssetRequests
+                            .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated)
+                            .FirstOrDefaultAsync();
+
+                        if (assetRequest != null)
                         {
-                            return BadRequest($"Failed to delete allocation with ID {allocation.AllocationId}: {ex.Message}");
+                            try
+                            {
+                                _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
+                                await _asset.Save();
+                            }
+                            catch (Exception ex)
+                            {
+                                return BadRequest($"Failed to delete AssetRequest with ID {assetRequest.AssetReqId}: {ex.Message}");
+                            }
                         }
                     }
-
-                    var assetRequest = await _context.AssetRequests
-                        .Where(a => a.AssetId == exisitingRequest.AssetId && a.UserId == exisitingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated)
-                        .FirstOrDefaultAsync();
-
-                    if (assetRequest != null)
-                    {
-                        try
-                        {
-                            _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
-                            await _asset.Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            return BadRequest($"Failed to delete AssetRequest with ID {assetRequest.AssetReqId}: {ex.Message}");
-                        }
-                    }
-
-                   
                 }
             }
+
             try
             {
-               await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {

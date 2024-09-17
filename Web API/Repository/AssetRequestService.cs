@@ -27,6 +27,55 @@ namespace Hexa_Hub.Repository
                 .Include(ar=>ar.User)
                 .ToListAsync();
         }
+        public async Task<List<AssetRequest>> GetAssetRequestByMonthAsync(string month)
+        {
+            var monthname = DateTime.ParseExact(month, "MMMM", null).Month;
+            return await _context.AssetRequests
+                                 .Where(a => a.AssetReqDate.Month == monthname)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetRequest>> GetAssetRequestByYearAsync(int year)
+        {
+            return await _context.AssetRequests
+                                 .Where(a => a.AssetReqDate.Year == year)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetRequest>> GetAssetRequestByMonthAndYearAsync(string month, int year)
+        {
+            var monthname = DateTime.ParseExact(month, "MMMM", null).Month;
+            return await _context.AssetRequests
+                                 .Where(a => a.AssetReqDate.Month == monthname && a.AssetReqDate.Year == year)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetRequest>> GetAssetRequestByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.AssetRequests
+                                 .Where(a => a.AssetReqDate>= startDate && a.AssetReqDate <= endDate)
+                                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<AssetRequestDto>> GetAssetRequestByStatus(RequestStatus status)
+        {
+            var reqByStatus = await (from request in _context.AssetRequests
+                                        where request.Request_Status == status
+                                        select new AssetRequestDto
+                                        {
+                                            AssetReqId = request.AssetReqId,
+                                            UserId = request.UserId,
+                                            AssetId = request.AssetId,
+                                            CategoryId = request.CategoryId,
+                                            AssetReqDate = request.AssetReqDate,
+                                            AssetReqReason= request.AssetReqReason, 
+                                            Request_Status = request.Request_Status.ToString()
+                                           
+                                        }).ToListAsync();
+
+            return reqByStatus;
+        }
+
 
         public async Task<List<AssetRequest>> GetAssetRequestsByUserId(int userId)
         {
@@ -68,36 +117,49 @@ namespace Hexa_Hub.Repository
                 throw new AssetRequestNotFoundException($"Asset request with ID {id} not found.");
             }
 
-            if (assetRequestDto.Request_Status != existingRequest.Request_Status)
+            // Check if the status has changed
+            if (assetRequestDto.Request_Status != existingRequest.Request_Status.ToString())
             {
-                existingRequest.Request_Status = assetRequestDto.Request_Status;
-
-                if (assetRequestDto.Request_Status == RequestStatus.Allocated)
+                // Parse the status from the DTO to the enum
+                if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
                 {
-                    var existingAllocId = await _context.AssetAllocations
-                        .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
+                    existingRequest.Request_Status = parsedStatus;
 
-                    if (existingAllocId == null)
+                    // If status changes to Allocated, handle the asset allocation logic
+                    if (parsedStatus == RequestStatus.Allocated)
                     {
-                        var assetAllocation = new AssetAllocation
-                        {
-                            AssetId = assetRequestDto.AssetId,
-                            UserId = assetRequestDto.UserId,
-                            AssetReqId = assetRequestDto.AssetReqId,
-                            AllocatedDate = DateTime.Now
-                        };
-                        await _assetAlloc.AddAllocation(assetAllocation);
+                        var existingAllocId = await _context.AssetAllocations
+                            .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
 
-                        var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
-                        if (asset != null)
+                        if (existingAllocId == null)
                         {
-                            asset.Asset_Status = AssetStatus.Allocated;
-                            _asset.UpdateAsset(asset);
+                            // Create new asset allocation
+                            var assetAllocation = new AssetAllocation
+                            {
+                                AssetId = assetRequestDto.AssetId,
+                                UserId = assetRequestDto.UserId,
+                                AssetReqId = assetRequestDto.AssetReqId,
+                                AllocatedDate = DateTime.Now
+                            };
+                            await _assetAlloc.AddAllocation(assetAllocation);
+
+                            // Update the asset status to Allocated
+                            var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+                            if (asset != null)
+                            {
+                                asset.Asset_Status = AssetStatus.Allocated;
+                                _asset.UpdateAsset(asset);
+                            }
                         }
                     }
                 }
+                else
+                {
+                    throw new ArgumentException("Invalid Request Status provided.");
+                }
             }
 
+            // Save changes to the context
             await _context.SaveChangesAsync();
             return existingRequest;
         }

@@ -46,6 +46,27 @@ namespace Hexa_Hub.Repository
             _context.SubCategories.Remove(subCategory);
         }
 
+        public async Task<IEnumerable<SubCategory>> GetSubCategoriesByQuantityAsync(int quantity)
+        {
+            // Filter SubCategories by Quantity
+            var subCategories = await _context.SubCategories
+                .Where(sc => sc.Quantity >= quantity)
+                .Include(sc => sc.Category) // Include Category for navigation
+                .ToListAsync();
+
+            return subCategories;
+        }
+
+        public async Task<IEnumerable<SubCategory>> GetSubCategoriesByCategoryNameAsync(string categoryName)
+        {
+            // Retrieve subcategories for the specified category name
+            var subCategories = await _context.SubCategories
+                .Where(sc => sc.Category.CategoryName == categoryName)
+                .ToListAsync();
+
+            return subCategories;
+        }
+
         public async Task Save()
         {
             await _context.SaveChangesAsync();

@@ -17,7 +17,7 @@ namespace Hexa_Hub.DTO
         public int AssetId { get; set; }
 
         [Required]
-        public string CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
@@ -26,9 +26,6 @@ namespace Hexa_Hub.DTO
 
         [Required]
         public string AssetReqReason { get; set; }
-
-
-        [DefaultValue(RequestStatus.Pending)]
-        public RequestStatus? Request_Status { get; set; } = RequestStatus.Pending;
+        public string Request_Status { get; set; }
     }
 }

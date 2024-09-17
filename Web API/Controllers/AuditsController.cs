@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Hexa_Hub.Models.MultiValues;
 
 namespace Hexa_Hub.Controllers
 {
@@ -105,7 +106,15 @@ namespace Hexa_Hub.Controllers
             }
             existingAudit.AuditDate = auditDto.AuditDate;
             existingAudit.AuditMessage = auditDto.AuditMessage;
-            existingAudit.Audit_Status = auditDto.Audit_Status;
+            if (Enum.TryParse<AuditStatus>(auditDto.Audit_Status, out var status))
+            {
+                existingAudit.Audit_Status = status;
+            }
+            else
+            {
+                return BadRequest($"Invalid Audit Status: {auditDto.Audit_Status}");
+            }
+
 
             try
             {
