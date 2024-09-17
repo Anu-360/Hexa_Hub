@@ -60,15 +60,24 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
         {
-            
             if (id != assetRequestDto.AssetReqId)
             {
-                return BadRequest("Id doesn't Match");
+                return BadRequest("Id doesn't match");
             }
 
-            if (assetRequestDto.Request_Status == RequestStatus.Allocated || assetRequestDto.Request_Status == RequestStatus.Rejected)
+            // Parse the string status from the DTO into the enum
+            if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
             {
-                return BadRequest($"The Request ID {id} has been {assetRequestDto.Request_Status}");
+                // Check if the status is Allocated or Rejected
+                if (parsedStatus == RequestStatus.Allocated || parsedStatus == RequestStatus.Rejected)
+                {
+                    return BadRequest($"The Request ID {id} has been {parsedStatus}");
+                }
+            }
+            else
+            {
+                // If parsing fails, return an error message
+                return BadRequest("Invalid Request_Status value");
             }
 
             var existingRequest = await _assetRequest.GetAssetRequestById(id);
@@ -84,13 +93,14 @@ namespace Hexa_Hub.Controllers
             }
             catch (AssetRequestNotFoundException)
             {
-                return NotFound($"AssetRequest for user {id} Not Found.");
+                return NotFound($"AssetRequest for user {id} not found.");
             }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
         }
+
 
         // POST: api/AssetRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -156,5 +166,116 @@ namespace Hexa_Hub.Controllers
         {
             return _context.AssetRequests.Any(e => e.AssetReqId == id);
         }
+
+        // GET: api/AssetRequest/filter-by-month?monthName=January
+        [HttpGet("filter-by-month")]
+        public async Task<IActionResult> FilterAssetRequestByMonth(string month)
+        {
+            // Validate that the month name is not null or empty
+            if (string.IsNullOrEmpty(month))
+            {
+                return BadRequest("Month name is required.");
+            }
+
+            try
+            {
+                var requests = await  _assetRequest.GetAssetRequestByMonthAsync(month);
+
+                if (requests == null || !requests.Any())
+                {
+                    throw new AssetRequestNotFoundException($"No requests found for the month of {month}.");
+                }
+
+                return Ok(requests);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("Invalid month name. Please provide a valid month name (e.g., January, February).");
+            }
+        }
+
+        // GET: api/AssetRequest/filter-by-year?year=2024
+        [HttpGet("filter-by-year")]
+        public async Task<IActionResult> FilterAssetRequestByYear(int year)
+        {
+            if (year < 1900 || year > DateTime.Now.Year)
+            {
+                return BadRequest("Invalid year. Please provide a valid year.");
+            }
+
+            var requests = await _assetRequest.GetAssetRequestByYearAsync(year);
+
+            if (requests == null || !requests.Any())
+            {
+                return NotFound($"No request found for the year {year}.");
+            }
+
+            return Ok(requests);
+        }
+
+        // GET: api/AssetRequest/filter-by-month-and-year?month=January&year=2024
+        [HttpGet("filter-by-month-and-year")]
+        public async Task<IActionResult> FilterAssetRequestByMonthAndYear(string month, int year)
+        {
+            if (string.IsNullOrEmpty(month))
+            {
+                return BadRequest("Month name is required.");
+            }
+
+            if (year < 1900 || year > DateTime.Now.Year)
+            {
+                return BadRequest("Invalid year. Please provide a valid year.");
+            }
+
+            try
+            {
+                var requests = await _assetRequest.GetAssetRequestByMonthAndYearAsync(month, year);
+
+                if (requests == null || !requests.Any())
+                {
+                    return NotFound($"No requests found for the month of {month} in the year {year}.");
+                }
+
+                return Ok(requests);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("Invalid month name. Please provide a valid month name (e.g., January, February).");
+            }
+        }
+
+        // GET: api/AssetRequest/filter-by-date-range?startDate=2024-01-01&endDate=2024-12-31
+        [HttpGet("filter-by-date-range")]
+        public async Task<IActionResult> FilterAssetRequestByDateRange(DateTime startDate, DateTime endDate)
+        {
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date cannot be greater than end date.");
+            }
+
+            var requests = await _assetRequest.GetAssetRequestByDateRangeAsync(startDate, endDate);
+
+            if (requests == null || !requests.Any())
+            {
+                throw new AssetRequestNotFoundException($"No requests found between {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}.");
+            }
+
+            return Ok(requests);
+        }
+
+        [HttpGet("Status")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetRequestDto>>> GetAssetRequestByStatus([FromQuery] RequestStatus status)
+        {
+            var assetreqDtos = await _assetRequest.GetAssetRequestByStatus(status);
+
+            if (assetreqDtos == null || !assetreqDtos.Any())
+            {
+                return NotFound($"No requests found with status '{status}'.");
+            }
+
+            return Ok(assetreqDtos);
+        }
+
     }
 }

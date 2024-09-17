@@ -23,7 +23,7 @@ namespace Hexa_Hub.DTO
         public string? AuditMessage { get; set; }
 
  
-        [DefaultValue(AuditStatus.Sent)]
-        public AuditStatus? Audit_Status { get; set; } = AuditStatus.Sent;
+       
+        public string Audit_Status { get; set; }
     }
 }

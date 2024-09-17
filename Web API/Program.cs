@@ -2,12 +2,17 @@ using Microsoft.EntityFrameworkCore;
 
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
+using Hexa_Hub.Constants;
+using Hexa_Hub.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Options;
+using System.Configuration;
+using Microsoft.AspNetCore.Hosting;
 namespace Hexa_Hub
 {
     public class Program
@@ -26,8 +31,11 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IMaintenanceLogRepo, MaintenanceLogRepo>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
+            builder.Services.AddTransient<IEmail, EmailService>();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
-            
+      
+
             builder.Services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
@@ -56,8 +64,13 @@ namespace Hexa_Hub
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
 
             // Add services to the container.
+            builder.Services.AddControllers()
+          .AddJsonOptions(options =>
+          {
+              options.JsonSerializerOptions.Converters.Add(new DateTimeConverter()); // Add the custom DateTime converter
+          });
 
-            
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -86,7 +99,14 @@ namespace Hexa_Hub
                         new string[]{}
                     }
                 });
+
+
+
+                // Register the custom schema filter
+                options.SchemaFilter<EnumSchemaFilter>();
             });
+           
+
 
             builder.Services.AddDbContext<DataContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
@@ -99,6 +119,7 @@ namespace Hexa_Hub
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+           
 
             app.UseHttpsRedirection();
             app.UseAuthentication();

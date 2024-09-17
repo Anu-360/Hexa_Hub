@@ -25,6 +25,16 @@ namespace Hexa_Hub.Repository
                                  .Include(c => c.SubCategories)
                                  .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
+        public async Task<IEnumerable<string>> GetAllCategoryNamesAsync()
+        {
+            // Retrieve distinct category names for the dropdown
+            var categoryNames = await _context.Categories
+                .Select(c => c.CategoryName)
+                .Distinct()
+                .ToListAsync();
+
+            return categoryNames;
+        }
 
         public async Task<Category> AddCategory(CategoriesDto categoryDto)
         {

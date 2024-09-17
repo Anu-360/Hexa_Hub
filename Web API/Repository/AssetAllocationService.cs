@@ -1,16 +1,24 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using Hexa_Hub.DTO;
+using static Hexa_Hub.Models.MultiValues;
+using static Hexa_Hub.Repository.AssetAllocationService;
+using System.Configuration;
 
 namespace Hexa_Hub.Repository
 {
     public class AssetAllocationService : IAssetAllocation
     {
         private readonly DataContext _context;
+        private readonly IEmail _email;
+        private readonly IConfiguration _configuration;  // For accessing appsettings
 
-        public AssetAllocationService(DataContext context)
+        public AssetAllocationService(DataContext context, IEmail email,IConfiguration configuration)
         {
             _context = context;
+            _email = email;
+            _configuration = configuration;
         }
 
         public async Task<List<AssetAllocation>> GetAllAllocations()
@@ -23,15 +31,47 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
+        public async Task<List<AssetAllocation>> GetAllocationsByMonthAsync(string month)
+        {
+            var monthname = DateTime.ParseExact(month, "MMMM", null).Month;
+            return await _context.AssetAllocations
+                                 .Where(a => a.AllocatedDate.Month == monthname)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetAllocation>> GetAllocationsByYearAsync(int year)
+        {
+            return await _context.AssetAllocations
+                                 .Where(a => a.AllocatedDate.Year == year)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetAllocation>> GetAllocationsByMonthAndYearAsync(string month, int year)
+        {
+            var monthname = DateTime.ParseExact(month, "MMMM", null).Month;
+            return await _context.AssetAllocations
+                                 .Where(a => a.AllocatedDate.Month == monthname && a.AllocatedDate.Year == year)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<AssetAllocation>> GetAllocationsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.AssetAllocations
+                                 .Where(a => a.AllocatedDate >= startDate && a.AllocatedDate <= endDate)
+                                 .ToListAsync();
+        }
+
+
         public async Task AddAllocation(AssetAllocation allocation)
         {
             try
             {
                 _context.AssetAllocations.Add(allocation);
+                await _context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception($"Error Adding Exception {ex.Message}");
+                throw new Exception($"Error Adding Allocation: {ex.Message}");
             }
         }
 
@@ -80,17 +120,68 @@ namespace Hexa_Hub.Repository
                     .ThenInclude(category => category.SubCategories)
                 .Include(aa => aa.User)
                 .Include(aa => aa.AssetRequests)
-                .ToListAsync();
+            .ToListAsync();
         }
 
-        //public Task<AssetAllocation> UpdateAllocation(AssetAllocation allocation)
-        //{
-        //    _context.AssetAllocations.Update(allocation);
-        //    return Task.FromResult(allocation);
-
-        //}
 
 
+        public async Task<AssetAllocation> AllocateAssetAsync(AssetAllocationDto allocationDto, int adminUserId)
+        {
+            // Check if the asset exists
+            var asset = await _context.Assets.FindAsync(allocationDto.AssetId);
+            if (asset == null)
+            {
+                throw new AssetNotFoundException("Asset not found.");
+            }
+
+            // Check if the user exists (employee to whom the asset is being allocated)
+            var user = await _context.Users.FindAsync(allocationDto.UserId);
+            if (user == null)
+            {
+                throw new UserNotFoundException("User not found.");
+            }
+
+            // Check if the current user (admin) exists
+            var admin = await _context.Users.FindAsync(adminUserId);
+            if (admin == null || admin.User_Type != UserType.Admin)
+            {
+                throw new UnauthorizedAccessException("Only an admin can allocate assets.");
+            }
+
+            // Create the AssetAllocation entity
+            var assetAllocation = new AssetAllocation
+            {
+                AssetId = allocationDto.AssetId,
+                UserId = allocationDto.UserId,
+                AssetReqId = allocationDto.AssetReqId,
+                AllocatedDate = DateTime.Now,
+                Asset = asset,
+                User = user
+            };
+
+            // Save the allocation to the database
+            _context.AssetAllocations.Add(assetAllocation);
+            await _context.SaveChangesAsync();
+
+            // Admin details for email
+            string fromEmail = admin.UserMail;  // Admin's email
+            string fromName = admin.UserName;    // Admin's name
+
+            // Employee details
+            string toEmail = user.UserMail;     // Employee's email
+            string subject = "Asset Allocation Notification";
+            string message = $"Dear {user.UserName},<br>Your asset {asset.AssetName} has been allocated successfully on {assetAllocation.AllocatedDate}.";
+
+            // Send email notification from Admin to Employee
+            await _email.SendEmailAsync(fromEmail, fromName, toEmail, subject, message);
+
+            return assetAllocation;
+        }
     }
-
 }
+
+
+
+    
+
+

@@ -34,6 +34,35 @@ namespace Hexa_Hub.Controllers
             return await _subcategory.GetAllSubCategories();
         }
 
+        // Filter by Quantity
+        [HttpGet("by-quantity")]
+        public async Task<IActionResult> GetSubCategoriesByQuantity(int quantity)
+        {
+            var subCategories = await _subcategory.GetSubCategoriesByQuantityAsync(quantity);
+
+            if (!subCategories.Any())
+            {
+                return NotFound("No subcategories found with the specified quantity.");
+            }
+
+            return Ok(subCategories);
+        }
+
+
+        // Endpoint to get subcategories by category name
+        [HttpGet("by-category-name")]
+        public async Task<IActionResult> GetSubCategoriesByCategoryName(string categoryName)
+        {
+            var subCategories = await _subcategory.GetSubCategoriesByCategoryNameAsync(categoryName);
+
+            if (subCategories == null || !subCategories.Any())
+            {
+                return NotFound("No subcategories found for the specified category.");
+            }
+
+            return Ok(subCategories);
+        }
+
 
         // PUT: api/SubCategories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
