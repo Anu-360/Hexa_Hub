@@ -125,58 +125,58 @@ namespace Hexa_Hub.Repository
 
 
 
-        public async Task<AssetAllocation> AllocateAssetAsync(AssetAllocationDto allocationDto, int adminUserId)
-        {
-            // Check if the asset exists
-            var asset = await _context.Assets.FindAsync(allocationDto.AssetId);
-            if (asset == null)
-            {
-                throw new AssetNotFoundException("Asset not found.");
-            }
+        //public async Task<AssetAllocation> AllocateAssetAsync(AssetAllocationDto allocationDto, int adminUserId)
+        //{
+        //    // Check if the asset exists
+        //    var asset = await _context.Assets.FindAsync(allocationDto.AssetId);
+        //    if (asset == null)
+        //    {
+        //        throw new AssetNotFoundException("Asset not found.");
+        //    }
 
-            // Check if the user exists (employee to whom the asset is being allocated)
-            var user = await _context.Users.FindAsync(allocationDto.UserId);
-            if (user == null)
-            {
-                throw new UserNotFoundException("User not found.");
-            }
+        //    // Check if the user exists (employee to whom the asset is being allocated)
+        //    var user = await _context.Users.FindAsync(allocationDto.UserId);
+        //    if (user == null)
+        //    {
+        //        throw new UserNotFoundException("User not found.");
+        //    }
 
-            // Check if the current user (admin) exists
-            var admin = await _context.Users.FindAsync(adminUserId);
-            if (admin == null || admin.User_Type != UserType.Admin)
-            {
-                throw new UnauthorizedAccessException("Only an admin can allocate assets.");
-            }
+        //    // Check if the current user (admin) exists
+        //    var admin = await _context.Users.FindAsync(adminUserId);
+        //    if (admin == null || admin.User_Type != UserType.Admin)
+        //    {
+        //        throw new UnauthorizedAccessException("Only an admin can allocate assets.");
+        //    }
 
-            // Create the AssetAllocation entity
-            var assetAllocation = new AssetAllocation
-            {
-                AssetId = allocationDto.AssetId,
-                UserId = allocationDto.UserId,
-                AssetReqId = allocationDto.AssetReqId,
-                AllocatedDate = DateTime.Now,
-                Asset = asset,
-                User = user
-            };
+        //    // Create the AssetAllocation entity
+        //    var assetAllocation = new AssetAllocation
+        //    {
+        //        AssetId = allocationDto.AssetId,
+        //        UserId = allocationDto.UserId,
+        //        AssetReqId = allocationDto.AssetReqId,
+        //        AllocatedDate = DateTime.Now,
+        //        Asset = asset,
+        //        User = user
+        //    };
 
-            // Save the allocation to the database
-            _context.AssetAllocations.Add(assetAllocation);
-            await _context.SaveChangesAsync();
+        //    // Save the allocation to the database
+        //    _context.AssetAllocations.Add(assetAllocation);
+        //    await _context.SaveChangesAsync();
 
-            // Admin details for email
-            string fromEmail = admin.UserMail;  // Admin's email
-            string fromName = admin.UserName;    // Admin's name
+        //    // Admin details for email
+        //    string fromEmail = admin.UserMail;  // Admin's email
+        //    string fromName = admin.UserName;    // Admin's name
 
-            // Employee details
-            string toEmail = user.UserMail;     // Employee's email
-            string subject = "Asset Allocation Notification";
-            string message = $"Dear {user.UserName},<br>Your asset {asset.AssetName} has been allocated successfully on {assetAllocation.AllocatedDate}.";
+        //    // Employee details
+        //    string toEmail = user.UserMail;     // Employee's email
+        //    string subject = "Asset Allocation Notification";
+        //    string message = $"Dear {user.UserName},<br>Your asset {asset.AssetName} has been allocated successfully on {assetAllocation.AllocatedDate}.";
 
-            // Send email notification from Admin to Employee
-            await _email.SendEmailAsync(fromEmail, fromName, toEmail, subject, message);
+        //    // Send email notification from Admin to Employee
+        //    await _email.SendEmailAsync(fromEmail, fromName, toEmail, subject, message);
 
-            return assetAllocation;
-        }
+        //    return assetAllocation;
+        //}
     }
 }
 

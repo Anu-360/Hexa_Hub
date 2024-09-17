@@ -22,14 +22,16 @@ namespace Hexa_Hub.Controllers
         private readonly IAsset _asset;
         private readonly IAssetAllocation _assetAlloc;
         private readonly IAssetRequest _assetRequest;
+        private readonly INotificationService _notificationService;
 
-        public ReturnRequestsController(DataContext context, IReturnReqRepo returnRequestRepo,IAsset asset,IAssetAllocation assetAllocation,IAssetRequest assetRequest)
+        public ReturnRequestsController(DataContext context, IReturnReqRepo returnRequestRepo,IAsset asset, IAssetAllocation assetAllocation, IAssetRequest assetRequest, INotificationService notificationService)
         {
             _context = context;
             _returnRequestRepo = returnRequestRepo;
             _asset = asset;
             _assetAlloc = assetAllocation;
             _assetRequest = assetRequest;
+            _notificationService = notificationService;
         }
 
         // GET: api/ReturnRequests
@@ -91,7 +93,6 @@ namespace Hexa_Hub.Controllers
                 return NotFound($"Details For the Request id {id} is not found");
             }
 
-            // Update request properties
             existingRequest.UserId = returnRequestDto.UserId;
             existingRequest.AssetId = returnRequestDto.AssetId;
             existingRequest.CategoryId = returnRequestDto.CategoryId;
@@ -99,7 +100,6 @@ namespace Hexa_Hub.Controllers
             existingRequest.Reason = returnRequestDto.Reason;
             existingRequest.Condition = returnRequestDto.Condition;
 
-            // Parse the ReturnStatus from the DTO
             if (Enum.TryParse(returnRequestDto.ReturnStatus, out Models.MultiValues.ReturnReqStatus parsedStatus))
             {
                 existingRequest.ReturnStatus = parsedStatus;
@@ -109,8 +109,8 @@ namespace Hexa_Hub.Controllers
                 return BadRequest("Invalid Return Status provided.");
             }
 
-            // If status is Approved or Returned, handle related logic
-            if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved || parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
+            // If status is Approved or Returned
+            if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved || parsedStatus == Models.MultiValues.ReturnReqStatus.Returned || parsedStatus == Models.MultiValues.ReturnReqStatus.Rejected)
             {
                 existingRequest.ReturnDate = DateTime.Now;
 
@@ -157,6 +157,22 @@ namespace Hexa_Hub.Controllers
                         }
                     }
                 }
+                var user = await _context.Users.FindAsync(existingRequest.UserId);
+                if (user != null)
+                {
+                    if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved)
+                    {
+                        await _notificationService.ReturnRequestApproved(user.UserMail, user.UserName, existingRequest.AssetId, id);
+                    }
+                    else if (parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
+                    {
+                        await _notificationService.ReturnRequestCompleted(user.UserMail, user.UserName, existingRequest.AssetId);
+                    }
+                    else if (parsedStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+                    {
+                        await _notificationService.ReturnRequestRejected(user.UserMail, user.UserName, existingRequest.AssetId, id);
+                    }
+                }
             }
 
             try
@@ -195,6 +211,7 @@ namespace Hexa_Hub.Controllers
 
             var createdRequest = await _returnRequestRepo.AddReturnRequest(returnRequestDto);
             await _returnRequestRepo.Save();
+
 
             return CreatedAtAction("GetReturnRequest", new { id = createdRequest.ReturnId }, createdRequest);
         }
