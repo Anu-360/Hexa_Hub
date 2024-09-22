@@ -12,7 +12,7 @@ namespace Hexa_Hub.Interface
         Task<List<AssetAllocation>> GetAllocationsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task AddAllocation(AssetAllocation allocation);
 
-        Task<AssetAllocation> AllocateAssetAsync(AssetAllocationDto allocationDto,int adminUserId);
+        //Task<AssetAllocation> AllocateAssetAsync(AssetAllocationDto allocationDto,int adminUserId);
         Task DeleteAllocation(int id);
         Task Save();
         Task<List<AssetAllocation>> GetAllocationListById(int userId);

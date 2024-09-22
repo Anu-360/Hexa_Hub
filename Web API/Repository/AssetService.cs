@@ -21,10 +21,34 @@ namespace Hexa_Hub.Repository
 
         public async Task<List<Asset>> GetAllAssets()
         {
-            return await _context.Assets
-                                 .Include(a => a.Category)
-                                 .Include(a => a.SubCategories)
-                                 .ToListAsync();
+            //return await _context.Assets
+            //                     .Include(a => a.Category)
+            //                     .Include(a => a.SubCategories)
+            //                     .ToListAsync();
+            var assets = await _context.Assets
+                                .Include(a => a.Category)
+                                .Include(a => a.SubCategories)
+                                .ToListAsync();
+
+            return assets.Select(a => new Asset
+            {
+                AssetId = a.AssetId,
+                AssetName = a.AssetName,
+                AssetDescription = a.AssetDescription,
+                CategoryId = a.CategoryId,
+                SubCategoryId = a.SubCategoryId,
+                AssetImage = a.AssetImage,
+                SerialNumber = a.SerialNumber,
+                Model = a.Model,
+                ManufacturingDate = a.ManufacturingDate,
+                Location = a.Location,
+                Value = a.Value,
+                Expiry_Date = a.Expiry_Date,
+                Asset_Status = a.Asset_Status,
+                Category = a.Category,
+                SubCategories = a.SubCategories
+            }).ToList();
+
         }
         public async Task<List<Asset>> GetAllDetailsOfAssets()
         {

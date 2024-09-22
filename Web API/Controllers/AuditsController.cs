@@ -7,6 +7,7 @@ using Hexa_Hub.DTO;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
 using Hexa_Hub.Repository;
+using iText.Commons.Bouncycastle.Cert.Ocsp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +22,15 @@ namespace Hexa_Hub.Controllers
     {
         private readonly IAuditRepo _auditRepo;
         private readonly DataContext _context;
+        private readonly INotificationService _notificationService;
+        private readonly IUserRepo _userRepo;
 
-        public AuditsController(IAuditRepo auditRepo,DataContext context)
+        public AuditsController(IAuditRepo auditRepo,DataContext context, INotificationService notificationService, IUserRepo userRepo)
         {
             _auditRepo = auditRepo;
             _context = context;
+            _notificationService = notificationService;
+            _userRepo = userRepo;
         }
 
         // GET: api/Audits
@@ -50,9 +55,17 @@ namespace Hexa_Hub.Controllers
             }
         }
 
+        [HttpGet("All")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<AuditsDto>>> GetAllAudits()
+        {
+            return await _auditRepo.GetAllAudit();
+        }
+
+
         // GET: api/Audits/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<Audit>> GetAudit(int id)
         {
             //User can see his own details whereas Admin can see all users details
@@ -120,6 +133,17 @@ namespace Hexa_Hub.Controllers
             {
                 await _auditRepo.UpdateAudit(existingAudit);
                 await _auditRepo.Save();
+                if (existingAudit.Audit_Status == AuditStatus.Completed)
+                {
+                    var adminUsers = await _userRepo.GetUsersByAdmin();
+
+                    foreach (var admin in adminUsers)
+                    {
+
+                        await _notificationService.AduitCompleted(admin.UserMail, admin.UserName, existingAudit.AuditId);
+                    }
+                    var admins = await _userRepo.GetUsersByRole(UserType.Admin);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -148,7 +172,19 @@ namespace Hexa_Hub.Controllers
             }
             var audit = await _auditRepo.AddAduit(auditDto);
             await _auditRepo.Save();
-
+            var employee = await _userRepo.GetUserId(audit.UserId);
+            if (employee != null)
+            {
+                await _notificationService.AduitCompleted(
+                    employee.UserMail,
+                    employee.UserName,
+                    audit.AuditId
+                );
+            }
+            else
+            {
+                return NotFound("Employee not found.");
+            }
             return CreatedAtAction("GetAudit", new { id = audit.AuditId }, audit);
         }
 

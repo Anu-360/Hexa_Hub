@@ -1,16 +1,22 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using static Hexa_Hub.Models.MultiValues;
+using Hexa_Hub.DTO;
 
 namespace Hexa_Hub.Repository
 {
     public class ServiceRequestImpl : IServiceRequest
     {
         private readonly DataContext _context;
+        private readonly IUserRepo _userRepo;
+        private readonly INotificationService _notificationService;
 
-        public ServiceRequestImpl(DataContext context)
+        public ServiceRequestImpl(DataContext context, IUserRepo userRepo, INotificationService notificationService)
         {
             _context = context;
+            _userRepo = userRepo;
+            _notificationService = notificationService;
         }
 
         public async Task<List<ServiceRequest>> GetAllServiceRequests()
@@ -20,6 +26,25 @@ namespace Hexa_Hub.Repository
                 .Include(sr => sr.User)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<ServiceRequestDto>> GetServiceReqByStatus (ServiceReqStatus serviceReqStatus)
+        {
+            var serviceByStatus = await (from service in _context.ServiceRequests
+                                         where service.ServiceReqStatus == serviceReqStatus
+                                         select new ServiceRequestDto
+                                         {
+                                             ServiceId = service.ServiceId,
+                                             AssetId = service.AssetId,
+                                             UserId = service.UserId,
+                                             ServiceRequestDate = service.ServiceRequestDate,
+                                             Issue_Type = service.Issue_Type,
+                                             ServiceDescription = service.ServiceDescription,
+                                             ServiceReqStatus = service.ServiceReqStatus.ToString() // Converting enum to string
+                                         }).ToListAsync();
+
+            return serviceByStatus;
+        }
+
 
         public async Task<ServiceRequest?> GetServiceRequestById(int id)
         {
@@ -38,6 +63,13 @@ namespace Hexa_Hub.Repository
             }
 
             _context.ServiceRequests.Add(serviceRequest);
+            var adminUsers = await _userRepo.GetUsersByAdmin();
+            foreach (var admin in adminUsers)
+            {
+                Console.WriteLine($"Sending email to: {admin.UserMail}");
+
+                await _notificationService.ServiceRequestSent(admin.UserMail, admin.UserName, serviceRequest.AssetId, serviceRequest.ServiceId, serviceRequest.Issue_Type);
+            }
         }
 
         public Task<ServiceRequest> UpdateServiceRequest(ServiceRequest existingRequest)

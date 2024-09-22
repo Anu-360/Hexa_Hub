@@ -20,7 +20,7 @@ namespace Hexa_Hub.Constants
             {
                 schema.Enum = context.Type.GetEnumNames()
                                  .Select(e => (IOpenApiAny)new OpenApiString(e))
-                                 .ToList(); // Casting to IOpenApiAny
+                                 .ToList(); 
                 schema.Type = "string";
                 schema.Format = null;
             }

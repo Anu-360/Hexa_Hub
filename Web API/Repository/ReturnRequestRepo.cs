@@ -2,15 +2,20 @@
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.DTO;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Hexa_Hub.Repository
 {
     public class ReturnRequestRepo : IReturnReqRepo
     {
         private readonly DataContext _context;
-        public ReturnRequestRepo(DataContext context)
+        private readonly IUserRepo _userRepo;
+        private readonly INotificationService _notificationService;
+        public ReturnRequestRepo(DataContext context, IUserRepo userRepo, INotificationService notificationService)
         {
             _context = context;
+            _userRepo = userRepo;
+            _notificationService = notificationService;
         }
         public async Task<ReturnRequest> AddReturnRequest(ReturnRequestDto returnRequestDto)
         {
@@ -25,6 +30,14 @@ namespace Hexa_Hub.Repository
                 Condition = returnRequestDto.Condition
             };
             await _context.AddAsync(req);
+            var adminUsers = await _userRepo.GetUsersByAdmin();
+
+           
+            foreach (var admin in adminUsers)
+            {
+
+                await _notificationService.ReturnRequestSent(admin.UserMail, admin.UserName, returnRequestDto.AssetId, req.ReturnId);
+            }
             return req;
         }
 

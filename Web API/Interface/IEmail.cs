@@ -3,7 +3,7 @@
    
         public interface IEmail
         {
-            Task SendEmailAsync(string fromEmail, string fromName, string toEmail, string subject, string message);
+            Task SendEmailAsync(string to, string subject, string body);
         }
 
     

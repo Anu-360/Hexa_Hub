@@ -29,6 +29,8 @@ namespace Hexa_Hub.Repository
                 AuditMessage = auditDto.AuditMessage
             };
             await _context.AddAsync(audit);
+
+
             return audit;
         }
 
@@ -57,6 +59,26 @@ namespace Hexa_Hub.Repository
                 .ToListAsync();
         }
 
+        public async Task<List<AuditsDto>> GetAllAudit()
+        {
+            var audits =  await _context.Audits
+                .Include(a => a.User)
+                .Include(a => a.Asset)
+                .OrderByDescending(a => a.AuditDate)
+                .Take(5)
+                .ToListAsync();
+            return audits.Select(a => new AuditsDto
+            {
+                AuditId = a.AuditId,
+                AssetId = a.AssetId,
+                UserId = a.UserId,
+                AuditDate = a.AuditDate,
+                AuditMessage = a.AuditMessage,
+                Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                AssetName = a.Asset?.AssetName,
+                UserName = a.User?.UserName
+            }).ToList();
+        }
         public async Task<Audit?> GetAuditById(int id)
         {
             return await _context.Audits

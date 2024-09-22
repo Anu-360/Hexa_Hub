@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Hexa_Hub.DTO;
 using Hexa_Hub.Exceptions;
 using Hexa_Hub.Interface;
+using Hexa_Hub.Models;
 using Hexa_Hub.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static Hexa_Hub.Models.MultiValues;
+
 
 namespace Hexa_Hub.Controllers
 {
@@ -55,31 +57,110 @@ namespace Hexa_Hub.Controllers
             }
         }
 
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
+        //{
+        //    if (id != assetRequestDto.AssetReqId)
+        //    {
+        //        return BadRequest("Id doesn't Match");
+        //    }
+
+        //    // Convert Request_Status from string to RequestStatus enum
+        //    if (Enum.TryParse<RequestStatus>(assetRequestDto.Request_Status, out var requestStatus))
+        //    {
+        //        if (requestStatus == RequestStatus.Allocated || requestStatus == RequestStatus.Rejected)
+        //        {
+        //            return BadRequest($"The Request ID {id} has been {requestStatus}");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Invalid Request Status");
+        //    }
+
+        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound("Request Not Found");
+        //    }
+
+        //    try
+        //    {
+        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
+        //        return Ok($"{assetRequestDto.Request_Status} has been Updated");
+        //    }
+        //    catch (AssetRequestNotFoundException)
+        //    {
+        //        return NotFound($"AssetRequest for user {id} Not Found.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { error = ex.Message });
+        //    }
+        //}
+
+
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
+        //{
+        //    if (id != assetRequestDto.AssetReqId)
+        //    {
+        //        return BadRequest("Id doesn't match");
+        //    }
+
+        //    // Parse the string status from the DTO into the enum
+        //    if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
+        //    {
+        //        // Check if the status is Allocated or Rejected
+        //        if (parsedStatus == RequestStatus.Allocated || parsedStatus == RequestStatus.Rejected)
+        //        {
+        //            return BadRequest($"The Request ID {id} has been {parsedStatus}");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // If parsing fails, return an error message
+        //        return BadRequest("Invalid Request_Status value");
+        //    }
+
+        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound("Request Not Found");
+        //    }
+
+        //    try
+        //    {
+        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
+        //        return Ok($"{assetRequestDto.Request_Status} has been Updated");
+        //    }
+        //    catch (AssetRequestNotFoundException)
+        //    {
+        //        return NotFound($"AssetRequest for user {id} not found.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { error = ex.Message });
+        //    }
+        //}
+
+
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
         {
+
             if (id != assetRequestDto.AssetReqId)
             {
-                return BadRequest("Id doesn't match");
+                return BadRequest("Id doesn't Match");
             }
-
-            // Parse the string status from the DTO into the enum
-            if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
+            if (assetRequestDto.Request_Status == "Allocated" || assetRequestDto.Request_Status == "Rejected")
             {
-                // Check if the status is Allocated or Rejected
-                if (parsedStatus == RequestStatus.Allocated || parsedStatus == RequestStatus.Rejected)
-                {
-                    return BadRequest($"The Request ID {id} has been {parsedStatus}");
-                }
+                return BadRequest($"The Request ID {id} has already been Allcoated/Rejected and cannot be updated");
             }
-            else
-            {
-                // If parsing fails, return an error message
-                return BadRequest("Invalid Request_Status value");
-            }
-
             var existingRequest = await _assetRequest.GetAssetRequestById(id);
             if (existingRequest == null)
             {
@@ -89,11 +170,11 @@ namespace Hexa_Hub.Controllers
             try
             {
                 await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
-                return Ok($"{assetRequestDto.Request_Status} has been Updated");
+                return Ok($"{assetRequestDto.AssetReqId} has been Updated");
             }
             catch (AssetRequestNotFoundException)
             {
-                return NotFound($"AssetRequest for user {id} not found.");
+                return NotFound($"AssetRequest for user {id} Not Found.");
             }
             catch (Exception ex)
             {
@@ -123,6 +204,7 @@ namespace Hexa_Hub.Controllers
 
             await _assetRequest.AddAssetRequest(assetRequestDto);
             await _assetRequest.Save();
+
 
             return CreatedAtAction("GetAssetRequests", new { id = assetRequestDto.AssetReqId }, assetRequestDto);
         }
@@ -275,6 +357,14 @@ namespace Hexa_Hub.Controllers
             }
 
             return Ok(assetreqDtos);
+        }
+
+
+        [HttpGet("GetAll")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetRequest>>> GetAllAssetRequests()
+        {
+           return await _assetRequest.GetAllAssetRequests();
         }
 
     }

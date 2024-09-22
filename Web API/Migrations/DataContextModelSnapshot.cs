@@ -55,7 +55,7 @@ namespace Hexa_Hub.Migrations
                         .HasColumnType("nvarchar(55)");
 
                     b.Property<DateTime>("ManufacturingDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -130,9 +130,8 @@ namespace Hexa_Hub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CategoryId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Request_Status")
                         .HasColumnType("nvarchar(max)");
