@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 
+
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {

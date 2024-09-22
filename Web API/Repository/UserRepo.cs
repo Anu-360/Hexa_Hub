@@ -89,6 +89,7 @@ namespace Hexa_Hub.Repository
             return await _context.Users.Where(u => u.User_Type == role).ToListAsync();
         }
 
+
         public async Task<User?> GetUserId(int id)
         {
             return await _context.Users
