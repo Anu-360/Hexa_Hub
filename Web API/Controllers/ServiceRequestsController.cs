@@ -205,7 +205,24 @@ namespace Hexa_Hub.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("Status/{status}")]
+        public async Task<IActionResult> GetServiceRequestsByStatus(ServiceReqStatus status)
+        {
+            try
+            {
+                var serviceRequests = await _serviceRequest.GetServiceReqByStatus(status);
+                if (serviceRequests == null)
+                {
+                    return NotFound("No service requests found with the given status.");
+                }
 
+                return Ok(serviceRequests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         private bool ServiceRequestExists(int id)
         {

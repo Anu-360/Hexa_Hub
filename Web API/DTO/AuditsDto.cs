@@ -21,9 +21,11 @@ namespace Hexa_Hub.DTO
         public DateTime? AuditDate { get; set; }
 
         public string? AuditMessage { get; set; }
-
- 
        
         public string Audit_Status { get; set; }
+
+        public string? AssetName { get; set; }
+
+        public string? UserName { get; set; }
     }
 }

@@ -55,6 +55,14 @@ namespace Hexa_Hub.Controllers
             }
         }
 
+        [HttpGet("All")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<AuditsDto>>> GetAllAudits()
+        {
+            return await _auditRepo.GetAllAudit();
+        }
+
+
         // GET: api/Audits/5
         [HttpGet("{id}")]
         [Authorize]

@@ -1,6 +1,8 @@
 ﻿using Hexa_Hub.Interface;
 using Microsoft.EntityFrameworkCore;
 using Hexa_Hub.Exceptions;
+using static Hexa_Hub.Models.MultiValues;
+using Hexa_Hub.DTO;
 
 namespace Hexa_Hub.Repository
 {
@@ -24,6 +26,25 @@ namespace Hexa_Hub.Repository
                 .Include(sr => sr.User)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<ServiceRequestDto>> GetServiceReqByStatus (ServiceReqStatus serviceReqStatus)
+        {
+            var serviceByStatus = await (from service in _context.ServiceRequests
+                                         where service.ServiceReqStatus == serviceReqStatus
+                                         select new ServiceRequestDto
+                                         {
+                                             ServiceId = service.ServiceId,
+                                             AssetId = service.AssetId,
+                                             UserId = service.UserId,
+                                             ServiceRequestDate = service.ServiceRequestDate,
+                                             Issue_Type = service.Issue_Type,
+                                             ServiceDescription = service.ServiceDescription,
+                                             ServiceReqStatus = service.ServiceReqStatus.ToString() // Converting enum to string
+                                         }).ToListAsync();
+
+            return serviceByStatus;
+        }
+
 
         public async Task<ServiceRequest?> GetServiceRequestById(int id)
         {

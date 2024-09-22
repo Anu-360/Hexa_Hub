@@ -1,4 +1,7 @@
-﻿namespace Hexa_Hub.Interface
+﻿using Hexa_Hub.DTO;
+using static Hexa_Hub.Models.MultiValues;
+
+namespace Hexa_Hub.Interface
 {
     public interface IServiceRequest
     {
@@ -9,7 +12,7 @@
         Task<ServiceRequest> UpdateServiceRequest(ServiceRequest existingRequest);
         Task DeleteServiceRequest(int id);
         Task Save();
-
+        Task<IEnumerable<ServiceRequestDto>> GetServiceReqByStatus(ServiceReqStatus serviceReqStatus);
         Task<List<ServiceRequest>> GetServiceRequestsByUserId(int userId);
     }
 
