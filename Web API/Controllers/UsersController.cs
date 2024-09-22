@@ -31,6 +31,19 @@ namespace Hexa_Hub.Controllers
             return await _userRepo.GetAllUser();
         }
 
+        [HttpGet("role")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole([FromQuery] UserType role)
+        {
+            var users = await _userRepo.GetUsersByRole(role);
+            if (users == null || !users.Any())
+            {
+                return NotFound("No users found with the specified role.");
+            }
+            return Ok(users);
+        }
+
+
 
         [HttpGet("profile")]
         [Authorize]
@@ -65,6 +78,7 @@ namespace Hexa_Hub.Controllers
 
             return BadRequest("Invalid user ID.");
         }
+
 
 
 
