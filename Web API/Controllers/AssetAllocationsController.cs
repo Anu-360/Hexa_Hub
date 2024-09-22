@@ -155,36 +155,6 @@ namespace Hexa_Hub.Controllers
             return Ok(allocations);
         }
 
-        //[HttpPost("allocate")]
-        //public async Task<IActionResult> AllocateAsset(AssetAllocationDto allocationDto)
-        //{
-        //    // Allocate the asset (existing logic)
-        //    var assetAllocation = await _assetallocation.AllocateAssetAsync(allocationDto);
-
-        //    if (assetAllocation == null)
-        //    {
-        //        return BadRequest("Asset allocation failed.");
-        //    }
-
-        //    // Fetch employee details
-        //    var user = await _userRepo.GetUserById(allocationDto.UserId);
-
-        //    if (user != null)
-        //    {
-        //        // Prepare email content
-        //        string subject = "Asset Allocation Confirmation";
-        //        string message = $"Dear {user.UserName},<br/><br/>" +
-        //                         $"The following asset has been allocated to you:<br/>" +
-        //                         $"<strong>Asset Name:</strong> {assetAllocation.Asset?.AssetName}<br/>" +
-        //                         $"<strong>Allocation Date:</strong> {assetAllocation.AllocatedDate:yyyy-MM-dd}<br/><br/>" +
-        //                         "Thank you!<br/>Asset Management Team";
-
-        //        // Send the email
-        //        await _email.SendEmailAsync(user.UserMail, subject, message);
-        //    }
-
-        //    return Ok(assetAllocation);
-        //}
     }
 }
 

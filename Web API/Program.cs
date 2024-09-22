@@ -40,6 +40,17 @@ namespace Hexa_Hub
             builder.Services.AddControllers()
             .AddJsonOptions(opts => opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReact",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                                .AllowCredentials();
+                    });
+            });
 
             builder.Services.AddAuthentication(options =>
             {
@@ -55,7 +66,7 @@ namespace Hexa_Hub
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey= true
                 };
             });
@@ -120,9 +131,11 @@ namespace Hexa_Hub
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-           
 
+            
             app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseCors("AllowReact");
             app.UseAuthentication();
             app.UseAuthorization();
             IConfiguration configuration = app.Configuration;

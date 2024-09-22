@@ -12,5 +12,6 @@ namespace Hexa_Hub.Interface
         Task DeleteAuditReq(int id);
         Task Save();
         Task<List<Audit>> GetAuditsByUserId(int userId);
+        Task<List<AuditsDto>> GetAllAudit();
     }
 }

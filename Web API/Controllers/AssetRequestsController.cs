@@ -146,6 +146,8 @@ namespace Hexa_Hub.Controllers
         //    }
         //}
 
+
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
@@ -355,6 +357,14 @@ namespace Hexa_Hub.Controllers
             }
 
             return Ok(assetreqDtos);
+        }
+
+
+        [HttpGet("GetAll")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetRequest>>> GetAllAssetRequests()
+        {
+           return await _assetRequest.GetAllAssetRequests();
         }
 
     }

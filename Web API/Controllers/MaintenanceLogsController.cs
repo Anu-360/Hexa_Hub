@@ -25,6 +25,12 @@ namespace Hexa_Hub.Controllers
             _context = context;
             _maintenanceLogRepo = maintenanceLogRepo;
         }
+        [HttpGet("AllLog")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MaintenanceLog>>> GetAllMaintenanceLog()
+        {
+            return await _maintenanceLogRepo.GetAllMaintenanceLog();
+        }
 
         // GET: api/MaintenanceLogs
         [HttpGet]
