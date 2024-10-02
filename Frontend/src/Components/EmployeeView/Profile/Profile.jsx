@@ -724,6 +724,7 @@ const Profile = () => {
                 />
               </div>
             </div>
+            
 
             {/* Address */}
             <div className="col-span-2">
@@ -737,6 +738,25 @@ const Profile = () => {
                   type="text"
                   name="address"
                   value={profileData.address}
+                  onChange={handleInputChange}
+                  disabled={!isEditable}
+                  className={`mt-1 block w-full px-8 py-2 border ${isEditable ? 'border-gray-300' : 'border-transparent'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${isEditable ? 'bg-indigo-950 text-slate-300' : 'bg-gray-100 text-indigo-950 font-semibold'}`}
+                />
+              </div>
+            </div>
+
+            {/* branch */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Branch</label>
+              <div className="mt-1 relative flex items-center">
+                <FontAwesomeIcon
+                  icon={faLocationDot}
+                  className={`absolute left-3 h-3 w-3 ${isEditable ? 'text-slate-300' : 'text-indigo-950'}`}
+                />
+                <input
+                  type="text"
+                  name="branch"
+                  value={profileData.branch}
                   onChange={handleInputChange}
                   disabled={!isEditable}
                   className={`mt-1 block w-full px-8 py-2 border ${isEditable ? 'border-gray-300' : 'border-transparent'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${isEditable ? 'bg-indigo-950 text-slate-300' : 'bg-gray-100 text-indigo-950 font-semibold'}`}

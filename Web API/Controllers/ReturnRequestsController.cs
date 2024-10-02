@@ -89,7 +89,7 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<ReturnRequest>> GetReturnRequestByid(int id)
         {
-            var req = await _returnRequestRepo.GetReturnRequestById(id);
+            var req = await _returnRequestRepo.GetReturnRequestId(id);
             return Ok(req);
         }
 

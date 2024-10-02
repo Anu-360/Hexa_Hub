@@ -24,10 +24,6 @@ const Header = () => {
   const [isDarkMode, setDarkMode] = useState(true);
   const [timeLeft, setTimeLeft] = useState(3600);
 
-
-
-  // Handle clicks outside the dropdown
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

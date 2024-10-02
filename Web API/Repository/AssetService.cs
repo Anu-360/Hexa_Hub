@@ -62,6 +62,8 @@ namespace Hexa_Hub.Repository
              AssetName = a.AssetName,
              Location = a.Location,
              Value = a.Value,
+             Model = a.Model,
+             SerialNumber = a.SerialNumber,
              CategoryName = a.Category.CategoryName,
              CategoryId =  a.Category.CategoryId,
              SubCategoryId = a.SubCategories.SubCategoryId,

@@ -139,6 +139,10 @@ const Assets = () => {
       setErrorMessage(`Asset "${asset.assetName}" is already allocated. Please select available assets.`);
       return;
     }
+    if (asset.assetStatusName === 'UnderMaintenance') {
+      setErrorMessage(`Asset "${asset.assetName}" is under Maintenane. Please select available assets.`);
+      return;
+    }
     setSelectedAsset(asset);
     setShowPrompt(true);
     setErrorMessage('');
@@ -496,10 +500,10 @@ const Assets = () => {
               <div className="p-4 text-left relative">
                 <h2 className="text-xl font-bold text-indigo-950">{asset.assetName}</h2>
                 <p className="text-sm text-gray-600">{asset.assetDescription}</p>
-                {/* <p className="text-gray-800">Serial No: {asset.serialNumber}</p> */}
+                <p className="text-gray-800">Serial No: {asset.serialNumber}</p>
                 <p className="text-red-400 font-bold">₹{asset.value}</p>
                 <p className="text-gray-800">Location: {asset.location}</p>
-                <p className="text-gary-800 font-semibold" >{asset.categoryName}</p>
+                <p className="text-gray-800 font-semibold" >{asset.categoryName}</p>
                 <p className="text-gray-800">Model: {asset.model}</p>
                 <span className={`text-sm font-semibold ${asset.assetStatusName === 'OpenToRequest' ? 'text-green-500' : 'text-red-500'}`}>
                   {asset.assetStatusName}
