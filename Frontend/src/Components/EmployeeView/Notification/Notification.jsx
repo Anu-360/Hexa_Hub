@@ -9,12 +9,12 @@ import axios from 'axios';
 
 const Notifications = () => {
     const [showAssetDetails, setShowAssetDetails] = useState(false);
-    const [notificationStatus, setNotificationStatus] = useState('active'); // Manage notification visibility
+    const [notificationStatus, setNotificationStatus] = useState('active'); 
     const [showSuccessPrompt, setShowSuccessPrompt] = useState(false);
     const [auditStatus, setAuditStatus] = useState('');
     const [showTrackDetails, setShowTrackDetails] = useState(false);
-    const [assetAllocations, setAssetAllocations] = useState([]); // Store asset allocations
-    const [isLoading, setIsLoading] = useState(true); // For loading state
+    const [assetAllocations, setAssetAllocations] = useState([]); 
+    const [isLoading, setIsLoading] = useState(true); 
     const [assetImages, setAssetImages] = useState({});
     const [assetRequest, setAssetRequest] = useState(null);
     const [serviceRequest, setServiceRequest] = useState(null);

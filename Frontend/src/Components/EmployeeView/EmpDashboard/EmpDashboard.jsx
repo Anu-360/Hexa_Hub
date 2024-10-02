@@ -19,10 +19,6 @@ if (token) {
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler);
 
-
-
-
-
 // Circular Gauge Component
 const CircularGauge = ({ percentage, label }) => {
     return (
@@ -49,7 +45,6 @@ const CircularGauge = ({ percentage, label }) => {
                             stroke="#102542" /* Color for remaining part */
                             strokeWidth="3.8"
                         />
-
                         {/* Foreground path (completed part) */}
                         <path
                             className="circle"
