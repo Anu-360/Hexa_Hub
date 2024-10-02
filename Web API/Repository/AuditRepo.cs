@@ -17,6 +17,20 @@ namespace Hexa_Hub.Repository
         {
             _context = context;
         }
+        public async Task<List<AllocatedAssetDto>> GetAllocatedAssetsAsync()
+        {
+            var allocatedAssets = await _context.AssetAllocations
+                .Select(a => new AllocatedAssetDto
+                {
+                    AssetId = a.AssetId,
+                    AssetName = a.Asset.AssetName, // Assuming you have navigation properties for Asset
+                    UserId = a.UserId,
+                    UserName = a.User.UserName // Assuming you have navigation properties for User
+                })
+                .ToListAsync();
+
+            return allocatedAssets;
+        }
 
         public async Task<Audit> AddAduit(AuditsDto auditDto)
         {
@@ -51,11 +65,23 @@ namespace Hexa_Hub.Repository
             
         }
 
-        public async Task<List<Audit>> GetAllAudits()
+        public async Task<List<AuditsDto>> GetAllAudits()
         {
             return await _context.Audits
                 .Include(a=>a.User)
                 .Include(a=>a.Asset)
+                .Select(a => new AuditsDto
+                {
+                    AuditId = a.AuditId,
+                    AssetId = a.AssetId,
+                    UserId = a.UserId,
+                    AuditDate = a.AuditDate,
+                    AuditMessage = a.AuditMessage,
+                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                    AssetName = a.Asset.AssetName,
+                    UserName = a.User.UserName
+                })
+                .OrderByDescending(a => a.AuditDate)
                 .ToListAsync();
         }
 
@@ -87,12 +113,51 @@ namespace Hexa_Hub.Repository
                     .FirstOrDefaultAsync(a=>a.AuditId == id);
         }
 
-        public async Task<List<Audit>> GetAuditsByUserId(int userId)
+        public async Task<AuditsDto?> GetAuditId(int id)
+        {
+            return await _context.Audits
+                    .Include(a => a.User)
+                    .Include(a => a.Asset)
+                    .Select(a => new AuditsDto
+                    {
+                        AuditId = a.AuditId,
+                        AssetId = a.AssetId,
+                        UserId = a.UserId,
+                        AuditDate = a.AuditDate,
+                        AuditMessage = a.AuditMessage,
+                        Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                        AssetName = a.Asset.AssetName,
+                        UserName = a.User.UserName
+                    })
+                    .FirstOrDefaultAsync(a => a.AuditId == id);
+        }
+
+        //public async Task<List<Audit>> GetAuditsByUserId(int userId)
+        //{
+        //    return await _context.Audits
+        //        .Where(a => a.UserId == userId)
+        //        .Include(a => a.Asset)
+        //        .Include(a => a.User)
+        //        .ToListAsync();
+        //}
+
+        public async Task<List<AuditsDto>> GetAuditsByUserId(int userId)
         {
             return await _context.Audits
                 .Where(a => a.UserId == userId)
                 .Include(a => a.Asset)
                 .Include(a => a.User)
+                .Select(a => new AuditsDto
+                {
+                    AuditId = a.AuditId,
+                    AssetId = a.AssetId,
+                    UserId = a.UserId,
+                    AuditDate = a.AuditDate,
+                    AuditMessage = a.AuditMessage,
+                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                    AssetName = a.Asset.AssetName,
+                    UserName = a.User.UserName
+                })
                 .ToListAsync();
         }
 

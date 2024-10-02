@@ -13,9 +13,12 @@ namespace Hexa_Hub.Repository
             _context = context;
         }
 
-        public async Task<List<SubCategory>> GetAllSubCategories()
+        public async Task<List<SubCategory>> GetAllSubCategories(int categoryId)
         {
-            return await _context.SubCategories.ToListAsync();
+            //return await _context.SubCategories.ToListAsync();
+            return await _context.SubCategories
+            .Where(sc => sc.CategoryId == categoryId)
+            .ToListAsync();
         }
 
         public async Task<SubCategory> GetSubCategoryById(int id)

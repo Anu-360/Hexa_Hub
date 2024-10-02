@@ -4,12 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField, Button, Typography, Box, Toolbar, Select, MenuItem, FormControl, InputLabel, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import Header from '../AdminHeader';
-import Navbar from '../AdminNavBar';
+// import Header from '../AdminHeader';
+// import Navbar from '../AdminNavBar';
 import { useTheme } from '../../ThemeContext';
 
 const UpdateUser = () => {
-    const [mobileOpen, setMobileOpen] = useState(false);
+    // const [mobileOpen, setMobileOpen] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
     const { darkMode } = useTheme();
@@ -57,9 +57,9 @@ const UpdateUser = () => {
             [name]: value,
         }));
     };
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+    // const handleDrawerToggle = () => {
+    //     setMobileOpen(!mobileOpen);
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Updating user with details:", userDetails);
@@ -77,14 +77,14 @@ const UpdateUser = () => {
                 Branch: userDetails.branch,
                 User_Type: userDetails.user_Type
             });
-            navigate('/employee');
+            navigate('/admin/employee');
         } catch (error) {
             console.error('Error updating user details:', error.response.data);
         }
     };
 
     const handleClose = () => {
-        navigate('/employee');
+        navigate('/admin/employee');
     };
 
     if (error) return <Typography color="error">{error}</Typography>;
@@ -98,8 +98,8 @@ const UpdateUser = () => {
                 minHeight: '100vh',
             }}
         >
-            <Header handleDrawerToggle={handleDrawerToggle}  />
-            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>
+            {/* <Header handleDrawerToggle={handleDrawerToggle} />
+            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} /> */}
             <Box sx={{ display: 'flex', flex: 1 }}>
                 <Box
                     component="main"

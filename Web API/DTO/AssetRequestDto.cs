@@ -6,8 +6,7 @@ namespace Hexa_Hub.DTO
 {
     public class AssetRequestDto
     {
-        [Required]
-        [Key]
+
         public int AssetReqId { get; set; }
 
         [Required]

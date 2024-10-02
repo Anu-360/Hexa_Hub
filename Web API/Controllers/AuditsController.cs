@@ -33,10 +33,17 @@ namespace Hexa_Hub.Controllers
             _userRepo = userRepo;
         }
 
+        [HttpGet("allocated-assets")]
+        public async Task<IActionResult> GetAllocatedAssets()
+        {
+            var allocatedAssets = await _auditRepo.GetAllocatedAssetsAsync();
+            return Ok(allocatedAssets);
+        }
+
         // GET: api/Audits
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Audit>>> GetAudits()
+        public async Task<ActionResult<IEnumerable<AuditsDto>>> GetAudits()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
@@ -62,6 +69,14 @@ namespace Hexa_Hub.Controllers
             return await _auditRepo.GetAllAudit();
         }
 
+
+        [HttpGet("Audis/{id}")]
+        [Authorize]
+        public async Task<ActionResult<Audit>> GetAuditsById(int id)
+        {
+            var audit = await _auditRepo.GetAuditId(id);
+            return Ok(audit);
+        }
 
         // GET: api/Audits/5
         [HttpGet("{id}")]
@@ -140,7 +155,7 @@ namespace Hexa_Hub.Controllers
                     foreach (var admin in adminUsers)
                     {
 
-                        await _notificationService.AduitCompleted(admin.UserMail, admin.UserName, existingAudit.AuditId);
+                        await _notificationService.AduitCompleted(admin.UserMail, existingAudit.AuditId);
                     }
                     var admins = await _userRepo.GetUsersByRole(UserType.Admin);
                 }
@@ -177,7 +192,6 @@ namespace Hexa_Hub.Controllers
             {
                 await _notificationService.AduitCompleted(
                     employee.UserMail,
-                    employee.UserName,
                     audit.AuditId
                 );
             }

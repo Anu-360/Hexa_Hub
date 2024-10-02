@@ -4,8 +4,10 @@ namespace Hexa_Hub.Interface
 {
     public interface IAssetAllocation
     {
-        Task<List<AssetAllocation>> GetAllAllocations();
-        Task<AssetAllocation?> GetAllocationById(int id);
+        Task<List<AllocationClassDto>> GetAllAllocations();
+        Task<AssetAllocation?> GetAllocById(int id);
+        Task<IEnumerable<AllocationDto>> GetAllocationsByUserIdAsync(int userId);
+        Task<AllocationClassDto?> GetAllocationById(int id);
         Task<List<AssetAllocation>> GetAllocationsByMonthAsync(string month);
         Task<List<AssetAllocation>> GetAllocationsByYearAsync(int year);
         Task<List<AssetAllocation>> GetAllocationsByMonthAndYearAsync(string month, int year);

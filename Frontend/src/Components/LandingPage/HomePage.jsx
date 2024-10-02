@@ -38,15 +38,15 @@ const HexaHubLandingPage = () => {
               <div className="md:w-1/2 mb-4 md:mb-0">
                 <img 
                   alt="AdminDashBoard" 
-                  src="../Images/Admin DashBoard.png" 
+                  src="../Images/Assets.png" 
                   className="h-auto w-full rounded-xl border" 
                 />
               </div>
               <div className="md:w-1/2 px-3">
                 <h4 className="text-xl font-semibold mb-4 text-black">Asset</h4>
                 <p className="mb-4 text-black">Easily submit and track service requests for assets that require maintenance or repair.</p>
-                <h4 className="text-xl font-semibold text-black">Asset</h4>
-                <p className="text-black">Easily submit and track service requests for assets that require maintenance or repair.</p>
+                {/* <h4 className="text-xl font-semibold text-black">Asset Request</h4> */}
+                <p className="text-black">Better asset tracking leads to better business performance – when you keep your equipment in working order and know where it is, you prevent losses from damage or theft.</p>
               </div>
             </div>
           </section>

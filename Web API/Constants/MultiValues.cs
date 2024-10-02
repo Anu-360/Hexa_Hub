@@ -40,7 +40,8 @@ public class MultiValues
     {
         UnderReview=0,
         Approved=1,
-        Completed=2
+        Completed=2,
+        Rejected =3
     }
 
     public enum ReturnReqStatus

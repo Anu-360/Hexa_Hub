@@ -17,14 +17,14 @@ namespace Hexa_Hub.Repository
         public async Task SendAudit (string UserMail, string UserName, int AuditId)
         {
             var subject = "Aduit Request";
-            var emailBody = $"Dear Admin,<br><br>You have been assigned an Audit Request {AuditId} which needs to be completed ASAP.<br><br>Best regards,<br>{UserName}";
+            var emailBody = $"Dear {UserName},<br><br>You have been assigned an Audit Request {AuditId} which needs to be completed ASAP.<br><br>Best regards,<br>HexaHub";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
-        public async Task AduitCompleted(string UserMail, string UserName, int AuditId)
+        public async Task AduitCompleted(string UserMail,int AuditId)
         {
             var subject = "Aduit Request Completed";
-            var emailBody = $"Dear {UserName},<br><br>I have completed my assigned an Audit Request {AuditId} .<br><br>Best regards,<br>{UserName}";
+            var emailBody = $"Greetings HexaHub,<br><br>I have completed my assigned Audit Request {AuditId} .";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
@@ -47,54 +47,54 @@ namespace Hexa_Hub.Repository
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        public async Task AssetRequestSent(string UserMail, string UserName, int assetId)
+        public async Task AssetRequestSent(string UserMail, int assetId)
         {
             var subject = "Asset Request";
-            var emailBody = $"Dear Admin,<br><br>An Asset Request for AssetId {assetId} has been Recieved.<br><br>Best regards,<br>{UserName}";
+            var emailBody = $"Greetings HexaHub,<br><br>An Asset Request for AssetId {assetId} has been Recieved.";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
         //SERVICE REQUEST NOTIFICATIONS
         
-        public async Task ServiceRequestSent(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType)
+        public async Task ServiceRequestSent(string UserMail, int AssetId, int ServiceId, IssueType issueType)
         {
             var subject = "Service Request";
-            var emailBody = $"Dear Admin,<br><br>An Service Request has been Raised for {AssetId} with {serviceId} {issueType.ToString()} .<br><br>Best regards,<br>{UserName}";
+            var emailBody = $"Greetings HexaHub,<br><br>An Service Request has been Raised for Asset Id {AssetId} with Service Id {ServiceId} as {issueType.ToString()} .";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        public async Task ServiceRequestApproved(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType)
+        public async Task ServiceRequestApproved(string UserMail, string UserName, int AssetId, int ServiceId, IssueType issueType)
         {
             var subject = "Service Request Approved";
-            var emailBody = $"Dear {UserName},<br><br>Service Request {serviceId} which have been Raised for {AssetId} with {issueType.ToString()} has been Approved .<br><br>Best regards,<br>HexaHub";
+            var emailBody = $"Dear {UserName},<br><br>Service Request {ServiceId} which have been Raised for {AssetId} with {issueType.ToString()} has been Approved .<br><br>Best regards,<br>HexaHub";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        public async Task ServiceRequestCompleted(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType)
+        public async Task ServiceRequestCompleted(string UserMail, string UserName, int AssetId, int ServiceId, IssueType issueType)
         {
             var subject = "Service Request Completion";
-            var emailBody = $"Dear {UserName},<br><br>Service Request {serviceId} which have been Raised for {AssetId} with {issueType.ToString()} has been Completed and the cost will be detained from salary .<br><br>Best regards,<br>HexaHub";
+            var emailBody = $"Dear {UserName},<br><br>Service Request {ServiceId} which have been Raised for {AssetId} with {issueType.ToString()} has been Completed and the cost will be detained from salary .<br><br>Best regards,<br>HexaHub";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
         //RETURN REQUEST NOTIFICATIONS
 
-        public async Task ReturnRequestSent(string UserMail, string UserName, int AssetId, int returnId)
+        public async Task ReturnRequestSent(string UserMail, int AssetId, int ReturnId)
         {
             var subject = "Return Request";
-            var emailBody = $"Dear Admin,<br><br>An Return Request has been Raised for {AssetId} with {returnId} .<br><br>Best regards,<br>{UserName}";
+            var emailBody = $"Greetings HexaHub,<br><br>An Return Request has been Raised for {AssetId} with {ReturnId} .";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        public async Task ReturnRequestApproved(string UserMail, string UserName, int AssetId, int returnId)
+        public async Task ReturnRequestApproved(string UserMail, string UserName, int AssetId, int ReturnId)
         {
             var subject = "Return Request Approved";
-            var emailBody = $"Dear {UserName},<br><br>Return Request {returnId} which have been Raised for {AssetId} has been Approved .<br><br>Best regards,<br>HexaHub";
+            var emailBody = $"Dear {UserName},<br><br>Return Request {ReturnId} which have been Raised for {AssetId} has been Approved .<br><br>Best regards,<br>HexaHub";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
@@ -106,10 +106,10 @@ namespace Hexa_Hub.Repository
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        public async Task ReturnRequestRejected(string UserMail, string UserName, int AssetId, int returnId)
+        public async Task ReturnRequestRejected(string UserMail, string UserName, int AssetId, int ReturnId)
         {
             var subject = "Return Request Declined";
-            var emailBody = $"Dear {UserName},<br><br>Return Request {returnId} which have been Raised for {AssetId} has been Rejected .<br><br>Best regards,<br>HexaHub";
+            var emailBody = $"Dear {UserName},<br><br>Return Request {ReturnId} which have been Raised for {AssetId} has been Rejected .<br><br>Best regards,<br>HexaHub";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }

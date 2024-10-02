@@ -36,7 +36,7 @@ namespace Hexa_Hub.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<ServiceRequest>>> GetServiceRequests()
+        public async Task<ActionResult<IEnumerable<ServiceClassDto>>> GetServiceRequests()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
@@ -56,30 +56,32 @@ namespace Hexa_Hub.Controllers
             }
         }
 
-        // PUT: api/ServiceRequests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutServiceRequest(int id, ServiceRequestDto serviceRequestDto)
+        public async Task<IActionResult> PutServiceRequest(int id, ServiceClassDto serviceRequestDto)
         {
+            // Validate the ID
             if (id != serviceRequestDto.ServiceId)
             {
-                return BadRequest($"Given Id's {id} and {serviceRequestDto.ServiceId} don't match");
+                return BadRequest($"Given IDs {id} and {serviceRequestDto.ServiceId} don't match.");
             }
 
+            // Fetch existing request
             var existingRequest = await _serviceRequest.GetServiceRequestById(id);
             if (existingRequest == null)
             {
                 return NotFound($"Service request with ID {id} not found.");
             }
 
+            // Update properties
             existingRequest.AssetId = serviceRequestDto.AssetId;
             existingRequest.UserId = serviceRequestDto.UserId;
             existingRequest.ServiceRequestDate = serviceRequestDto.ServiceRequestDate;
             existingRequest.Issue_Type = serviceRequestDto.Issue_Type;
             existingRequest.ServiceDescription = serviceRequestDto.ServiceDescription;
 
-            if (Enum.TryParse(serviceRequestDto.ServiceReqStatus, out ServiceReqStatus parsedStatus))
+            // Parse and update status
+            if (Enum.TryParse(serviceRequestDto.serviceReqStatus.ToString(), out ServiceReqStatus parsedStatus))
             {
                 existingRequest.ServiceReqStatus = parsedStatus;
 
@@ -91,6 +93,7 @@ namespace Hexa_Hub.Controllers
                         asset.Asset_Status = AssetStatus.UnderMaintenance;
                         _context.Entry(asset).State = EntityState.Modified;
                     }
+
                     var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
                     if (user != null)
                     {
@@ -105,6 +108,7 @@ namespace Hexa_Hub.Controllers
                         asset.Asset_Status = AssetStatus.Allocated;
                         _context.Entry(asset).State = EntityState.Modified;
                     }
+
                     var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
                     if (user != null)
                     {
@@ -114,9 +118,10 @@ namespace Hexa_Hub.Controllers
             }
             else
             {
-                return BadRequest("Invalid ServiceReqStatus value");
+                return BadRequest("Invalid ServiceReqStatus value.");
             }
 
+            // Update the database
             try
             {
                 _serviceRequest.UpdateServiceRequest(existingRequest);
@@ -137,6 +142,89 @@ namespace Hexa_Hub.Controllers
 
             return Ok("Data modified successfully");
         }
+
+
+        //// PUT: api/ServiceRequests/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutServiceRequest(int id, ServiceRequestDto serviceRequestDto)
+        //{
+        //    if (id != serviceRequestDto.ServiceId)
+        //    {
+        //        return BadRequest($"Given Id's {id} and {serviceRequestDto.ServiceId} don't match");
+        //    }
+
+        //    var existingRequest = await _serviceRequest.GetServiceRequestById(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound($"Service request with ID {id} not found.");
+        //    }
+
+        //    existingRequest.AssetId = serviceRequestDto.AssetId;
+        //    existingRequest.UserId = serviceRequestDto.UserId;
+        //    existingRequest.ServiceRequestDate = serviceRequestDto.ServiceRequestDate;
+        //    existingRequest.Issue_Type = serviceRequestDto.Issue_Type;
+        //    existingRequest.ServiceDescription = serviceRequestDto.ServiceDescription;
+
+        //    if (Enum.TryParse(serviceRequestDto.ServiceReqStatus, out ServiceReqStatus parsedStatus))
+        //    {
+        //        existingRequest.ServiceReqStatus = parsedStatus;
+
+        //        if (parsedStatus == ServiceReqStatus.Approved)
+        //        {
+        //            var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
+        //            if (asset != null)
+        //            {
+        //                asset.Asset_Status = AssetStatus.UnderMaintenance;
+        //                _context.Entry(asset).State = EntityState.Modified;
+        //            }
+        //            var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
+        //            if (user != null)
+        //            {
+        //                await _notificationService.ServiceRequestApproved(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
+        //            }
+        //        }
+        //        else if (parsedStatus == ServiceReqStatus.Completed)
+        //        {
+        //            var asset = await _context.Assets.FindAsync(serviceRequestDto.AssetId);
+        //            if (asset != null)
+        //            {
+        //                asset.Asset_Status = AssetStatus.Allocated;
+        //                _context.Entry(asset).State = EntityState.Modified;
+        //            }
+        //            var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
+        //            if (user != null)
+        //            {
+        //                await _notificationService.ServiceRequestCompleted(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Invalid ServiceReqStatus value");
+        //    }
+
+        //    try
+        //    {
+        //        _serviceRequest.UpdateServiceRequest(existingRequest);
+        //        await _serviceRequest.Save();
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ServiceRequestExists(id))
+        //        {
+        //            return NotFound($"Details for the request ID {id} not found.");
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return Ok("Data modified successfully");
+        //}
 
 
         // POST: api/ServiceRequests
@@ -227,6 +315,14 @@ namespace Hexa_Hub.Controllers
         private bool ServiceRequestExists(int id)
         {
             return _context.ServiceRequests.Any(e => e.ServiceId == id);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<AssetRequestClassDto>> GetServiceRequestById(int id)
+        {
+            var requestDto = await _serviceRequest.GetServiceById(id);
+            return Ok(requestDto);
         }
     }
 }

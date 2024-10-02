@@ -18,22 +18,29 @@ namespace Hexa_Hub.Controllers
     {
         private readonly DataContext _context;
         private readonly IAssetAllocation _assetallocation;
-        //private readonly IUserRepo _userRepo;
-        //private readonly IEmail _email;
 
         public AssetAllocationsController(DataContext context, IAssetAllocation assetAllocation)
      
         {
             _context = context;
             _assetallocation = assetAllocation;
-            //_userRepo = userService;
-            //_email = emailService;
+        }
+        // GET: api/allocation/user/{userId}
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<AllocationDto>>> GetAllocationsByUserId(int userId)
+        {
+            var allocations = await _assetallocation.GetAllocationsByUserIdAsync(userId);
+            if (allocations == null || !allocations.Any())
+            {
+                return NotFound();
+            }
+            return Ok(allocations);
         }
 
         // GET: api/AssetAllocations
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<AssetAllocation>>> GetAssetAllocations()
+        public async Task<ActionResult<IEnumerable<AllocationClassDto>>> GetAssetAllocations()
         {
             try
             {
@@ -155,6 +162,13 @@ namespace Hexa_Hub.Controllers
             return Ok(allocations);
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetAssetAllocationById(int id)
+        {
+            var asset = await _assetallocation.GetAllocationById(id);
+            return Ok(asset);
+        }
     }
 }
 

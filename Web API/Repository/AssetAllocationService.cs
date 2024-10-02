@@ -21,15 +21,51 @@ namespace Hexa_Hub.Repository
             _configuration = configuration;
         }
 
-        public async Task<List<AssetAllocation>> GetAllAllocations()
+        public async Task<List<AllocationClassDto>> GetAllAllocations()
         {
             return await _context.AssetAllocations
                 .Include(aa=>aa.Asset)
                     .ThenInclude(asset => asset.Category)
                     .ThenInclude(category => category.SubCategories)    
                 .Include(aa=>aa.User)
+                .Select(aa=> new AllocationClassDto
+                {
+                    AllocationId = aa.AllocationId,
+                    AssetName = aa.Asset.AssetName,
+                    AssetId = aa.Asset.AssetId,
+                    UserId = aa.User.UserId,
+                    UserName = aa.User.UserName,
+                    CategoryName = aa.Asset.Category.CategoryName,
+                    SubCategoryName = aa.Asset.SubCategories.SubCategoryName,
+                    AssetReqDate = aa.AssetRequests.AssetReqDate,
+                    AssetReqId = aa.AssetReqId,
+                    AllocatedDate = aa.AllocatedDate,
+                })
+                .OrderByDescending(aa => aa.AllocatedDate)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<AllocationDto>> GetAllocationsByUserIdAsync(int userId)
+        {
+            var allocations = await _context.AssetAllocations
+                .Include(a => a.Asset) // Include the related Asset entity
+                .Where(a => a.UserId == userId)
+                .Select(a => new AllocationDto
+                {
+                    UserId = a.UserId,
+                    AssetName = a.Asset.AssetName,
+                    AssetId = a.Asset.AssetId,
+                    CategoryName = a.Asset.Category.CategoryName,
+                    CategoryId = a.Asset.Category.CategoryId,
+                    Value = a.Asset.Value,
+                    Model = a.Asset.Model,
+                    AllocatedDate = a.AllocatedDate
+                })
+                .ToListAsync();
+
+            return allocations;
+        }
+
 
         public async Task<List<AssetAllocation>> GetAllocationsByMonthAsync(string month)
         {
@@ -79,7 +115,7 @@ namespace Hexa_Hub.Repository
         {
             try
             {
-                var allocation = await GetAllocationById(id);
+                var allocation = await GetAllocById(id);
                 if (allocation == null)
                 {
                     throw new AllocationNotFoundException($"Allocation with ID {id} Not Found");
@@ -90,7 +126,7 @@ namespace Hexa_Hub.Repository
             {
                 throw new AllocationNotFoundException(ex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Error Deleting the Allocation{ex.Message}");
             }
@@ -101,13 +137,36 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<AssetAllocation?> GetAllocationById(int id)
+        public async Task<AssetAllocation?> GetAllocById(int id)
         {
             return await _context.AssetAllocations
                 .Include(aa => aa.Asset)
                     .ThenInclude(asset => asset.Category)
                     .ThenInclude(category => category.SubCategories)
                 .Include(aa => aa.User)
+                .FirstOrDefaultAsync(aa => aa.AllocationId == id);
+        }
+
+        public async Task<AllocationClassDto?> GetAllocationById(int id)
+        {
+            return await _context.AssetAllocations
+                .Include(aa => aa.Asset)
+                    .ThenInclude(asset => asset.Category)
+                    .ThenInclude(category => category.SubCategories)
+                .Include(aa => aa.User)
+                .Select(aa => new AllocationClassDto
+                {
+                    AllocationId = aa.AllocationId,
+                    AssetName = aa.Asset.AssetName,
+                    UserName = aa.User.UserName,
+                    AssetId = aa.Asset.AssetId,
+                    UserId = aa.User.UserId,
+                    CategoryName = aa.Asset.Category.CategoryName,
+                    SubCategoryName = aa.Asset.SubCategories.SubCategoryName,
+                    AssetReqDate = aa.AssetRequests.AssetReqDate,
+                    AssetReqId = aa.AssetReqId,
+                    AllocatedDate = aa.AllocatedDate,
+                })
                 .FirstOrDefaultAsync(aa => aa.AllocationId == id);
         }
 

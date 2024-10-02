@@ -85,10 +85,11 @@ namespace Hexa_Hub.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize(Roles ="Admin")]
+        [Authorize]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _userRepo.GetUserById(id);
+            //var user = await _userRepo.GetUserById(id);
+            var user = await _userRepo.GetUserId(id);
 
             if (user == null)
             {

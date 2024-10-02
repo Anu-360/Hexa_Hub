@@ -29,9 +29,11 @@ namespace Hexa_Hub.Controllers
         // GET: api/SubCategories
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<SubCategory>>> GetSubCategories()
+        public async Task<ActionResult<IEnumerable<SubCategory>>> GetSubCategories(int categoryId)
         {
-            return await _subcategory.GetAllSubCategories();
+            //return await _subcategory.GetAllSubCategories();
+            var subCategories = await _subcategory.GetAllSubCategories(categoryId);
+            return Ok(subCategories);
         }
 
         // Filter by Quantity

@@ -36,7 +36,7 @@ namespace Hexa_Hub.Controllers
         // GET: api/AssetRequests
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<AssetRequest>>> GetAssetRequests()
+        public async Task<ActionResult<IEnumerable<AssetRequestClassDto>>> GetAssetRequests()
         {
             //User can see his own details whereas Admin can see all users details
 
@@ -147,40 +147,74 @@ namespace Hexa_Hub.Controllers
         //}
 
 
-
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
+        public async Task<IActionResult> PutAssetRequest(int id, [FromBody] UpdateRequestClassDto assetRequestDto)
         {
-
             if (id != assetRequestDto.AssetReqId)
             {
-                return BadRequest("Id doesn't Match");
+                return BadRequest(new { error = "Id doesn't match" });
             }
-            if (assetRequestDto.Request_Status == "Allocated" || assetRequestDto.Request_Status == "Rejected")
-            {
-                return BadRequest($"The Request ID {id} has already been Allcoated/Rejected and cannot be updated");
-            }
+
             var existingRequest = await _assetRequest.GetAssetRequestById(id);
             if (existingRequest == null)
             {
-                return NotFound("Request Not Found");
+                return NotFound(new { error = "Request not found" });
+            }
+
+            if (existingRequest.Request_Status == RequestStatus.Allocated || existingRequest.Request_Status == RequestStatus.Rejected)
+            {
+                return BadRequest(new { error = $"The Request ID {id} has already been Allocated/Rejected and cannot be updated." });
             }
 
             try
             {
                 await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
-                return Ok($"{assetRequestDto.AssetReqId} has been Updated");
+                return Ok(new { message = $"{assetRequestDto.AssetReqId} has been updated" });
             }
-            catch (AssetRequestNotFoundException)
+            catch (AssetRequestNotFoundException ex)
             {
-                return NotFound($"AssetRequest for user {id} Not Found.");
+                return NotFound(new { error = ex.Message });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] UpdateRequestClassDto assetRequestDto)
+        //{
+
+        //    if (id != assetRequestDto.AssetReqId)
+        //    {
+        //        return BadRequest("Id doesn't Match");
+        //    }
+        //    if (assetRequestDto.RequestStatusName == "Allocated" || assetRequestDto.RequestStatusName == "Rejected")
+        //    {
+        //        return BadRequest($"The Request ID {id} has already been Allcoated/Rejected and cannot be updated");
+        //    }
+        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound("Request Not Found");
+        //    }
+
+        //    try
+        //    {
+        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
+        //        return Ok($"{assetRequestDto.AssetReqId} has been Updated");
+        //    }
+        //    catch (AssetRequestNotFoundException)
+        //    {
+        //        return NotFound($"AssetRequest for user {id} Not Found.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { error = ex.Message });
+        //    }
+        //}
 
 
         // POST: api/AssetRequests
@@ -362,10 +396,42 @@ namespace Hexa_Hub.Controllers
 
         [HttpGet("GetAll")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<AssetRequest>>> GetAllAssetRequests()
+        public async Task<ActionResult<IEnumerable<AssetRequestClassDto>>> GetAllAssetRequests()
         {
            return await _assetRequest.GetAllAssetRequests();
         }
+
+        //[HttpGet("{id}")]
+        //[Authorize]
+        //public async Task<ActionResult<AssetRequestClassDto>> GetAssetRequestById(int id)
+        //{
+        //    // Admin can view all details, users can only view their own requests
+        //    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //    var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+        //    var request = await _assetRequest.GetAssetRequestId(id);
+
+        //    if (request == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (userRole != "Admin" && request.UserId != userId)
+        //    {
+        //        return Forbid();
+        //    }
+
+        //    return Ok(request);
+        //}
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<AssetRequestClassDto>> GetAssetRequestById(int id)
+        {
+            var requestDto = await _assetRequest.GetAssetRequestId(id);
+            return Ok(requestDto);
+        }
+
 
     }
 }

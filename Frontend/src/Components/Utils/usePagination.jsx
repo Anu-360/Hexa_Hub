@@ -1,19 +1,17 @@
-import {useState} from 'react';
+import { useState } from 'react';
 
-const usePagination = (itemsPerPage, items) =>{
-    const[currentPage, setCurrentPage] = useState(1);
+const usePagination = (itemsPerPage, items) => {
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const indexOfLastEmployee = currentPage * itemsPerPage;
-    const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-    const currentItems = items.slice(indexOfFirstEmployee, indexOfLastEmployee);
+    const pageCount = Math.ceil(items.length / itemsPerPage);
+    
+    const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const pageCount = Math.ceil(items.length / itemsPerPage)
-
-    const paginate = (event, value) => {
-        setCurrentPage(value);
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
     };
 
-    return {currentItems, paginate, pageCount};
-}
+    return { currentItems, paginate, pageCount, currentPage, setCurrentPage };
+};
 
 export default usePagination;

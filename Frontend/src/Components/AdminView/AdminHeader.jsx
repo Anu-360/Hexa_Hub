@@ -50,9 +50,6 @@ const Header = ({ handleDrawerToggle }) => {
         <IconButton onClick={toggleDarkMode} color="inherit">
           {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
         </IconButton>
-        <IconButton color="inherit">
-          <AccountCircleIcon />
-        </IconButton>
         <IconButton onClick={handleLogout} color="inherit">
           <ExitToAppIcon />
         </IconButton>

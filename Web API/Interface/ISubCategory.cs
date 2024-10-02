@@ -2,8 +2,8 @@
 {
     public interface ISubCategory
     {
-        Task<List<SubCategory>> GetAllSubCategories();
-
+        //Task<List<SubCategory>> GetAllSubCategories();
+        Task<List<SubCategory>> GetAllSubCategories(int categoryId);
         Task<SubCategory> GetSubCategoryById(int id);
         Task AddSubCategory(SubCategory subcategory);
         Task<SubCategory> UpdateSubCategory(SubCategory subcategory);

@@ -56,13 +56,13 @@ body.light {
 }
 
 body.dark {
-  background-color: #121212; /* or another dark color */
+  background-color: #121212; 
   color: white;
   
 }
 @media (max-width: 600px) {
   #root {
-    width: 100%; /* Ensure full width on mobile */
+    width: 100%; 
   }
   body{
     width: fit-content;
