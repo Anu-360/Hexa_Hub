@@ -4,6 +4,8 @@ using Hexa_Hub.Exceptions;
 using Hexa_Hub.DTO;
 using static Hexa_Hub.Models.MultiValues;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hexa_Hub.Repository
 {
@@ -25,11 +27,24 @@ namespace Hexa_Hub.Repository
             _userRepo = userRepo;
         }
 
-        public async Task<List<AssetRequest>> GetAllAssetRequests()
+        public async Task<List<AssetRequestClassDto>> GetAllAssetRequests()
         {
             return await _context.AssetRequests
-                .Include(ar=>ar.Asset)
-                .Include(ar=>ar.User)
+                .Include(ar => ar.Asset)
+                .Include(ar => ar.User)
+                .Select(ar => new AssetRequestClassDto
+                {
+                    AssetReqId = ar.AssetReqId,
+                    UserName = ar.User.UserName,
+                    UserId = ar.User.UserId,
+                    AssetId = ar.Asset.AssetId,
+                    AssetName =ar.Asset.AssetName,
+                    CategoryName = ar.Asset.Category.CategoryName,
+                    AssetReqDate = ar.AssetReqDate,
+                    AssetReqReason = ar.AssetReqReason,
+                    RequestStatus = ar.Request_Status ?? RequestStatus.Pending,
+                })
+                .OrderByDescending(ar => ar.AssetReqDate)
                 .ToListAsync();
         }
         public async Task<List<AssetRequest>> GetAssetRequestByMonthAsync(string month)
@@ -82,12 +97,33 @@ namespace Hexa_Hub.Repository
         }
 
 
-        public async Task<List<AssetRequest>> GetAssetRequestsByUserId(int userId)
+        //public async Task<List<AssetRequest>> GetAssetRequestsByUserId(int userId)
+        //{
+        //    return await _context.AssetRequests
+        //        .Where(sr => sr.UserId == userId)
+        //        .Include(sr => sr.Asset)
+        //        .Include(sr => sr.User)
+        //        .ToListAsync();
+        //}
+
+        public async Task<List<AssetRequestClassDto>> GetAssetRequestsByUserId(int userId)
         {
             return await _context.AssetRequests
                 .Where(sr => sr.UserId == userId)
                 .Include(sr => sr.Asset)
                 .Include(sr => sr.User)
+                .Select(ar => new AssetRequestClassDto
+                {
+                    AssetReqId = ar.AssetReqId,
+                    UserName = ar.User.UserName,
+                    UserId = ar.User.UserId,
+                    AssetId = ar.Asset.AssetId,
+                    AssetName = ar.Asset.AssetName,
+                    CategoryName = ar.Asset.Category.CategoryName,
+                    AssetReqDate = ar.AssetReqDate,
+                    AssetReqReason = ar.AssetReqReason,
+                    RequestStatus = ar.Request_Status ?? RequestStatus.Pending,
+                })
                 .ToListAsync();
         }
 
@@ -97,6 +133,26 @@ namespace Hexa_Hub.Repository
                 .Include(ar => ar.Asset)
                 .Include(ar => ar.User)
                 .FirstOrDefaultAsync(u => u.AssetReqId == id);
+        }
+
+        public async Task<AssetRequestClassDto> GetAssetRequestId(int id)
+        {
+            return await _context.AssetRequests
+                .Include(ar => ar.Asset)
+                .Include(ar => ar.User)
+                .Select(ar => new AssetRequestClassDto
+                {
+                    AssetReqId = ar.AssetReqId,
+                    UserName = ar.User.UserName,
+                    UserId = ar.User.UserId,
+                    AssetName = ar.Asset.AssetName,
+                    CategoryName = ar.Asset.Category.CategoryName,
+                    AssetReqDate = ar.AssetReqDate,
+                    AssetReqReason = ar.AssetReqReason,
+                    RequestStatus = ar.Request_Status ?? RequestStatus.Pending,
+                    AssetId = ar.Asset.AssetId,
+                })
+                .FirstOrDefaultAsync(ar => ar.AssetReqId == id);
         }
 
         public async Task AddAssetRequest(AssetRequestDto dto)
@@ -117,11 +173,94 @@ namespace Hexa_Hub.Repository
             foreach (var admin in adminUsers)
             {
 
-                await _notificationService.AssetRequestSent(admin.UserMail, admin.UserName, req.AssetId);
+                await _notificationService.AssetRequestSent(admin.UserMail,  req.AssetId);
             }
         }
 
-        public async Task<AssetRequest> UpdateAssetRequest(int id, AssetRequestDto assetRequestDto)
+        //public async Task<AssetRequest> UpdateAssetRequest(int id, AssetRequestDto assetRequestDto)
+        //{
+        //    var existingRequest = await GetAssetRequestById(id);
+        //    if (existingRequest == null)
+        //    {
+        //        throw new AssetRequestNotFoundException($"Asset request with ID {id} not found.");
+        //    }
+
+        //    if (assetRequestDto.Request_Status != existingRequest.Request_Status.ToString())
+        //    {
+        //        if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
+        //        {
+        //            existingRequest.Request_Status = parsedStatus;
+
+        //            if (parsedStatus == RequestStatus.Allocated)
+        //             {
+        //                var existingAllocId = await _context.AssetAllocations
+        //                    .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
+
+        //                if (existingAllocId == null)
+        //                {
+        //                    var assetAllocation = new AssetAllocation
+        //                    {
+        //                        AssetId = assetRequestDto.AssetId,
+        //                        UserId = assetRequestDto.UserId,
+        //                        AssetReqId = assetRequestDto.AssetReqId,
+        //                        AllocatedDate = DateTime.Now
+        //                    };
+        //                    await _assetAlloc.AddAllocation(assetAllocation);
+
+        //                    var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+        //                    if (asset != null)
+        //                    {
+        //                        asset.Asset_Status = AssetStatus.Allocated;
+        //                        _asset.UpdateAsset(asset);
+        //                    }
+        //                    var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+        //                    if (user == null)
+        //                    {
+        //                        throw new ArgumentException("User not found.");
+        //                    }
+        //                    else
+        //                    {
+        //                        await _notificationService.SendAllocationApproved(
+        //                            user.UserMail,
+        //                            user.UserName,
+        //                            asset.AssetName,
+        //                            asset.AssetId);
+        //                    }
+        //                }
+        //            }
+        //            else if(parsedStatus == RequestStatus.Rejected)
+        //            {
+        //                var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+        //                if (asset != null)
+        //                {
+        //                    var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+        //                    if (user == null)
+        //                    {
+        //                        throw new ArgumentException("User not found.");
+        //                    }
+        //                    else
+        //                    {
+        //                        await _notificationService.SendAllocationRejected(
+        //                            user.UserMail,
+        //                            user.UserName,
+        //                            asset.AssetName,
+        //                            asset.AssetId);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new ArgumentException("Invalid Request Status provided.");
+        //        }
+        //    }
+        //    await _context.SaveChangesAsync();
+        //    return existingRequest;
+        //}
+
+        
+
+        public async Task<AssetRequest> UpdateAssetRequest(int id, UpdateRequestClassDto assetRequestDto)
         {
             var existingRequest = await GetAssetRequestById(id);
             if (existingRequest == null)
@@ -129,68 +268,24 @@ namespace Hexa_Hub.Repository
                 throw new AssetRequestNotFoundException($"Asset request with ID {id} not found.");
             }
 
-            if (assetRequestDto.Request_Status != existingRequest.Request_Status.ToString())
+            if (assetRequestDto.RequestStatusName != existingRequest.Request_Status.ToString())
             {
-                if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
+                if (Enum.TryParse(assetRequestDto.RequestStatusName, out RequestStatus parsedStatus))
                 {
                     existingRequest.Request_Status = parsedStatus;
 
-                    if (parsedStatus == RequestStatus.Allocated)
-                     {
-                        var existingAllocId = await _context.AssetAllocations
-                            .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
-
-                        if (existingAllocId == null)
-                        {
-                            var assetAllocation = new AssetAllocation
-                            {
-                                AssetId = assetRequestDto.AssetId,
-                                UserId = assetRequestDto.UserId,
-                                AssetReqId = assetRequestDto.AssetReqId,
-                                AllocatedDate = DateTime.Now
-                            };
-                            await _assetAlloc.AddAllocation(assetAllocation);
-
-                            var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
-                            if (asset != null)
-                            {
-                                asset.Asset_Status = AssetStatus.Allocated;
-                                _asset.UpdateAsset(asset);
-                            }
-                            var user = await _context.Users.FindAsync(assetRequestDto.UserId);
-                            if (user == null)
-                            {
-                                throw new ArgumentException("User not found.");
-                            }
-                            else
-                            {
-                                await _notificationService.SendAllocationApproved(
-                                    user.UserMail,
-                                    user.UserName,
-                                    asset.AssetName,
-                                    asset.AssetId);
-                            }
-                        }
-                    }
-                    else if(parsedStatus == RequestStatus.Rejected)
+                    switch (parsedStatus)
                     {
-                        var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
-                        if (asset != null)
-                        {
-                            var user = await _context.Users.FindAsync(assetRequestDto.UserId);
-                            if (user == null)
-                            {
-                                throw new ArgumentException("User not found.");
-                            }
-                            else
-                            {
-                                await _notificationService.SendAllocationRejected(
-                                    user.UserMail,
-                                    user.UserName,
-                                    asset.AssetName,
-                                    asset.AssetId);
-                            }
-                        }
+                        case RequestStatus.Allocated:
+                            await HandleAllocation(assetRequestDto, existingRequest);
+                            break;
+
+                        case RequestStatus.Rejected:
+                            await HandleRejection(assetRequestDto);
+                            break;
+
+                        default:
+                            throw new ArgumentException("Invalid Request Status provided.");
                     }
                 }
                 else
@@ -198,9 +293,68 @@ namespace Hexa_Hub.Repository
                     throw new ArgumentException("Invalid Request Status provided.");
                 }
             }
+
             await _context.SaveChangesAsync();
             return existingRequest;
         }
+
+        private async Task HandleAllocation(UpdateRequestClassDto assetRequestDto, AssetRequest existingRequest)
+        {
+            var existingAllocId = await _context.AssetAllocations
+                .FirstOrDefaultAsync(aa => aa.AssetReqId == assetRequestDto.AssetReqId);
+
+            if (existingAllocId == null)
+            {
+                var assetAllocation = new AssetAllocation
+                {
+                    AssetId = assetRequestDto.AssetId,
+                    UserId = assetRequestDto.UserId,
+                    AssetReqId = assetRequestDto.AssetReqId,
+                    AllocatedDate = DateTime.Now
+                };
+
+                await _assetAlloc.AddAllocation(assetAllocation);
+
+                var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+                if (asset != null)
+                {
+                    asset.Asset_Status = AssetStatus.Allocated;
+                    _asset.UpdateAsset(asset);
+                }
+
+                var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found.");
+                }
+
+                await _notificationService.SendAllocationApproved(
+                    user.UserMail,
+                    user.UserName,
+                    asset.AssetName,
+                    asset.AssetId);
+            }
+        }
+
+        private async Task HandleRejection(UpdateRequestClassDto assetRequestDto)
+        {
+            var asset = await _asset.GetAssetById(assetRequestDto.AssetId);
+            if (asset != null)
+            {
+                var user = await _context.Users.FindAsync(assetRequestDto.UserId);
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found.");
+                }
+
+                await _notificationService.SendAllocationRejected(
+                    user.UserMail,
+                    user.UserName,
+                    asset.AssetName,
+                    asset.AssetId);
+            }
+        }
+
 
         public async Task DeleteAssetRequest(int id)
         {

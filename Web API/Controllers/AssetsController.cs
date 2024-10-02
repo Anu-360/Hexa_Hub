@@ -25,13 +25,53 @@ namespace Hexa_Hub.Controllers
             _asset = asset;
         }
 
-        // GET: api/Assets
-        [HttpGet]
-        [Authorize]
+        //GET: api/Assets
+       [HttpGet]
+       [Authorize]
         public async Task<ActionResult<IEnumerable<Asset>>> GetAssets()
         {
             return await _asset.GetAllAssets();
         }
+
+
+        [HttpGet("assetall")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<AssetDtoClass>>> GetAllAssets()
+        {
+            var assets = await _asset.GetAssetsAll();
+            return Ok(assets);
+        }
+        //[HttpGet]
+        //[Authorize]
+        //public async Task<ActionResult<IEnumerable<AssetDto>>> GetAssets()
+        //{
+        //    var assetDtos = await _asset.GetAllAssets();
+        //    return Ok(assetDtos);
+        //}
+        //[HttpGet("assetsall")]
+        //[Authorize]
+        //public async Task<ActionResult<IEnumerable<AssetDto>>> GetAssetsAll()
+        //{
+        //    var assets = await _context.Assets
+        // .Include(a => a.Category)
+        // .Include(a => a.SubCategories)
+        // .ToListAsync();
+
+        //    var assetDtos = assets.Select(asset => new AssetClassDto
+        //    {
+        //        AssetId = asset.AssetId,
+        //        AssetName = asset.AssetName,
+        //        Location = asset.Location,
+        //        Value = asset.Value,
+        //        AssetStatus = asset.Asset_Status?.ToString() ?? "N/A",
+        //        CategoryName = asset.Category?.CategoryName ?? "Unknown",
+        //        SubCategoryName = asset.SubCategories?.SubCategoryName ?? "Unknown"
+        //    }).ToList();
+
+        //    return Ok(assetDtos);
+        //}
+
+
 
         [HttpGet("Details")]
         [Authorize]
@@ -106,11 +146,18 @@ namespace Hexa_Hub.Controllers
             return Ok(assetDtos);
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetAssetByAsset(int id)
+        {
+            var asset = await _asset.GetAssetByAssetId(id);
+            return Ok(asset);
+        }
 
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutAsset(int id, [FromBody] AssetDto assetDto)
+        public async Task<IActionResult> PutAsset(int id, [FromBody] AssetUpdateDto assetDto)
         {
             if (id != assetDto.AssetId)
             {
@@ -138,19 +185,172 @@ namespace Hexa_Hub.Controllers
         }
 
 
-      
-        [HttpPost]
+        [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto)
+        public async Task<IActionResult> DeleteSubCategory(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
-            var asset = await _asset.AddAsset(assetDto);
-            return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+            try
+            {
+                await _asset.DeleteAsset(id);
+                await _asset.Save();
+                return NoContent();
+            }
+            catch (SubCategoryNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto,IFormFile AssetImage)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    if (AssetImage != null)
+        //    {
+        //        using (var memoryStream = new MemoryStream())
+        //        {
+        //            await AssetImage.CopyToAsync(memoryStream);
+        //            assetDto.AssetImage = memoryStream.ToArray(); // Convert to byte array
+        //        }
+        //    }
+        //    var asset = await _asset.AddAsset(assetDto);
+        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+        //}
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto, IFormFile assetImage)
+        //{
+        //    // Scenario 3: Invalid Request
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    // Scenario 1: Valid Request with Image
+        //    if (assetImage != null)
+        //    {
+        //        try
+        //        {
+        //            using (var memoryStream = new MemoryStream())
+        //            {
+        //                await assetImage.CopyToAsync(memoryStream);
+        //                assetDto.AssetImage = memoryStream.ToArray(); // Convert to byte array
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Handle image upload failure
+        //            return BadRequest($"Image upload failed: {ex.Message}");
+        //        }
+        //    }
+
+        //    Asset asset;
+        //    try
+        //    {
+        //        // Scenario 2: Valid Request without Image
+        //        asset = await _asset.AddAsset(assetDto);
+        //    }
+        //    catch (DbUpdateException dbEx)
+        //    {
+        //        // Scenario 5: Asset Creation Failure
+        //        return StatusCode(500, $"Database error: {dbEx.InnerException?.Message}");
+        //    }
+
+        //    // Scenario 1: Valid Request with Image (successful)
+        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+        //}
+
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<Asset>> PostAsset([FromForm] AssetDto assetDto, [FromForm] IFormFile assetImage)
+        //{
+        //    // Scenario 3: Invalid Request
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    // Scenario 1: Valid Request with Image
+        //    if (assetImage != null)
+        //    {
+        //        try
+        //        {
+        //            using (var memoryStream = new MemoryStream())
+        //            {
+        //                await assetImage.CopyToAsync(memoryStream);
+        //                assetDto.AssetImage = memoryStream.ToArray(); // Convert to byte array
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Handle image upload failure
+        //            return BadRequest($"Image upload failed: {ex.Message}");
+        //        }
+        //    }
+
+        //    Asset asset;
+        //    try
+        //    {
+        //        // Scenario 2: Valid Request without Image
+        //        asset = await _asset.AddAsset(assetDto);
+        //    }
+        //    catch (DbUpdateException dbEx)
+        //    {
+        //        // Scenario 5: Asset Creation Failure
+        //        return StatusCode(500, $"Database error: {dbEx.InnerException?.Message}");
+        //    }
+
+        //    // Scenario 1: Valid Request with Image (successful)
+        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+        //}
+
+
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<ActionResult<Asset>> PostAsset([FromBody] AssetDto assetDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    // Check if the category exists, if not, create it
+        //    var category = await _context.Categories.FindAsync(assetDto.CategoryId);
+        //    if (category == null)
+        //    {
+        //        category = new Category
+        //        {
+        //            CategoryName = assetDto.CategoryName
+        //        };
+        //        _context.Categories.Add(category);
+        //        await _context.SaveChangesAsync();
+        //    }
+
+        //    // Check if the subcategory exists, if not, create it
+        //    var subcategory = await _context.SubCategories.FindAsync(assetDto.SubCategoryId);
+        //    if (subcategory == null)
+        //    {
+        //        subcategory = new SubCategory
+        //        {
+        //            SubCategoryName = assetDto.SubCategoryName,
+        //            CategoryId = category.CategoryId // Link to the newly created or existing category
+        //        };
+        //        _context.SubCategories.Add(subcategory);
+        //        await _context.SaveChangesAsync();
+        //    }
+
+        //    var asset = await _asset.AddAsset(assetDto);
+        //    return CreatedAtAction("GetAssets", new { id = asset.AssetId }, asset);
+        //}
 
 
         private bool AssetExists(int id)
@@ -158,55 +358,158 @@ namespace Hexa_Hub.Controllers
             return _context.Assets.Any(e => e.AssetId == id);
         }
 
-        [HttpPut("{assetId}/upload")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadAssetImage(int assetId, IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("No file uploaded.");
-            }
-            var supportedFiles = new[] { "image/jpeg", "image/png" };
-            if (!supportedFiles.Contains(file.ContentType))
-            {
-                return BadRequest("Only JPEG or PNG format are allowed");
-            }
-            var fileName = await _asset.UploadAssetImageAsync(assetId, file);
-            if (fileName == null)
-            {
-                return NotFound();
-            }
+        //[HttpPut("{assetId}/upload")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> UploadAssetImage(int assetId, IFormFile file)
+        //{
+        //    if (file == null || file.Length == 0)
+        //    {
+        //        return BadRequest("No file uploaded.");
+        //    }
+        //    var supportedFiles = new[] { "image/jpeg", "image/png" };
+        //    if (!supportedFiles.Contains(file.ContentType))
+        //    {
+        //        return BadRequest("Only JPEG or PNG format are allowed");
+        //    }
+        //    var fileName = await _asset.UploadAssetImageAsync(assetId, file);
+        //    if (fileName == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(new { FileName = fileName });
+        //    return Ok(new { FileName = fileName });
+        //}
+
+        //[HttpPost("{assetId}/upload")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> UploadAssetImage(int assetId, IFormFile file)
+        //{
+        //    if (file == null || file.Length == 0)
+        //    {
+        //        return BadRequest("No file uploaded.");
+        //    }
+        //    var supportedFiles = new[] { "image/jpeg", "image/png" };
+        //    if (!supportedFiles.Contains(file.ContentType))
+        //    {
+        //        return BadRequest("Only JPEG or PNG format are allowed");
+        //    }
+        //    var fileName = await _asset.UploadAssetImageAsync(assetId, file);
+        //    if (fileName == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(new { FileName = fileName });
+        //}
+
+
+
+        [HttpPost("upload-image/{assetId}")]
+        public async Task<ActionResult<string>> UploadAssetImage(int assetId, IFormFile file)
+        {
+            var result = await _asset.UploadAssetImageAsync(assetId, file);
+            if (result == null)
+            {
+                return NotFound("Asset not found.");
+            }
+            return Ok(result);
         }
 
-        //image
-        [HttpGet("{assetId}/assetImage")]
-        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult<Asset>> AddAsset([FromForm] AssetDto assetDto)
+        {
+            var asset = await _asset.AddAsset(assetDto);
+            return CreatedAtAction(nameof(GetAssetByAsset), new { id = asset.AssetId }, asset);
+        }
+
+        //[HttpGet("get-image/{assetId}")]
+        //public IActionResult GetAssetImage(int assetId)
+        //{
+        //    var asset = _context.Assets.Find(assetId);
+        //    if (asset == null || asset.AssetImage == null)
+        //    {
+        //        return NotFound("Asset not found or no image available.");
+        //    }
+
+        //    var fileName = Encoding.UTF8.GetString(asset.AssetImage);
+        //    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "AssetImages", fileName);
+
+        //    if (!System.IO.File.Exists(imagePath))
+        //    {
+        //        return NotFound("Image not found.");
+        //    }
+
+        //    var fileBytes = System.IO.File.ReadAllBytes(imagePath);
+        //    return File(fileBytes, "image/jpeg"); // Adjust the content type based on your image type
+        //}
+
+
+
+        /// <summary>
+        /// /ccccccccc
+        /// </summary>
+        /// <param name="assetId"></param>
+        /// <returns></returns>
+
+        //[HttpGet("get-image/{assetId}")]
+        //public async Task<IActionResult> GetAssetImage(int assetId)
+        //{
+        //    var asset = await _context.Assets.FindAsync(assetId);
+        //    if (asset == null || asset.AssetImage == null)
+        //    {
+        //        return NotFound("Asset not found or no image available.");
+        //    }
+
+        //    // Use the byte array directly
+        //    var fileBytes = asset.AssetImage;
+
+        //    return File(fileBytes, "image/jpeg"); // Adjust the content type based on your image type
+        //}
+
+        [HttpGet("get-image/{assetId}")]
         public async Task<IActionResult> GetAssetImage(int assetId)
         {
-            var asset = await _asset.GetAssetById(assetId);
-            if (asset == null || asset.AssetImage == null)
+            var asset = await _context.Assets.FindAsync(assetId);
+            if (asset == null || asset.AssetImage == null || asset.AssetImage.Length == 0)
             {
-                var defualtImagePath = _asset.GetImagePath("AssetDefault.jpg");
-                return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), defualtImagePath), "image/jpeg");
-            }
-            string fileName = Encoding.UTF8.GetString(asset.AssetImage);
-            string imagePath = Path.Combine(Directory.GetCurrentDirectory(), _asset.GetImagePath(fileName));
-
-            if (!System.IO.File.Exists(imagePath))
-            {
-                return NotFound("Image file not found.");
+                return NotFound("Asset not found or no image available.");
             }
 
-            string contentType = Path.GetExtension(fileName).ToLowerInvariant() switch
-            {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                _ => "application/octet-stream"
-            };
+            
+            var fileBytes = asset.AssetImage;
 
-            return PhysicalFile(imagePath, contentType);
+            return File(fileBytes, "image/jpeg");
         }
+
+
+
+        ////image
+        //[HttpGet("{assetId}/assetImage")]
+        //[Authorize]
+        //public async Task<IActionResult> GetAssetImage(int assetId)
+        //{
+        //    var asset = await _asset.GetAssetById(assetId);
+        //    if (asset == null || asset.AssetImage == null)
+        //    {
+        //        var defualtImagePath = _asset.GetImagePath("AssetDefault.jpg");
+        //        return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), defualtImagePath), "image/jpeg");
+        //    }
+        //    string fileName = Encoding.UTF8.GetString(asset.AssetImage);
+        //    string imagePath = Path.Combine(Directory.GetCurrentDirectory(), _asset.GetImagePath(fileName));
+
+        //    if (!System.IO.File.Exists(imagePath))
+        //    {
+        //        return NotFound("Image file not found.");
+        //    }
+
+        //    string contentType = Path.GetExtension(fileName).ToLowerInvariant() switch
+        //    {
+        //        ".jpg" or ".jpeg" => "image/jpeg",
+        //        ".png" => "image/png",
+        //        _ => "application/octet-stream"
+        //    };
+
+        //    return PhysicalFile(imagePath, contentType);
+        //}
     }
 }

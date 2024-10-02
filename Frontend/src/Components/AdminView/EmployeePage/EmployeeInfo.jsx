@@ -5,8 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { jwtToken } from '../../Utils/utils';
 import CloseIcon from '@mui/icons-material/Close';
-import Header from '../AdminHeader';
-import Navbar from '../AdminNavBar';
+// import Header from '../AdminHeader';
+// import Navbar from '../AdminNavBar';
 import {
     Box,
     Card,
@@ -39,10 +39,10 @@ const UserDetails = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+    // const [mobileOpen, setMobileOpen] = useState(false);
+    // const handleDrawerToggle = () => {
+    //     setMobileOpen(!mobileOpen);
+    // };
     useEffect(() => {
         const fetchUserDetails = async () => {
             const decodedToken = jwtToken();
@@ -67,7 +67,7 @@ const UserDetails = () => {
     }, [id, navigate]);
 
     const handleClose = () => {
-        navigate('/employee');
+        navigate('/admin/employee');
     };
 
     if (loading) return <CircularProgress />;
@@ -76,8 +76,8 @@ const UserDetails = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header handleDrawerToggle={handleDrawerToggle} />
-            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>
+            {/* <Header handleDrawerToggle={handleDrawerToggle} />
+            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/> */}
             <Box sx={{ display: 'flex', flex: 1 }}>
                 <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - 240px)` }, marginLeft: { sm: '240px' } }}>
                     <Toolbar />

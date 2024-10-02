@@ -6,14 +6,10 @@ namespace Hexa_Hub.DTO
 {
     public class AuditsDto
     {
-        [Required]
-        [Key]
         public int AuditId { get; set; }
 
-        [Required]
         public int AssetId { get; set; }
 
-        [Required]
         public int UserId { get; set; }
 
         [DataType(DataType.Date)]

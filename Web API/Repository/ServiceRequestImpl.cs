@@ -19,11 +19,24 @@ namespace Hexa_Hub.Repository
             _notificationService = notificationService;
         }
 
-        public async Task<List<ServiceRequest>> GetAllServiceRequests()
+        public async Task<List<ServiceClassDto>> GetAllServiceRequests()
         {
             return await _context.ServiceRequests
                 .Include(sr => sr.Asset)
                 .Include(sr => sr.User)
+                .Select(sr => new ServiceClassDto
+                {
+                    ServiceId = sr.ServiceId,
+                    UserName = sr.User.UserName,
+                    UserId = sr.User.UserId,
+                    AssetId = sr.Asset.AssetId,
+                    AssetName = sr.Asset.AssetName,
+                    ServiceDescription = sr.ServiceDescription,
+                    ServiceRequestDate = sr.ServiceRequestDate,
+                    Issue_Type = sr.Issue_Type != default ? sr.Issue_Type : IssueType.Repair,
+                    serviceReqStatus = sr.ServiceReqStatus ?? ServiceReqStatus.UnderReview,
+                })
+                .OrderByDescending(sr => sr.ServiceRequestDate)
                 .ToListAsync();
         }
 
@@ -39,7 +52,7 @@ namespace Hexa_Hub.Repository
                                              ServiceRequestDate = service.ServiceRequestDate,
                                              Issue_Type = service.Issue_Type,
                                              ServiceDescription = service.ServiceDescription,
-                                             ServiceReqStatus = service.ServiceReqStatus.ToString() // Converting enum to string
+                                             ServiceReqStatus = service.ServiceReqStatus.ToString() 
                                          }).ToListAsync();
 
             return serviceByStatus;
@@ -51,6 +64,26 @@ namespace Hexa_Hub.Repository
             return await _context.ServiceRequests
                 .Include(sr => sr.Asset)
                 .Include(sr => sr.User)
+                .FirstOrDefaultAsync(u => u.ServiceId == id);
+        }
+
+        public async Task<ServiceClassDto?> GetServiceById(int id)
+        {
+            return await _context.ServiceRequests
+                .Include(sr => sr.Asset)
+                .Include(sr => sr.User)
+                 .Select(sr => new ServiceClassDto
+                 {
+                     ServiceId = sr.ServiceId,
+                     UserName = sr.User.UserName,
+                     UserId = sr.User.UserId,
+                     AssetId = sr.Asset.AssetId,
+                     AssetName = sr.Asset.AssetName,
+                     ServiceDescription = sr.ServiceDescription,
+                     ServiceRequestDate = sr.ServiceRequestDate,
+                     Issue_Type = sr.Issue_Type != default ? sr.Issue_Type : IssueType.Repair,
+                     serviceReqStatus = sr.ServiceReqStatus ?? ServiceReqStatus.UnderReview,
+                 })
                 .FirstOrDefaultAsync(u => u.ServiceId == id);
         }
 
@@ -68,7 +101,7 @@ namespace Hexa_Hub.Repository
             {
                 Console.WriteLine($"Sending email to: {admin.UserMail}");
 
-                await _notificationService.ServiceRequestSent(admin.UserMail, admin.UserName, serviceRequest.AssetId, serviceRequest.ServiceId, serviceRequest.Issue_Type);
+                await _notificationService.ServiceRequestSent(admin.UserMail, serviceRequest.AssetId, serviceRequest.ServiceId, serviceRequest.Issue_Type);
             }
         }
 
@@ -93,12 +126,34 @@ namespace Hexa_Hub.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ServiceRequest>> GetServiceRequestsByUserId(int userId)
+        //public async Task<List<ServiceRequest>> GetServiceRequestsByUserId(int userId)
+        //{
+        //    return await _context.ServiceRequests
+        //        .Where(sr => sr.UserId == userId)
+        //        .Include(sr => sr.Asset)
+        //        .Include(sr => sr.User)
+        //        .ToListAsync();
+        //}
+
+        public async Task<List<ServiceClassDto>> GetServiceRequestsByUserId(int userId)
         {
             return await _context.ServiceRequests
                 .Where(sr => sr.UserId == userId)
                 .Include(sr => sr.Asset)
                 .Include(sr => sr.User)
+                 .Select(sr => new ServiceClassDto
+                 {
+                     ServiceId = sr.ServiceId,
+                     UserName = sr.User.UserName,
+                     UserId = sr.User.UserId,
+                     AssetId = sr.Asset.AssetId,
+                     AssetName = sr.Asset.AssetName,
+                     ServiceDescription = sr.ServiceDescription,
+                     ServiceRequestDate = sr.ServiceRequestDate,
+                     Issue_Type = sr.Issue_Type != default ? sr.Issue_Type : IssueType.Repair,
+                     serviceReqStatus = sr.ServiceReqStatus ?? ServiceReqStatus.UnderReview,
+                 })
+                .OrderByDescending(sr => sr.ServiceRequestDate)
                 .ToListAsync();
         }
 

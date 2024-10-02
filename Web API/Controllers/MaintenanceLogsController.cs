@@ -27,9 +27,9 @@ namespace Hexa_Hub.Controllers
         }
         [HttpGet("AllLog")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<MaintenanceLog>>> GetAllMaintenanceLog()
+        public async Task<ActionResult<IEnumerable<MaintenanceClassDto>>> GetAllMaintenanceLog()
         {
-            return await _maintenanceLogRepo.GetAllMaintenanceLog();
+            return await _maintenanceLogRepo.GetAllLog();
         }
 
         // GET: api/MaintenanceLogs
@@ -74,6 +74,21 @@ namespace Hexa_Hub.Controllers
             }
         }
 
+        [HttpGet("id/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<MaintenanceClassDto>> GetMaintenanceLogById(int id)
+        {
+            var maintenanceLog = await _maintenanceLogRepo.GetMaintenanceById(id);
+
+            if (maintenanceLog == null)
+            {
+                return NotFound($"No maintenance log found with ID {id}.");
+            }
+
+            return Ok(maintenanceLog);
+        }
+
+
         // GET: api/MaintenanceLogs/5
         [HttpGet("{userId}")]
         [Authorize(Roles ="Admin")]
@@ -91,10 +106,9 @@ namespace Hexa_Hub.Controllers
             return Ok(maintenanceLogs);
         }
 
-        // PUT: api/MaintenanceLogs/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutMaintenanceLog(int id, [FromBody] MaintenanceDto maintenanceDto)
+        public async Task<IActionResult> PutMaintenanceLog(int id, [FromBody] MaintenanceClassDto maintenanceClassDto)
         {
             if (!ModelState.IsValid)
             {
@@ -103,27 +117,72 @@ namespace Hexa_Hub.Controllers
 
             try
             {
-                var result = await _maintenanceLogRepo.UpdateMaintenanceLog(id, maintenanceDto);
-                if (!result)
+                // Retrieve the existing log to update
+                var existingLog = await _maintenanceLogRepo.GetMaintenanceById(id);
+                if (existingLog == null)
                 {
-                    return NotFound($"No maintenance has been for for user {id}");
+                    return NotFound($"No maintenance log found with ID {id}.");
                 }
+
+                // Update the fields
+                existingLog.Maintenance_date = maintenanceClassDto.Maintenance_date;
+                existingLog.Cost = maintenanceClassDto.Cost;
+                existingLog.Maintenance_Description = maintenanceClassDto.Maintenance_Description;
+
+                // Call the update method
+                await _maintenanceLogRepo.UpdateMaintenanceLog(existingLog);
+
+                // Save changes
                 await _maintenanceLogRepo.Save();
+
+                return Ok("Update successful");
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!MaintenanceLogExists(id))
                 {
-                    return NotFound($"No maintenance has been for for user {id}");
+                    return NotFound($"No maintenance log found with ID {id}.");
                 }
                 else
                 {
                     throw;
                 }
             }
-
-            return Ok("Updation Success");
         }
+
+        //// PUT: api/MaintenanceLogs/5
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutMaintenanceLog(int id, [FromBody] MaintenanceDto maintenanceDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    try
+        //    {
+        //        var result = await _maintenanceLogRepo.UpdateMaintenanceLog(id, maintenanceDto);
+        //        if (!result)
+        //        {
+        //            return NotFound($"No maintenance has been for for user {id}");
+        //        }
+        //        await _maintenanceLogRepo.Save();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!MaintenanceLogExists(id))
+        //        {
+        //            return NotFound($"No maintenance has been for for user {id}");
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return Ok("Updation Success");
+        //}
 
         // DELETE: api/MaintenanceLogs/5
         [HttpDelete("{id}")]

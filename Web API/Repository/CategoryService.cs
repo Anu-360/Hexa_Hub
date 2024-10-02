@@ -15,9 +15,9 @@ namespace Hexa_Hub.Repository
 
         public async Task<List<Category>> GetAllCategories()
         {
-            return await _context.Categories.Include(c => c.Assets).Include(c => c.SubCategories).ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
-
+        //Include(c => c.Assets).Include(c => c.SubCategories).
         public async Task<Category?> GetCategoryById(int id)
         {
             return await _context.Categories

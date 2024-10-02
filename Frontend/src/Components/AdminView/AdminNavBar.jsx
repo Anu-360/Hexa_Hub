@@ -27,14 +27,14 @@ const drawerWidth = 240;
 
 const navItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/Dashboard' },
-    { text: 'Employee', icon: <EmployeeIcon />, path: '/employee' },
-    { text: 'Assets', icon: <AssetsIcon />, path: '/assets' },
-    { text: 'Request', icon: <RequestIcon />, path: '/request' },
-    { text: 'Allocation', icon: <AllocationIcon />, path: '/allocation' },
-    { text: 'Return', icon: <ReturnIcon />, path: '/return' },
-    { text: 'Audit', icon: <AuditIcon />, path: '/audit' },
-    { text: 'Service', icon: <ServiceIcon />, path: '/service' },
-    { text: 'Maintenance', icon: <MaintenanceIcon />, path: '/maintenance' },
+    { text: 'Employee', icon: <EmployeeIcon />, path: '/admin/employee' },
+    { text: 'Assets', icon: <AssetsIcon />, path: '/admin/asset' },
+    { text: 'Request', icon: <RequestIcon />, path: '/admin/request' },
+    { text: 'Allocation', icon: <AllocationIcon />, path: '/admin/allocation' },
+    { text: 'Return', icon: <ReturnIcon />, path: '/admin/return' },
+    { text: 'Audit', icon: <AuditIcon />, path: '/admin/audit' },
+    { text: 'Service', icon: <ServiceIcon />, path: '/admin/service' },
+    { text: 'Maintenance', icon: <MaintenanceIcon />, path: '/admin/maintenance' },
 ];
 
 const Navbar = ({ mobileOpen, handleDrawerToggle }) => {

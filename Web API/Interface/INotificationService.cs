@@ -7,16 +7,16 @@ namespace Hexa_Hub.Interface
         Task SendAllocationApproved(string UserMail, string UserName, string AssetName, int assetId);
         Task SendAllocationRejected(string UserMail, string UserName, string AssetName, int assetId);
         Task SendAudit(string UserMail, string UserName, int AuditId);
-        Task AduitCompleted(string UserMail, string UserName, int AuditId);
-        Task ServiceRequestSent(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType);
-        Task ServiceRequestApproved(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType);
-        Task ServiceRequestCompleted(string UserMail, string UserName, int AssetId, int serviceId, IssueType issueType);
-        Task ReturnRequestSent(string UserMail, string UserName, int AssetId, int returnId);
-        Task ReturnRequestApproved(string UserMail, string UserName, int AssetId, int returnId);
-        Task ReturnRequestRejected(string UserMail, string UserName, int AssetId, int returnId);
+        Task AduitCompleted(string UserMail, int AuditId);
+        Task ServiceRequestSent(string UserMail, int AssetId, int ServiceId, IssueType issueType);
+        Task ServiceRequestApproved(string UserMail, string UserName, int AssetId, int ServiceId, IssueType issueType);
+        Task ServiceRequestCompleted(string UserMail, string UserName, int AssetId, int ServiceId, IssueType issueType);
+        Task ReturnRequestSent(string UserMail, int AssetId, int ReturnId);
+        Task ReturnRequestApproved(string UserMail, string UserName, int AssetId, int ReturnId);
+        Task ReturnRequestRejected(string UserMail, string UserName, int AssetId, int ReturnId);
         Task ReturnRequestCompleted(string UserMail, string UserName, int AssetId);
 
-        Task AssetRequestSent(string UserMail, string UserName, int assetId);
+        Task AssetRequestSent(string UserMail, int assetId);
 
 
 

@@ -34,6 +34,39 @@ namespace Hexa_Hub.Controllers
             _notificationService = notificationService;
         }
 
+        //// GET: api/ReturnRequests
+        //[HttpGet("all")]
+        //[Authorize]
+        //public async Task<ActionResult<IEnumerable<ReturnClassDto>>> GetReturnRequestsall()
+        //{
+        //    //return await _context.ReturnRequests.ToListAsync();
+        //    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //    var userRole = User.FindFirstValue(ClaimTypes.Role);
+        //    if (userRole == "Admin")
+        //    {
+        //        return await _returnRequestRepo.GetAllReturnRequest();
+        //    }
+        //    else
+        //    {
+        //        var req = await _returnRequestRepo.GetReturnRequestsByUserId(userId);
+        //        if (req == null||req.Count==0)
+        //        {
+        //            return NotFound($"No details found");
+        //        }
+        //        return Ok(req);
+        //    }
+        //}
+
+        // GET: api/ReturnRequests
+        [HttpGet("all")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ReturnClassDto>>> GetReturnRequestsall()
+        {
+          
+                return await _returnRequestRepo.GetAllReturnRequest();
+           
+        }
+
         // GET: api/ReturnRequests
         [HttpGet]
         [Authorize]
@@ -41,20 +74,23 @@ namespace Hexa_Hub.Controllers
         {
             //return await _context.ReturnRequests.ToListAsync();
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-            if (userRole == "Admin")
+           
+            var req = await _returnRequestRepo.GetReturnRequestsByUserId(userId);
+            if (req == null || req.Count == 0)
             {
-                return await _returnRequestRepo.GetAllReturnRequest();
+                return NotFound($"No details found");
             }
-            else
-            {
-                var req = await _returnRequestRepo.GetReturnRequestsByUserId(userId);
-                if (req == null||req.Count==0)
-                {
-                    return NotFound($"No details found");
-                }
-                return Ok(req);
-            }
+            return Ok(req);
+            
+        }
+
+
+        [HttpGet("GetByReturnId/{id}")]
+        [Authorize]
+        public async Task<ActionResult<ReturnRequest>> GetReturnRequestByid(int id)
+        {
+            var req = await _returnRequestRepo.GetReturnRequestById(id);
+            return Ok(req);
         }
 
         // GET: api/ReturnRequests/5
@@ -75,115 +111,92 @@ namespace Hexa_Hub.Controllers
             return Forbid();
         }
 
-
-        // PUT: api/ReturnRequests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutReturnRequest(int id, ReturnRequestDto returnRequestDto)
+        public async Task<IActionResult> PutReturnRequest(int id, ReturnClassDto returnRequestDto)
         {
             if (id != returnRequestDto.ReturnId)
             {
                 return BadRequest("Return Id Mismatch");
             }
 
-            var existingRequest = await _returnRequestRepo.GetReturnRequestById(id);
+            // Fetch the existing request from the database
+            var existingRequest = await _returnRequestRepo.GetReturnRequestId(id);
             if (existingRequest == null)
             {
-                return NotFound($"Details For the Request id {id} is not found");
+                return NotFound($"Details for the Request ID {id} not found");
             }
 
+            // Map fields from DTO to the existing request
             existingRequest.UserId = returnRequestDto.UserId;
             existingRequest.AssetId = returnRequestDto.AssetId;
             existingRequest.CategoryId = returnRequestDto.CategoryId;
             existingRequest.ReturnDate = returnRequestDto.ReturnDate;
             existingRequest.Reason = returnRequestDto.Reason;
             existingRequest.Condition = returnRequestDto.Condition;
+            existingRequest.ReturnStatus = returnRequestDto.ReturnStatus;
 
-            if (Enum.TryParse(returnRequestDto.ReturnStatus, out Models.MultiValues.ReturnReqStatus parsedStatus))
-            {
-                existingRequest.ReturnStatus = parsedStatus;
-            }
-            else
-            {
-                return BadRequest("Invalid Return Status provided.");
-            }
-
-            // If status is Approved or Returned
-            if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved || parsedStatus == Models.MultiValues.ReturnReqStatus.Returned || parsedStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+            // Additional logic for asset status change and notifications
+            if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved ||
+                existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned ||
+                existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Rejected)
             {
                 existingRequest.ReturnDate = DateTime.Now;
 
                 var asset = await _context.Assets.FindAsync(existingRequest.AssetId);
                 if (asset != null)
                 {
-                    if (parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
+                    if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
                     {
                         asset.Asset_Status = Models.MultiValues.AssetStatus.OpenToRequest;
                         _context.Entry(asset).State = EntityState.Modified;
 
                         var allocation = await _context.AssetAllocations
-                            .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId)
-                            .FirstOrDefaultAsync();
+                            .FirstOrDefaultAsync(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId);
 
                         if (allocation != null)
                         {
-                            try
-                            {
-                                await _assetAlloc.DeleteAllocation(allocation.AllocationId);
-                                await _assetAlloc.Save();
-                            }
-                            catch (Exception ex)
-                            {
-                                return BadRequest($"Failed to delete allocation with ID {allocation.AllocationId}: {ex.Message}");
-                            }
+                            await _assetAlloc.DeleteAllocation(allocation.AllocationId);
                         }
 
                         var assetRequest = await _context.AssetRequests
-                            .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated)
-                            .FirstOrDefaultAsync();
+                            .FirstOrDefaultAsync(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated);
 
                         if (assetRequest != null)
                         {
-                            try
-                            {
-                                _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
-                                await _asset.Save();
-                            }
-                            catch (Exception ex)
-                            {
-                                return BadRequest($"Failed to delete AssetRequest with ID {assetRequest.AssetReqId}: {ex.Message}");
-                            }
+                            await _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
                         }
                     }
                 }
+
                 var user = await _context.Users.FindAsync(existingRequest.UserId);
                 if (user != null)
                 {
-                    if (parsedStatus == Models.MultiValues.ReturnReqStatus.Approved)
+                    switch (existingRequest.ReturnStatus)
                     {
-                        await _notificationService.ReturnRequestApproved(user.UserMail, user.UserName, existingRequest.AssetId, id);
-                    }
-                    else if (parsedStatus == Models.MultiValues.ReturnReqStatus.Returned)
-                    {
-                        await _notificationService.ReturnRequestCompleted(user.UserMail, user.UserName, existingRequest.AssetId);
-                    }
-                    else if (parsedStatus == Models.MultiValues.ReturnReqStatus.Rejected)
-                    {
-                        await _notificationService.ReturnRequestRejected(user.UserMail, user.UserName, existingRequest.AssetId, id);
+                        case Models.MultiValues.ReturnReqStatus.Approved:
+                            await _notificationService.ReturnRequestApproved(user.UserMail, user.UserName, existingRequest.AssetId, id);
+                            break;
+                        case Models.MultiValues.ReturnReqStatus.Returned:
+                            await _notificationService.ReturnRequestCompleted(user.UserMail, user.UserName, existingRequest.AssetId);
+                            break;
+                        case Models.MultiValues.ReturnReqStatus.Rejected:
+                            await _notificationService.ReturnRequestRejected(user.UserMail, user.UserName, existingRequest.AssetId, id);
+                            break;
                     }
                 }
             }
 
             try
             {
-                await _context.SaveChangesAsync();
+                _returnRequestRepo.UpdateReturnRequest(existingRequest);
+                await _returnRequestRepo.Save();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!ReturnRequestExists(id))
                 {
-                    return NotFound($"Details For the Request id {id} is not found");
+                    return NotFound($"Details for the Request ID {id} not found");
                 }
                 else
                 {
@@ -193,6 +206,232 @@ namespace Hexa_Hub.Controllers
 
             return NoContent();
         }
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutReturnRequest(int id, ReturnClassDto returnRequestDto)
+        //{
+        //    if (id != returnRequestDto.ReturnId)
+        //    {
+        //        return BadRequest("Return Id Mismatch");
+        //    }
+
+        //    // Fetch the existing request from the database
+        //    var existingRequest = await _returnRequestRepo.GetReturnRequestId(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound($"Details for the Request ID {id} not found");
+        //    }
+
+        //    // Map fields from DTO to the existing request
+        //    existingRequest.UserId = returnRequestDto.UserId;
+        //    existingRequest.AssetId = returnRequestDto.AssetId;
+        //    existingRequest.CategoryId = returnRequestDto.CategoryId;
+        //    existingRequest.ReturnDate = returnRequestDto.ReturnDate;
+        //    existingRequest.Reason = returnRequestDto.Reason;
+        //    existingRequest.Condition = returnRequestDto.Condition;
+
+        //    // Handle the return status update
+        //    if (returnRequestDto.ReturnStatus != null)
+        //    {
+        //        existingRequest.ReturnStatus = returnRequestDto.ReturnStatus;
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Invalid Return Status provided.");
+        //    }
+
+        //    // Additional logic for asset status change and notifications
+        //    if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved ||
+        //        existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned ||
+        //        existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+        //    {
+        //        existingRequest.ReturnDate = DateTime.Now;
+
+        //        var asset = await _context.Assets.FindAsync(existingRequest.AssetId);
+        //        if (asset != null)
+        //        {
+        //            if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+        //            {
+        //                asset.Asset_Status = Models.MultiValues.AssetStatus.OpenToRequest;
+        //                _context.Entry(asset).State = EntityState.Modified;
+
+        //                var allocation = await _context.AssetAllocations
+        //                    .FirstOrDefaultAsync(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId);
+
+        //                if (allocation != null)
+        //                {
+        //                    await _assetAlloc.DeleteAllocation(allocation.AllocationId);
+        //                    await _assetAlloc.Save();
+        //                }
+
+        //                var assetRequest = await _context.AssetRequests
+        //                    .FirstOrDefaultAsync(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated);
+
+        //                if (assetRequest != null)
+        //                {
+        //                    await _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
+        //                    await _asset.Save();
+        //                }
+        //            }
+        //        }
+
+        //        var user = await _context.Users.FindAsync(existingRequest.UserId);
+        //        if (user != null)
+        //        {
+        //            if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved)
+        //            {
+        //                await _notificationService.ReturnRequestApproved(user.UserMail, user.UserName, existingRequest.AssetId, id);
+        //            }
+        //            else if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+        //            {
+        //                await _notificationService.ReturnRequestCompleted(user.UserMail, user.UserName, existingRequest.AssetId);
+        //            }
+        //            else if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+        //            {
+        //                await _notificationService.ReturnRequestRejected(user.UserMail, user.UserName, existingRequest.AssetId, id);
+        //            }
+        //        }
+        //    }
+
+        //    try
+        //    {
+        //        await _returnRequestRepo.Save(); // Save changes to the database
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ReturnRequestExists(id))
+        //        {
+        //            return NotFound($"Details for the Request ID {id} not found");
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> PutReturnRequest(int id, ReturnClassDto returnRequestDto)
+        //{
+        //    if (id != returnRequestDto.ReturnId)
+        //    {
+        //        return BadRequest("Return Id Mismatch");
+        //    }
+
+        //    var existingRequest = await _returnRequestRepo.GetReturnRequestId(id);
+        //    if (existingRequest == null)
+        //    {
+        //        return NotFound($"Details for the Request ID {id} not found");
+        //    }
+
+        //    existingRequest.UserId = returnRequestDto.UserId;
+        //    existingRequest.AssetId = returnRequestDto.AssetId;
+        //    existingRequest.CategoryId = returnRequestDto.CategoryId;
+        //    existingRequest.ReturnDate = returnRequestDto.ReturnDate;
+        //    existingRequest.Reason = returnRequestDto.Reason;
+        //    existingRequest.Condition = returnRequestDto.Condition;
+
+        //    // Handle the return status update
+        //    if (returnRequestDto.ReturnStatus.HasValue)
+        //    {
+        //        existingRequest.ReturnStatus = returnRequestDto.ReturnStatus.Value;
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Invalid Return Status provided.");
+        //    }
+
+        //    // Additional logic for asset status change and notifications
+        //    if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved ||
+        //        existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned ||
+        //        existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+        //    {
+        //        existingRequest.ReturnDate = DateTime.Now;
+
+        //        var asset = await _context.Assets.FindAsync(existingRequest.AssetId);
+        //        if (asset != null)
+        //        {
+        //            if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+        //            {
+        //                asset.Asset_Status = Models.MultiValues.AssetStatus.OpenToRequest;
+        //                _context.Entry(asset).State = EntityState.Modified;
+
+        //                var allocation = await _context.AssetAllocations
+        //                    .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId)
+        //                    .FirstOrDefaultAsync();
+
+        //                if (allocation != null)
+        //                {
+        //                    try
+        //                    {
+        //                        await _assetAlloc.DeleteAllocation(allocation.AllocationId);
+        //                        await _assetAlloc.Save();
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        return BadRequest($"Failed to delete allocation with ID {allocation.AllocationId}: {ex.Message}");
+        //                    }
+        //                }
+
+        //                var assetRequest = await _context.AssetRequests
+        //                    .Where(a => a.AssetId == existingRequest.AssetId && a.UserId == existingRequest.UserId && a.Request_Status == Models.MultiValues.RequestStatus.Allocated)
+        //                    .FirstOrDefaultAsync();
+
+        //                if (assetRequest != null)
+        //                {
+        //                    try
+        //                    {
+        //                        _assetRequest.DeleteAssetRequest(assetRequest.AssetReqId);
+        //                        await _asset.Save();
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        return BadRequest($"Failed to delete AssetRequest with ID {assetRequest.AssetReqId}: {ex.Message}");
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        var user = await _context.Users.FindAsync(existingRequest.UserId);
+        //        if (user != null)
+        //        {
+        //            if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Approved)
+        //            {
+        //                await _notificationService.ReturnRequestApproved(user.UserMail, user.UserName, existingRequest.AssetId, id);
+        //            }
+        //            else if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Returned)
+        //            {
+        //                await _notificationService.ReturnRequestCompleted(user.UserMail, user.UserName, existingRequest.AssetId);
+        //            }
+        //            else if (existingRequest.ReturnStatus == Models.MultiValues.ReturnReqStatus.Rejected)
+        //            {
+        //                await _notificationService.ReturnRequestRejected(user.UserMail, user.UserName, existingRequest.AssetId, id);
+        //            }
+        //        }
+        //    }
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!ReturnRequestExists(id))
+        //        {
+        //            return NotFound($"Details for the Request ID {id} not found");
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
 
         // POST: api/ReturnRequests
         [HttpPost]

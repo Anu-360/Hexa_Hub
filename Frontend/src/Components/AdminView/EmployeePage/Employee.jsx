@@ -1,9 +1,6 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import Header from '../AdminHeader';
-import Navbar from '../AdminNavBar';
 import { useTheme } from '../../ThemeContext';
 import PaginationRounded from '../../Utils/Pagination';
 import usePagination from '../../Utils/usePagination';
@@ -11,6 +8,7 @@ import RadioButton from '../../Utils/RadioButton';
 import { jwtToken } from '../../Utils/utils';
 import ConfirmationDialog from '../../Utils/Dialog';
 import Cookies from 'js-cookie';
+import AddIcon from '@mui/icons-material/Add';
 import {
     Box,
     Table,
@@ -25,12 +23,14 @@ import {
     Autocomplete,
     TextField,
     IconButton,
+    Button,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 const token = Cookies.get('token');
 if (token) {
@@ -38,7 +38,6 @@ if (token) {
 }
 
 export default function Employee() {
-    const [mobileOpen, setMobileOpen] = useState(false);
     const { darkMode } = useTheme();
     const itemsPerPage = 10;
     const [searchTerm, setSearchTerm] = useState('');
@@ -56,7 +55,6 @@ export default function Employee() {
             }
             try {
                 const response = await axios.get('https://localhost:7287/api/Users/role?role=Employee');
-                console.log('Fetched Employees Response:', JSON.stringify(response.data));
                 setEmployees(response.data.$values || []);
             } catch (error) {
                 console.error("Error fetching employees:", error);
@@ -65,6 +63,21 @@ export default function Employee() {
 
         fetchData();
     }, []);
+
+    const filteredEmployees = useMemo(() => {
+        return employees.filter(employee => {
+            const searchLower = searchTerm.toLowerCase();
+            return (
+                (employee.userName?.toLowerCase().includes(searchLower) || "") ||
+                (employee.userId?.toString().includes(searchLower) || "") ||
+                (employee.branch?.toLowerCase().includes(searchLower) || "") ||
+                (employee.dept?.toLowerCase().includes(searchLower) || "") ||
+                (employee.designation?.toLowerCase().includes(searchLower) || "")
+            );
+        });
+    }, [employees, searchTerm]);
+
+    const { currentItems, paginate, pageCount, currentPage, setCurrentPage } = usePagination(itemsPerPage, filteredEmployees);
 
     const handleDeleteConfirmation = (id) => {
         setDeleteId(id);
@@ -84,22 +97,84 @@ export default function Employee() {
         }
     };
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
+    const handleSearch = (event, newValue) => {
+        setSearchTerm(newValue);
+        setCurrentPage(1);
     };
 
-    const filteredEmployees = employees.filter(employee => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-            employee.userName.toLowerCase().includes(searchLower) ||
-            employee.userId.toString().includes(searchLower) 
-        );
-    });
-    const { currentItems, paginate, pageCount } = usePagination(itemsPerPage, filteredEmployees);
-
     const handleRadioBtn = (newValue) => {
-        console.log(`Selected value changed to: ${newValue}`);
         setSelectedValue(newValue);
+    };
+
+    const logo = "/Images/logo.png";
+    const generatePDF = async () => {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: 'a4'
+        });
+
+        const tableColumn = ["UserId", "Name", "Email", "Department", "Designation", "Phone Number", "Address", "Branch"];
+        const tableRows = [];
+
+        filteredEmployees.forEach(employee => {
+            const employeeData = [
+                employee.userId,
+                employee.userName,
+                employee.userMail,
+                employee.dept,
+                employee.designation,
+                employee.phoneNumber,
+                employee.address,
+                employee.branch
+            ];
+            tableRows.push(employeeData);
+        });
+        try {
+            const img = await loadImage(logo);
+            doc.addImage(img, 'PNG', 10, 10, 30, 30);
+        } catch (error) {
+            console.error("Error loading the logo image:", error);
+            return;
+        }
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 80,
+            theme: 'grid',
+            styles: { fontSize: 8, cellPadding: 1 },
+            columnStyles: {
+                0: { cellWidth: 40 },
+                1: { cellWidth: 80 },
+                2: { cellWidth: 100 },
+                3: { cellWidth: 80 },
+                4: { cellWidth: 80 },
+                5: { cellWidth: 80 },
+                6: { cellWidth: 100 },
+                7: { cellWidth: 80 }
+            },
+            didDrawPage: function (data) {
+                doc.setFontSize(18);
+                doc.text("HexaHub", 50, 30);
+                doc.text("Employee List", 40, 60);
+            },
+        });
+
+        doc.save("employee_list.pdf");
+    };
+    const loadImage = (url) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                console.log("Image loaded successfully");
+                resolve(img);
+            };
+            img.onerror = (err) => {
+                console.error("Error loading image:", err);
+                reject(err);
+            };
+        });
     };
 
     return (
@@ -111,8 +186,6 @@ export default function Employee() {
                 minHeight: 'fit-content',
             }}
         >
-            <Header handleDrawerToggle={handleDrawerToggle} />
-            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
             <Box sx={{ display: 'flex', flex: 1 }}>
                 <Box
                     component="main"
@@ -131,14 +204,13 @@ export default function Employee() {
                         <Autocomplete
                             freeSolo
                             disableClearable
-                            options={currentItems.map((option) => (option.userName))}
-                            onInputChange={(e, newValue) => {
-                                setSearchTerm(newValue);
-                            }}
+                            options={employees.map((option) => option.userName)}
+                            onInputChange={handleSearch}
                             renderInput={(params) => (
                                 <TextField
+                                    placeholder='by Name, Id, Branch, Dept, Designation'
                                     {...params}
-                                    label="Search"
+                                    label="Search "
                                     InputProps={{
                                         ...params.InputProps,
                                         type: 'search',
@@ -153,21 +225,22 @@ export default function Employee() {
                             )}
                         />
                         <Box>
-                            <IconButton>
-                                <FilterListIcon />
-                            </IconButton>
+                            <Link to={'/admin/employee/add'}>
+                                <IconButton>
+                                    <AddIcon />
+                                </IconButton>
+                            </Link>
+
                             {selectedValue != null && (
                                 <>
-                                    <Link to={`/user/update/${selectedValue}`}>
-                                    <IconButton>
-                                        <EditIcon />
-                                    </IconButton>
-                                    </Link>
                                     <IconButton onClick={() => handleDeleteConfirmation(selectedValue)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </>
                             )}
+                            <IconButton onClick={generatePDF} >
+                                <PictureAsPdfIcon />
+                            </IconButton>
                         </Box>
                     </Box>
                     <TableContainer component={Paper}>
@@ -183,41 +256,46 @@ export default function Employee() {
                                     <TableCell>Phone Number</TableCell>
                                     <TableCell>Address</TableCell>
                                     <TableCell>Branch</TableCell>
-                                    <TableCell>Role</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {currentItems.map((employee) => (
-                                    <TableRow key={employee.userId}>
-                                        <TableCell>
-                                            <RadioButton
-                                                selectedValue={selectedValue}
-                                                onChange={handleRadioBtn}
-                                                value={employee.userId}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{employee.userId}</TableCell>
-                                        <TableCell>{employee.userName}</TableCell>
-                                        <TableCell>{employee.userMail}</TableCell>
-                                        <TableCell>{employee.dept}</TableCell>
-                                        <TableCell>{employee.designation}</TableCell>
-                                        <TableCell>{employee.phoneNumber}</TableCell>
-                                        <TableCell>{employee.address}</TableCell>
-                                        <TableCell>{employee.branch}</TableCell>
-                                        <TableCell>{employee.user_Type === 1 ? 'Admin' : 'Employee'}</TableCell>
-                                        <TableCell>
-                                            <Link to={`/user/${employee.userId}`}>
-                                                <IconButton>
-                                                    <InfoIcon />
-                                                </IconButton>
-                                            </Link>
-                                        </TableCell>
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((employee) => (
+                                        <TableRow key={employee.userId}>
+                                            <TableCell>
+                                                <RadioButton
+                                                    selectedValue={selectedValue}
+                                                    onChange={handleRadioBtn}
+                                                    value={employee.userId}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{employee.userId}</TableCell>
+                                            <TableCell>{employee.userName}</TableCell>
+                                            <TableCell>{employee.userMail}</TableCell>
+                                            <TableCell>{employee.dept}</TableCell>
+                                            <TableCell>{employee.designation}</TableCell>
+                                            <TableCell>{employee.phoneNumber}</TableCell>
+                                            <TableCell>{employee.address}</TableCell>
+                                            <TableCell>{employee.branch}</TableCell>
+                                            <TableCell>
+                                                <Link to={`${employee.userId}`}>
+                                                    <IconButton>
+                                                        <InfoIcon />
+                                                    </IconButton>
+                                                </Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={10} align="center">No employees found</TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <PaginationRounded count={pageCount} onChange={paginate} />
+
+                    <PaginationRounded count={pageCount} page={currentPage} onChange={(_, page) => setCurrentPage(page)} />
                 </Box>
             </Box>
             <ConfirmationDialog

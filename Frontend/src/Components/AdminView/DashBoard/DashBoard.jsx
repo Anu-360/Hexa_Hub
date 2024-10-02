@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import Header from '../AdminHeader';
-import Navbar from '../AdminNavBar';
+// import Header from '../AdminHeader';
+// import Navbar from '../AdminNavBar';
 import { jwtToken } from '../../Utils/utils';
 import Cookies from 'js-cookie';
 import {
@@ -46,7 +46,7 @@ const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
 export default function Dashboard() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [mobileOpen, setMobileOpen] = useState(false);
+    // const [mobileOpen, setMobileOpen] = useState(false);
     const [totalAssets, setTotalAssets] = useState(0);
     const [allocatedAssets, setAllocatedAssets] = useState(0);
     const [totalEmployees, setTotalEmployees] = useState(0);
@@ -58,9 +58,9 @@ export default function Dashboard() {
     const [assetRequestData, setAssetRequestData] = useState([]);
     const [assetAllocData, setAssetAllocData] = useState([]);
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+    // const handleDrawerToggle = () => {
+    //     setMobileOpen(!mobileOpen);
+    // };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -162,8 +162,8 @@ export default function Dashboard() {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <Header handleDrawerToggle={handleDrawerToggle} />
-            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
+            {/* <Header handleDrawerToggle={handleDrawerToggle} />
+            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} /> */}
             <Box
                 component="main"
                 sx={{

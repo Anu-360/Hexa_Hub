@@ -7,8 +7,6 @@ namespace Hexa_Hub.DTO
 {
     public class ServiceRequestDto
     {
-        [Required]
-        [Key]
         public int ServiceId { get; set; }
 
         [Required]
@@ -25,7 +23,7 @@ namespace Hexa_Hub.DTO
         [Required]
         public IssueType Issue_Type { get; set; }
 
-        [Required]
+ 
         public string ServiceDescription { get; set; }
 
         
