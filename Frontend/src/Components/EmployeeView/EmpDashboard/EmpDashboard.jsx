@@ -75,7 +75,7 @@ const CircularGauge = ({ percentage, label }) => {
 };
 
 const EmpDashboard = () => {
-    console.log("EmpDashboard component rendered");
+    
     const [assetTableData, setAssetTableData] = useState([]);
     const [requestsCount, setRequestsCount] = useState(0);
     const [returnRequests, setReturnRequests] = useState([]);
@@ -88,7 +88,7 @@ const EmpDashboard = () => {
 
     // Week labels for the current month
     const weekLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
-
+    
     useEffect(() => {
         const token = Cookies.get('token');
         if (token) {

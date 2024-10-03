@@ -44,6 +44,7 @@ const drawerWidth = 240;
 const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
 
 export default function Dashboard() {
+    
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // const [mobileOpen, setMobileOpen] = useState(false);
@@ -58,22 +59,19 @@ export default function Dashboard() {
     const [assetRequestData, setAssetRequestData] = useState([]);
     const [assetAllocData, setAssetAllocData] = useState([]);
 
-    // const handleDrawerToggle = () => {
-    //     setMobileOpen(!mobileOpen);
-    // };
-
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const decodedToken = jwtToken();
-            if (!decodedToken) {
+            const token = Cookies.get('token');
+            if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } else {
                 console.error('No valid token found.');
                 setLoading(false);
                 return;
             }
 
             try {
-                //Fetching Audit data
                 const auditResponse = await axios.get('https://localhost:7287/api/Audits/All');
                 if (auditResponse.data && auditResponse.data.$values) {
                     setAuditTableData(auditResponse.data.$values);

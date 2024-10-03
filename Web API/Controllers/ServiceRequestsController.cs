@@ -94,11 +94,21 @@ namespace Hexa_Hub.Controllers
                         _context.Entry(asset).State = EntityState.Modified;
                     }
 
+
                     var user = await _context.Users.FindAsync(serviceRequestDto.UserId);
                     if (user != null)
                     {
                         await _notificationService.ServiceRequestApproved(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
                     }
+                    var maintenanceLog = new MaintenanceLog
+                    {
+                        AssetId = serviceRequestDto.AssetId,
+                        UserId = serviceRequestDto.UserId,
+                        Maintenance_date = DateTime.Now,
+                        Maintenance_Description = serviceRequestDto.ServiceDescription
+                    };
+                    _maintenanceLog.AddMaintenanceLog(maintenanceLog);
+                    await _maintenanceLog.Save();
                 }
                 else if (parsedStatus == ServiceReqStatus.Completed)
                 {
@@ -115,6 +125,10 @@ namespace Hexa_Hub.Controllers
                         await _notificationService.ServiceRequestCompleted(user.UserMail, user.UserName, serviceRequestDto.AssetId, id, serviceRequestDto.Issue_Type);
                     }
                 }
+                //else if(parsedStatus == ServiceReqStatus.Rejected)
+                //{
+
+                //}
             }
             else
             {
@@ -246,16 +260,16 @@ namespace Hexa_Hub.Controllers
             await _serviceRequest.AddServiceRequest(serviceRequest);
             await _serviceRequest.Save();
 
-            var maintenanceLog = new MaintenanceLog
-            {
-                AssetId = serviceRequest.AssetId,
-                UserId = loggedInUserId,
-                Maintenance_date = DateTime.Now,
-                Maintenance_Description = serviceRequest.ServiceDescription
-            };
+            //var maintenanceLog = new MaintenanceLog
+            //{
+            //    AssetId = serviceRequest.AssetId,
+            //    UserId = loggedInUserId,
+            //    Maintenance_date = DateTime.Now,
+            //    Maintenance_Description = serviceRequest.ServiceDescription
+            //};
 
-            _maintenanceLog.AddMaintenanceLog(maintenanceLog);
-            await _maintenanceLog.Save();
+            //_maintenanceLog.AddMaintenanceLog(maintenanceLog);
+            //await _maintenanceLog.Save();
 
             return CreatedAtAction("GetServiceRequests", new { id = serviceRequest.ServiceId }, serviceRequest);
         }

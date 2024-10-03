@@ -4,6 +4,7 @@ import { ThemeProvider } from '../ThemeContext';
 import { useTheme } from '../ThemeContext';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import {
   AppBar,
   Toolbar,
@@ -23,6 +24,7 @@ const Header = ({ handleDrawerToggle }) => {
   const navigate = useNavigate();
   const handleLogout = (e) => {
     e.preventDefault();
+    Cookies.remove('token');
     navigate('/signin');
   };
 

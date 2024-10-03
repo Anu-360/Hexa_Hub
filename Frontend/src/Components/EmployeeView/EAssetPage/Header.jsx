@@ -167,11 +167,10 @@ const Header = () => {
       });
     }, 1000); // Update every second
 
-    return () => clearInterval(timer); // Clean up the interval on unmount
+    return () => clearInterval(timer);
   }, []);
 
   const handleLogout = () => {
-    // Clear the token and redirect to the landing page
     Cookies.remove('token');
     navigate('/');
   };
