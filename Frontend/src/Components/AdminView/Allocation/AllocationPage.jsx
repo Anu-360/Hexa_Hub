@@ -91,17 +91,17 @@ export default function AllocationPage() {
         setFilterDrawerOpen(!filterDrawerOpen);
     };
     const logo = "/Images/logo.png";
-    const generatePDF = async() =>{
+    const generatePDF = async () => {
         const doc = new jsPDF({
             orientation: 'landscape',
-            unit:'pt',
+            unit: 'pt',
             format: 'a4'
         });
 
         const tableColumn = ["Allocation ID", "Request ID", "Asset Name", "UserName", "Allocated Date"];
         const tableRows = [];
 
-        filteredRequests.forEach(allocation =>{
+        filteredRequests.forEach(allocation => {
             const allocData = [
                 allocation.allocationId,
                 allocation.requestId,
@@ -111,9 +111,9 @@ export default function AllocationPage() {
             ];
             tableRows.push(allocData);
         });
+        let img;
         try {
-            const img = await loadImage(logo);
-            doc.addImage(img, 'PNG', 10, 10, 30, 30);
+            img = await loadImage(logo);
         } catch (error) {
             console.error("Error loading the logo image:", error);
             return;
@@ -133,19 +133,22 @@ export default function AllocationPage() {
                 5: { cellWidth: 80 },
                 6: { cellWidth: 70 }
             },
-            didDrawPage :function(data){
-                doc.setFontSize(18);
-                doc.text("HexaHub", 50, 30);
-                doc.setFontSize(20);
-                doc.text("Allocation List", 40, 60);
-                doc.setFontSize(10);
-                let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}`;
-                doc.text(filterText, 40, 80);
+            didDrawPage: function (data) {
+                if (doc.internal.getNumberOfPages() === 1) {
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                    doc.setFontSize(18);
+                    doc.text("HexaHub", 50, 30);
+                    doc.setFontSize(20);
+                    doc.text("Allocation List", 40, 60);
+                    doc.setFontSize(10);
+                    let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}`;
+                    doc.text(filterText, 40, 80);
+                }
             },
         });
         doc.save("allocation_List.pdf");
     }
-    
+
     const loadImage = (url) => {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -272,25 +275,25 @@ export default function AllocationPage() {
                             </TableHead>
                             <TableBody>
                                 {currentItems.length > 0 ? (
-                                        currentItems.map((allocation) => (
-                                            <TableRow key={allocation.allocationId}>
-                                                <TableCell>
-                                                </TableCell>
-                                                <TableCell>{allocation.allocationId}</TableCell>
-                                                <TableCell>{allocation.assetReqId}</TableCell>
-                                                <TableCell>{allocation.assetName}</TableCell>
-                                                <TableCell>{allocation.userName}</TableCell>
-                                                <TableCell>{allocation.allocatedDate}</TableCell>
-                                                <TableCell>
-                                                    <Link to={`/admin/allocation/${allocation.allocationId}`}>
-                                                        <IconButton>
-                                                            <InfoIcon />
-                                                        </IconButton>
-                                                    </Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                        ) : (
+                                    currentItems.map((allocation) => (
+                                        <TableRow key={allocation.allocationId}>
+                                            <TableCell>
+                                            </TableCell>
+                                            <TableCell>{allocation.allocationId}</TableCell>
+                                            <TableCell>{allocation.assetReqId}</TableCell>
+                                            <TableCell>{allocation.assetName}</TableCell>
+                                            <TableCell>{allocation.userName}</TableCell>
+                                            <TableCell>{allocation.allocatedDate}</TableCell>
+                                            <TableCell>
+                                                <Link to={`/admin/allocation/${allocation.allocationId}`}>
+                                                    <IconButton>
+                                                        <InfoIcon />
+                                                    </IconButton>
+                                                </Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
                                     <TableRow>
                                         <TableCell colSpan={10} align="center">No Allocations found</TableCell>
                                     </TableRow>

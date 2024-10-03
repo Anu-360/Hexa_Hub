@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import CustomPagination from '../../Utils/CustomPagination';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck, faCircleExclamation, faCircleRight, faThumbsUp, faTimes ,faXmark} from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCircleExclamation, faCircleRight, faThumbsUp, faTimes, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const ServiceRequest = () => {
   const [serviceRequests, setServiceRequests] = useState([]);
@@ -30,14 +30,14 @@ const ServiceRequest = () => {
   const itemsPerPage = 10;
 
   const issueTypeMapping = {
-    0: 'Malfunction',
-    1: 'Repair',
-    2: 'Installation',
+    1: 'Malfunction',
+    2: 'Repair',
+    3: 'Installation',
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       const token = Cookies.get('token');
       if (token) {
         const decode = jwtDecode(token);
@@ -56,23 +56,26 @@ const ServiceRequest = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
-            console.log(serviceResponse);
+            console.log('Service Requests fetched:', serviceResponse.data);
             setServiceRequests(serviceResponse.data.$values || []);
-            try {
-              const assetResponse = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-              console.log('Asset Allocations fetched:', assetResponse.data);
-              setAssetAllocations(assetResponse.data.$values || []);
-            } catch (assetError) {
-              console.error('Error fetching asset allocations:', assetError.response ? assetError.response.data : assetError.message);
-              setAssetAllocations([]);
-            }
+
+            
           } catch (error) {
             setError('Error fetching data');
-          } finally {
+            console.error('Error fetching service requests:', error);
+          } 
+          try {
+            const assetResponse = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            console.log('Asset Allocations fetched:', assetResponse.data);
+            setAssetAllocations(assetResponse.data.$values || []);
+          } catch (assetError) {
+            console.error('Error fetching asset allocations:', assetError.response ? assetError.response.data : assetError.message);
+            setAssetAllocations([]);
+          }finally {
             setLoading(false);
           }
         } else {
@@ -146,7 +149,11 @@ const ServiceRequest = () => {
         serviceDescription: '',
         serviceReqStatus: 'UnderReview',
       });
-
+      if (!formData.assetId || !formData.issue_Type || !formData.serviceDescription) {
+        console.error("Form submission failed: Missing required fields");
+        return;
+      }
+      
       setShowForm(false);
       setSuccessMessage('Service request sent successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -200,7 +207,8 @@ const ServiceRequest = () => {
                       <td className="px-4 py-2">{request.assetId}</td>
                       <td className="px-4 py-2">{request.assetName ? request.assetName : 'N/A'}</td>
                       <td className="px-4 py-2">{new Date(request.serviceRequestDate).toLocaleDateString()}</td>
-                      <td>{issueTypeMapping[request.issue_Type] || 'Unknown'}</td>
+                      {/* <td>{issueTypeMapping[request.issue_Type] || 'Unknown'}</td> */}
+                      <td>{issueTypeMapping[request.issue_Type] !== undefined ? issueTypeMapping[request.issue_Type] : 'Unknown'}</td>
                       <td className="px-4 py-2">{request.serviceDescription}</td>
                       <td className="px-4 py-2">
                         {request.serviceReqStatus === 0 ? (
@@ -208,7 +216,7 @@ const ServiceRequest = () => {
                         ) : request.serviceReqStatus === 1 ? (
                           <span className="text-yellow-500 font-semibold"><FontAwesomeIcon icon={faThumbsUp} /> Approved</span>
                         ) :
-                          request.serviceReqStatus === 2? (
+                          request.serviceReqStatus === 2 ? (
                             <span className="text-green-500 font-semibold"><FontAwesomeIcon icon={faCircleCheck} /> Completed</span>
                           ) : (
                             <span className="text-red-500 font-semibold"><FontAwesomeIcon icon={faXmark} /> Rejected</span>
@@ -228,8 +236,11 @@ const ServiceRequest = () => {
                 onPageChange={setCurrentPage}
               />
 
-              {/* Service Guidelines and Button Layout */}
-              <div className="p-10 mt-8 text-black flex justify-between items-start">
+              
+            </>
+          )}
+          {/* Service Guidelines and Button Layout */}
+          <div className="p-10 mt-8 text-black flex justify-between items-start">
                 <div className="mt-4 bg-gray-100 p-4 rounded-lg w-1/2 shadow-lg">
                   <h2 className="text-lg font-bold">SERVICE GUIDELINES</h2>
                   <ul className="mt-2 text-lg">
@@ -350,8 +361,6 @@ const ServiceRequest = () => {
                   )}
                 </div>
               </div>
-            </>
-          )}
           {successMessage && (
             <div className="fixed top-5 right-5 bg-green-500 text-white p-3 rounded shadow-lg">
               {successMessage}

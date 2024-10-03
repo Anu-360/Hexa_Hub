@@ -130,13 +130,13 @@ export default function Employee() {
             ];
             tableRows.push(employeeData);
         });
-        try {
-            const img = await loadImage(logo);
-            doc.addImage(img, 'PNG', 10, 10, 30, 30);
-        } catch (error) {
-            console.error("Error loading the logo image:", error);
-            return;
-        }
+        let img;
+    try {
+        img = await loadImage(logo);
+    } catch (error) {
+        console.error("Error loading the logo image:", error);
+        return;
+    }
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
@@ -154,9 +154,12 @@ export default function Employee() {
                 7: { cellWidth: 80 }
             },
             didDrawPage: function (data) {
+                if (doc.internal.getNumberOfPages() === 1) {
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
                 doc.setFontSize(18);
                 doc.text("HexaHub", 50, 30);
                 doc.text("Employee List", 40, 60);
+                }
             },
         });
 

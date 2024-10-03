@@ -51,30 +51,6 @@ const ReturnRequest = () => {
                         userId: userId // Set the userId in formData
                     }));
 
-                    // try {
-                    //   // Fetch return requests
-                    //   const returnResponse = await axios.get('https://localhost:7287/api/ReturnRequests', {
-                    //     headers: {
-                    //       Authorization: `Bearer ${token}`,
-                    //     },
-                    //   });
-                    //   console.log('Return Requests fetched:', returnResponse.data);
-                    //   setReturnRequests(returnResponse.data.$values || []);
-                    // }
-                    //   // Fetch asset allocations
-                    //   const assetResponse = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`, {
-                    //     headers: {
-                    //       Authorization: `Bearer ${token}`,
-                    //     },
-                    //   });
-                    //   console.log('Asset Allocations fetched:', assetResponse.data);
-                    // //   const assetAllocationsData = Array.isArray(assetResponse.data.$values) ? assetResponse.data.$values : assetResponse.data;
-                    //   setAssetAllocations(assetResponse.data.$values || []);
-                    // } catch (error) {
-                    //   setError('Error fetching data');
-                    // } finally {
-                    //   setLoading(false); // End loading
-                    // }
                     try {
                         // Fetch return requests first
                         const returnResponse = await axios.get('https://localhost:7287/api/ReturnRequests', {
@@ -86,26 +62,26 @@ const ReturnRequest = () => {
 
                         // Set return requests regardless of the allocation fetch
                         setReturnRequests(returnResponse.data.$values || []);
-
-                        // Fetch asset allocations
-                        try {
-                            const assetResponse = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`, {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            });
-                            console.log('Asset Allocations fetched:', assetResponse.data);
-                            setAssetAllocations(assetResponse.data.$values || []);
-                        } catch (assetError) {
-                            // Log the error but do not set error state; just indicate no asset allocations were found
-                            console.error('Error fetching asset allocations:', assetError.response ? assetError.response.data : assetError.message);
-                            setAssetAllocations([]); // or handle it as needed
-                        }
+                        
                     } catch (error) {
                         // Handle error fetching return requests if necessary
                         console.error('Error fetching return requests:', error.response ? error.response.data : error.message);
                         setError('Error fetching return requests: ' + (error.response ? error.response.data : 'Unknown error'));
-                    } finally {
+                    } 
+                    try {
+                        const assetResponse = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        });
+                        console.log('Asset Allocations fetched:', assetResponse.data);
+                        setAssetAllocations(assetResponse.data.$values || []);
+                    } catch (assetError) {
+                        // Log the error but do not set error state; just indicate no asset allocations were found
+                        console.error('Error fetching asset allocations:', assetError.response ? assetError.response.data : assetError.message);
+                        setAssetAllocations([]); // or handle it as needed
+                    }
+                    finally {
                         setLoading(false); // End loading
                     }
 
@@ -250,8 +226,12 @@ const ReturnRequest = () => {
                             />
 
 
-                            {/* Terms and Conditions */}
-                            <div className="p-10 mt-8  flex justify-between items-start">
+                            
+                        </>
+                        
+                    )}
+                    {/* Terms and Conditions */}
+                    <div className="p-10 mt-8  flex justify-between items-start">
                                 <div className="mt-4 bg-gray-100 p-4 rounded-lg w-1/2 shadow-lg">
                                     <h2 className="text-lg font-bold">Terms and Conditions</h2>
                                     <p className="mt-2 text-sm">
@@ -371,8 +351,6 @@ const ReturnRequest = () => {
                                     )}
                                 </div>
                             </div>
-                        </>
-                    )}
                     {successMessage && (
                         <div className="fixed top-5 right-5 bg-green-500 text-white p-3 rounded shadow-lg">
                             {successMessage}

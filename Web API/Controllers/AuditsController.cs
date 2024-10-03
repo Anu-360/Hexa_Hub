@@ -190,8 +190,9 @@ namespace Hexa_Hub.Controllers
             var employee = await _userRepo.GetUserId(audit.UserId);
             if (employee != null)
             {
-                await _notificationService.AduitCompleted(
+                await _notificationService.SendAudit(
                     employee.UserMail,
+                    employee.UserName,
                     audit.AuditId
                 );
             }
