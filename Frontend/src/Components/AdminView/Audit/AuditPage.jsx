@@ -342,7 +342,7 @@ export default function AuditPage() {
                                             <TableCell>{audit.userName}</TableCell>
                                             <TableCell>{audit.assetName}</TableCell>
                                             <TableCell sx={{
-                                                color: audit.audit_Status === 'Sent' ? '#36A2EB' : '#0BDA51',
+                                                color: audit.audit_Status === 'Sent' ? '#36A2EB' : audit.audit_Status === 'InProgress' ? '#FF7518':'#0BDA51',
                                             }}>{audit.audit_Status}</TableCell>
                                             <TableCell>
                                                 <Link to={`/admin/audit/${audit.auditId}`}>

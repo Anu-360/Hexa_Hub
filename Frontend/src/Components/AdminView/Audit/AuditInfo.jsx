@@ -89,7 +89,7 @@ const AuditInfo = () => {
                                         color="secondary"
                                         sx={{
                                             mt: 1,
-                                            backgroundColor: audit.audit_Status === 'Completed' ? '#0BDA51' :
+                                            backgroundColor: audit.audit_Status === 'Completed' ? '#0BDA51' :audit.audit_Status === 'InProgress' ? '#FF7518':
                                             '#36A2EB' ,
                                             color: '#000000' ,
                                             fontWeight: 'bold'
