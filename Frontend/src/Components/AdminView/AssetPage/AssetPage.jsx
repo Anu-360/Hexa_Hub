@@ -198,13 +198,13 @@ export default function AssetPage() {
             ];
             tableRows.push(assetData);
         });
-        try {
-            const img = await loadImage(logo);
-            doc.addImage(img, 'PNG', 10, 10, 30, 30);
-        } catch (error) {
-            console.error("Error loading the logo image:", error);
-            return;
-        }
+        let img;
+    try {
+        img = await loadImage(logo);
+    } catch (error) {
+        console.error("Error loading the logo image:", error);
+        return;
+    }
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
@@ -221,13 +221,16 @@ export default function AssetPage() {
                 6: { cellWidth: 70 }
             },
             didDrawPage: function (data) {
-                doc.setFontSize(18);
-                doc.text("HexaHub", 50, 30);
-                doc.setFontSize(18);
-                doc.text("Asset List", 40, 60);
-                doc.setFontSize(10);
-                let filterText = `Filters: ${selectedCategory ? `Category: ${selectedCategory}, ` : ''}${selectedSubCategory ? `Subcategory: ${selectedSubCategory}, ` : ''}${selectedStatus ? `Status: ${selectedStatus}, ` : ''}Value Range: ${minValue} - ${maxValue}`;
-                doc.text(filterText, 40, 80);
+                if (doc.internal.getNumberOfPages() === 1) {
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                    doc.setFontSize(18);
+                    doc.text("HexaHub", 50, 30);
+                    doc.setFontSize(18);
+                    doc.text("Asset List", 40, 60);
+                    doc.setFontSize(10);
+                    let filterText = `Filters: ${selectedCategory ? `Category: ${selectedCategory}, ` : ''}${selectedSubCategory ? `Subcategory: ${selectedSubCategory}, ` : ''}${selectedStatus ? `Status: ${selectedStatus}, ` : ''}Value Range: ${minValue} - ${maxValue}`;
+                    doc.text(filterText, 40, 80);
+                }
             },
         });
 

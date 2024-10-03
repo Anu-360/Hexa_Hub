@@ -75,7 +75,7 @@ const AddAudit = () => {
         try {
             await axios.post(`https://localhost:7287/api/Audits`, formData);
             setTimeout(() => {
-                showToast('Category Added Successfully', 'success');
+                showToast('Audit Added Successfully', 'success');
             }, 2000)
             navigate('/admin/audit');
             setFormData({
@@ -87,7 +87,7 @@ const AddAudit = () => {
             });
         } catch (error) {
             console.error('Error adding audit:', error);
-            showToast('Asset Updated Failed', 'error');
+            showToast('Audit Failed', 'error');
             alert('Failed to add audit. Please try again.');
         }
     };

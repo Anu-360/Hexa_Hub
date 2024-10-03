@@ -119,9 +119,9 @@ export default function AuditPage() {
             ];
             tableRows.push(RequestData);
         });
+        let img;
         try {
-            const img = await loadImage(logo);
-            doc.addImage(img, 'PNG', 10, 10, 30, 30);
+            img = await loadImage(logo);
         } catch (error) {
             console.error("Error loading the logo image:", error);
             return;
@@ -142,6 +142,8 @@ export default function AuditPage() {
                 6: { cellWidth: 70 }
             },
             didDrawPage :function(data){
+                if (doc.internal.getNumberOfPages() === 1) {
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
                 doc.setFontSize(18);
                 doc.text("HexaHub", 50, 30);
                 doc.setFontSize(20);
@@ -149,6 +151,7 @@ export default function AuditPage() {
                 doc.setFontSize(10);
                 let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
                 doc.text(filterText, 40, 80);
+                }
             },
         });
         doc.save("audit_List.pdf");

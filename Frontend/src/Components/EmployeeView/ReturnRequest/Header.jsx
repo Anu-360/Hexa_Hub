@@ -252,7 +252,9 @@ const Header = () => {
               <Link to="/dashboard" className="block text-slate-200 hover:text-indigo-950 w-full h-full">DashBoard</Link>
             </li>
 
-                <li className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer">Settings</li>
+            <li className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer">
+                <Link to="/Settings" className="block text-slate-200 hover:text-indigo-950 w-full h-full">Settings</Link>
+                </li>
               </ul>
             </div>
           )}

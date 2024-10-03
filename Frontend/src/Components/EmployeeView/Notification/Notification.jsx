@@ -169,12 +169,11 @@ const Notifications = () => {
             fetchAssetAllocations();
         }
     }, []);
-
     const fetchRequests = async () => {
         try {
             const token = Cookies.get('token'); // Get token from cookies
             let userId;
-
+    
             if (token) {
                 const decode = jwtDecode(token); // Decode the token
                 userId = decode.nameid; // Extract the user ID
@@ -182,33 +181,87 @@ const Notifications = () => {
                 console.error('No token found');
                 return; // Exit if no token is found
             }
-
-            // Make API requests using the userId with Authorization header
-            const [assetRes, serviceRes, returnRes] = await Promise.all([
+    
+            // Create an array to hold the promises for the API requests
+            const requests = [
                 axios.get('https://localhost:7287/api/AssetRequests', {
                     headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
-                }), // Asset requests
+                }).then(res => {
+                    setAssetRequest(res.data.$values);
+                    console.log('Asset Requests:', res.data);
+                }).catch(error => {
+                    console.error('Error fetching asset requests:', error.response ? error.response.data : error.message);
+                    setAssetRequest([]); // Set to empty if there's an error
+                }),
+                
                 axios.get('https://localhost:7287/api/ServiceRequests', {
                     headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
-                }), // Service requests
+                }).then(res => {
+                    setServiceRequest(res.data.$values);
+                    console.log('Service Requests:', res.data);
+                }).catch(error => {
+                    console.error('Error fetching service requests:', error.response ? error.response.data : error.message);
+                    setServiceRequest([]); // Set to empty if there's an error
+                }),
+                
                 axios.get('https://localhost:7287/api/ReturnRequests', {
                     headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
-                }), // Return requests
-            ]);
-
-            // Handle the responses
-            setAssetRequest(assetRes.data.$values);
-            setServiceRequest(serviceRes.data.$values);
-            setReturnRequest(returnRes.data.$values);
-
-            console.log('Asset Requests:', assetRes.data);
-            console.log('Service Requests:', serviceRes.data);
-            console.log('Return Requests:', returnRes.data);
-
+                }).then(res => {
+                    setReturnRequest(res.data.$values);
+                    console.log('Return Requests:', res.data);
+                }).catch(error => {
+                    console.error('Error fetching return requests:', error.response ? error.response.data : error.message);
+                    setReturnRequest([]); // Set to empty if there's an error
+                }),
+            ];
+    
+            // Wait for all requests to complete
+            await Promise.all(requests);
+            
         } catch (error) {
-            console.error('Error fetching requests:', error.response ? error.response.data : error.message);
+            console.error('Unexpected error fetching requests:', error.response ? error.response.data : error.message);
         }
     };
+    
+    // const fetchRequests = async () => {
+    //     try {
+    //         const token = Cookies.get('token'); // Get token from cookies
+    //         let userId;
+
+    //         if (token) {
+    //             const decode = jwtDecode(token); // Decode the token
+    //             userId = decode.nameid; // Extract the user ID
+    //         } else {
+    //             console.error('No token found');
+    //             return; // Exit if no token is found
+    //         }
+
+    //         // Make API requests using the userId with Authorization header
+    //         const [assetRes, serviceRes, returnRes] = await Promise.all([
+    //             axios.get('https://localhost:7287/api/AssetRequests', {
+    //                 headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
+    //             }), // Asset requests
+    //             axios.get('https://localhost:7287/api/ServiceRequests', {
+    //                 headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
+    //             }), // Service requests
+    //             axios.get('https://localhost:7287/api/ReturnRequests', {
+    //                 headers: { Authorization: `Bearer ${token}` }, // Add Authorization header
+    //             }), // Return requests
+    //         ]);
+
+    //         // Handle the responses
+    //         setAssetRequest(assetRes.data.$values);
+    //         setServiceRequest(serviceRes.data.$values);
+    //         setReturnRequest(returnRes.data.$values);
+
+    //         console.log('Asset Requests:', assetRes.data);
+    //         console.log('Service Requests:', serviceRes.data);
+    //         console.log('Return Requests:', returnRes.data);
+
+    //     } catch (error) {
+    //         console.error('Error fetching requests:', error.response ? error.response.data : error.message);
+    //     }
+    // };
 
     useEffect(() => {
         fetchRequests(); // Call the fetchRequests function on component mount

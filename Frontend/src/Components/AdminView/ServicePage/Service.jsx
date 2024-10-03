@@ -101,19 +101,19 @@ export default function ServicePage() {
             console.log('Cannot edit this request as it is Completed.');
         }
     };
-    
+
     const logo = "/Images/logo.png";
-    const generatePDF = async() =>{
+    const generatePDF = async () => {
         const doc = new jsPDF({
             orientation: 'landscape',
-            unit:'pt',
+            unit: 'pt',
             format: 'a4'
         });
 
         const tableColumn = ["Service ID", "User Name", "Asset Name", "Service Date", "Status"];
         const tableRows = [];
 
-        filteredRequests.forEach(Request =>{
+        filteredRequests.forEach(Request => {
             const RequestData = [
                 Request.serviceId,
                 Request.userName,
@@ -123,9 +123,9 @@ export default function ServicePage() {
             ];
             tableRows.push(RequestData);
         });
+        let img;
         try {
-            const img = await loadImage(logo);
-            doc.addImage(img, 'PNG', 10, 10, 30, 30);
+            img = await loadImage(logo);
         } catch (error) {
             console.error("Error loading the logo image:", error);
             return;
@@ -145,14 +145,17 @@ export default function ServicePage() {
                 5: { cellWidth: 80 },
                 6: { cellWidth: 70 }
             },
-            didDrawPage :function(data){
-                doc.setFontSize(18);
-                doc.text("HexaHub", 50, 30);
-                doc.setFontSize(20);
-                doc.text("Service List", 40, 60);
-                doc.setFontSize(10);
-                let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
-                doc.text(filterText, 40, 80);
+            didDrawPage: function (data) {
+                if (doc.internal.getNumberOfPages() === 1) {
+                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                    doc.setFontSize(18);
+                    doc.text("HexaHub", 50, 30);
+                    doc.setFontSize(20);
+                    doc.text("Service List", 40, 60);
+                    doc.setFontSize(10);
+                    let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
+                    doc.text(filterText, 40, 80);
+                }
             },
         });
         doc.save("serviceRequest_List.pdf");
@@ -171,7 +174,7 @@ export default function ServicePage() {
             };
         });
     };
-    
+
 
     const toggleFilterDrawer = () => {
         setFilterDrawerOpen(!filterDrawerOpen);
@@ -323,8 +326,8 @@ export default function ServicePage() {
                                             <TableCell>{request.assetName}</TableCell>
                                             <TableCell>{new Date(request.serviceRequestDate).toLocaleDateString()}</TableCell>
                                             <TableCell sx={{
-                                                color: request.serviceReqStatusName === 'Approved' ? '#0BDA51' : request.serviceReqStatusName ==='Rejected' ? '#D2042D' :
-                                                request.serviceReqStatusName === 'UnderReview' ? '#36A2EB' : '#FF7518',
+                                                color: request.serviceReqStatusName === 'Approved' ? '#0BDA51' : request.serviceReqStatusName === 'Rejected' ? '#D2042D' :
+                                                    request.serviceReqStatusName === 'UnderReview' ? '#36A2EB' : '#FF7518',
                                             }}>
                                                 {request.serviceReqStatusName}
                                             </TableCell>

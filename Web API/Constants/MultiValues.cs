@@ -25,9 +25,9 @@ public class MultiValues
 
     public enum IssueType
     {
-        Malfunction=0,
-        Repair=1,
-        Installation=2
+        Malfunction=1,
+        Repair=2,
+        Installation=3
     }
 
     public enum AuditStatus
