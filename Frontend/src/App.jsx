@@ -2,6 +2,8 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HexaHubLandingPage from './Components/LandingPage/HomePage';
 import SignInPage from './Components/SignInPage/Signin';
+import Privacy from './Components/PrivacyTerms/Privacy';
+import Terms from './Components/PrivacyTerms/Terms';
 import Dashboard from './Components/AdminView/DashBoard/DashBoard';
 import EmpDashboard from './Components/EmployeeView/EmpDashboard/EmpDashboard';
 import ServiceRequest from './Components/EmployeeView/ServicePage/ServiceRequest';
@@ -54,6 +56,8 @@ function App() {
           <Routes>
             <Route path="/" element={<HexaHubLandingPage />} />
             <Route path="/signin" element={<SignInPage />} />
+            <Route path="Privacy" element={<Privacy/>}/>
+            <Route path="Terms" element={<Terms/>}/>
             <Route path="dashboard" element={<EmpDashboard />} />
             <Route path="ServiceRequest" element={<ServiceRequest />} />
             <Route path="ReturnRequest" element={<ReturnRequest />} />

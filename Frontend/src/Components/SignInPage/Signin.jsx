@@ -5,6 +5,7 @@ import ToastNotification, { showToast } from '../Utils/ToastNotification';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
+import CloseIcon from '@mui/icons-material/Close';
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
@@ -61,9 +62,11 @@ const SignInPage = () => {
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-4 sm:px-6 lg:px-8 h-1/2">
       <div className="flex items-start justify-start mt-4 mb-8">
           <img
-            src="/Images/HEXA_HUB.jpg"
+            src="/Images/HEXA_HUB.png"
             alt="HexaHub Logo"
             className="h-20 w-20 mr-4" 
+            onClick={handleLogoClick}
+            
           />
         </div>
         <div className="w-full max-w-md mx-auto">
@@ -107,8 +110,8 @@ const SignInPage = () => {
             </form>
             <ToastNotification />
             <div className="mt-6 flex items-center justify-between text-sm">
-              <a href="#" className="font-medium text-indigo-950 hover:text-cyan-500">Privacy</a>
-              <a href="#" className="font-medium text-indigo-950 hover:text-cyan-500">Terms</a>
+              <a href="/Privacy" className="font-medium text-indigo-950 hover:text-cyan-500">Privacy</a>
+              <a href="/Terms" className="font-medium text-indigo-950 hover:text-cyan-500">Terms</a>
             </div>
           </div>
         </div>

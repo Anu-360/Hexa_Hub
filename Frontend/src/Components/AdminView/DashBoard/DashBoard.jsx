@@ -160,8 +160,7 @@ export default function Dashboard() {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            {/* <Header handleDrawerToggle={handleDrawerToggle} />
-            <Navbar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} /> */}
+
             <Box
                 component="main"
                 sx={{
