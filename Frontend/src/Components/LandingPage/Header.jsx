@@ -17,7 +17,7 @@ export default function Header() {
         <div className="flex items-center lg:flex-1">
         <div className="flex flex-row items-center cursor-pointer" onClick={handleLogoClick}>
             <span className="sr-only">HexaHub</span>
-            <img alt="HexaHub Logo" src="../Images/logo.png" className="h-12 w-auto" />
+            <img alt="HexaHub Logo" src="/Images/logo.png" className="h-12 w-auto" />
             <p className="text-xl font-semibold leading-6 text-gray-900">HexaHub</p>
           </div>
         </div>

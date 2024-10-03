@@ -77,7 +77,7 @@ namespace Hexa_Hub.Repository
                     UserId = a.UserId,
                     AuditDate = a.AuditDate,
                     AuditMessage = a.AuditMessage,
-                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : a.Audit_Status == AuditStatus.InProgress ? "InProgress" : "Sent",
                     AssetName = a.Asset.AssetName,
                     UserName = a.User.UserName
                 })
@@ -100,7 +100,8 @@ namespace Hexa_Hub.Repository
                 UserId = a.UserId,
                 AuditDate = a.AuditDate,
                 AuditMessage = a.AuditMessage,
-                Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" :
+               a.Audit_Status == AuditStatus.InProgress ? "InProgress" : "Sent",
                 AssetName = a.Asset?.AssetName,
                 UserName = a.User?.UserName
             }).ToList();
@@ -125,7 +126,8 @@ namespace Hexa_Hub.Repository
                         UserId = a.UserId,
                         AuditDate = a.AuditDate,
                         AuditMessage = a.AuditMessage,
-                        Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                        Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" :
+               a.Audit_Status == AuditStatus.InProgress ? "InProgress" : "Sent",
                         AssetName = a.Asset.AssetName,
                         UserName = a.User.UserName
                     })
@@ -154,7 +156,8 @@ namespace Hexa_Hub.Repository
                     UserId = a.UserId,
                     AuditDate = a.AuditDate,
                     AuditMessage = a.AuditMessage,
-                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" : "Sent",
+                    Audit_Status = a.Audit_Status == AuditStatus.Completed ? "Completed" :
+               a.Audit_Status == AuditStatus.InProgress ? "InProgress" : "Sent",
                     AssetName = a.Asset.AssetName,
                     UserName = a.User.UserName
                 })

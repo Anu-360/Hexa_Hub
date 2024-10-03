@@ -70,3 +70,34 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background:#CDD7D6; 
+  border-radius: 5px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background:#102542; 
+  cursor: pointer;
+  
+  transition: background 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background:#102542;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}

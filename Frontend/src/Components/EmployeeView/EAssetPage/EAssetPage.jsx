@@ -30,7 +30,24 @@ const Assets = () => {
   const [selectedAssetStatus, setSelectedAssetStatus] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [assetImages, setAssetImages] = useState({});
-  const defaultImage ="Images/AssetDefault.jpg";
+  const defaultImage = "Images/AssetDefault.jpg";
+
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setLocationDropdownOpen(false);
+      setCategoryDropdownOpen(false);
+      setAssetStatusDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
 
   const [formData, setFormData] = useState({
     assetReqId: 0, // Set default for new requests
@@ -76,63 +93,69 @@ const Assets = () => {
       }));
     }
   };
-  
+
 
   // Fetch assets and related data
   const fetchAssets = async () => {
     try {
       const response = await axios.get('https://localhost:7287/api/Assets/assetall');
       console.log('Fetched assets:', response.data);
-  
+
       // Check if response data is in the expected format
       if (response.data && response.data.$values && Array.isArray(response.data.$values)) {
         const data = response.data.$values;
         const assetsWithImages = await Promise.all(
           data.map(async (asset) => {
             console.log('Fetching image for asset ID:', asset.assetId); // Log asset ID
-            
+
             // Fetch image URL using the fetchAssetImage function
             const imageUrl = await fetchAssetImage(asset.assetId);
-    
+
             return {
               ...asset,
               imageUrl: imageUrl, // Assign the fetched or default image URL
             };
           })
         );
-    
+
         setAssetsData(data);
         // setFilteredAssets(data);
         setFilteredAssets(assetsWithImages);
         // Extract unique locations
         const uniqueLocations = [...new Set(data.map(asset => asset.location))];
         setLocations(uniqueLocations);
-  
+
         // Extract unique categories
         const uniqueCategories = [...new Set(data.map(asset => asset.categoryName))];
         setCategory(uniqueCategories);
-  
+
         // Extract unique asset statuses
         const uniqueStatuses = [...new Set(data.map(asset => asset.assetStatusName))];
         setAssetStatuses(uniqueStatuses);
-  
-        // Set min and max values if data exists
+
         if (data.length > 0) {
           const values = data.map(asset => asset.value);
+          setMinValue(Math.min(...values));
           setMaxValue(Math.max(...values));
+          setCurrentMaxValue(Math.max(...values));
+        } else {
+          setMinValue(0);
+          setMaxValue(10000000); // Reset to some default value if no assets
+          setCurrentMaxValue(10000000);
         }
       } else {
         console.error('Unexpected data structure:', response.data);
         setAssetsData([]);
         setFilteredAssets([]);
       }
+
     } catch (error) {
       console.error('Error fetching assets data:', error.response ? error.response.data : error.message);
       setAssetsData([]);
       setFilteredAssets([]);
     }
   };
-  
+
 
   const openPrompt = (asset) => {
     if (asset.assetStatusName === 'Allocated') {
@@ -164,7 +187,7 @@ const Assets = () => {
       if (userId) {
         setFormData((prevFormData) => ({
           ...prevFormData,
-          userId: parseInt(userId, 10) 
+          userId: parseInt(userId, 10)
         }));
       }
     }
@@ -214,7 +237,7 @@ const Assets = () => {
   };
 
   useEffect(() => {
-    if (Array.isArray(assetsData)) { 
+    if (Array.isArray(assetsData)) {
       const filtered = assetsData.filter((asset) => asset.value <= currentMaxValue);
       setFilteredAssets(filtered);
     }
@@ -263,10 +286,30 @@ const Assets = () => {
     setSearchTerm(value);
   };
   const dropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
-  const categorydropdownRef = useRef(null);
-  const assetstatusdropdownRef = useRef(null);
+  // const locationDropdownRef = useRef(null);
+  // const categorydropdownRef = useRef(null);
+  // const assetstatusdropdownRef = useRef(null);
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
 
+  const toggleCategoryDropdown = () => {
+    setCategoryDropdownOpen((prev) => !prev);
+    setLocationDropdownOpen(false);
+    setAssetStatusDropdownOpen(false);
+  };
+
+  const toggleLocationDropdown = () => {
+    setLocationDropdownOpen((prev) => !prev);
+    setCategoryDropdownOpen(false);
+    setAssetStatusDropdownOpen(false);
+  };
+
+  const toggleAssetStatusDropdown = () => {
+    setAssetStatusDropdownOpen((prev) => !prev);
+    setLocationDropdownOpen(false);
+    setCategoryDropdownOpen(false);
+  };
 
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
@@ -299,61 +342,6 @@ const Assets = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Toggle dropdown visibility
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
-
-  // Handle clicks outside the dropdown
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (categorydropdownRef.current && !categorydropdownRef.current.contains(event.target)) {
-        setCategoryDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Toggle dropdown visibility
-  const toggleCategoryDropdown = () => {
-    setCategoryDropdownOpen((prev) => !prev);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target)) {
-        setLocationDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Toggle dropdown visibility
-  const toggleLocationDropdown = () => {
-    setLocationDropdownOpen((prev) => !prev);
-  };
-
-  // Handle clicks outside the dropdown
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (assetstatusdropdownRef.current && !assetstatusdropdownRef.current.contains(event.target)) {
-        setAssetStatusDropdownOpen(false);
       }
     };
 
@@ -397,9 +385,9 @@ const Assets = () => {
                 />
               </div>
 
-              <div className="relative">
+              <div className="relative" ref={dropdownRef} >
                 {isDropdownOpen && (
-                  <div ref={dropdownRef} className="absolute right-0 mt-5 w-48 bg-indigo-950 border rounded-lg shadow-lg z-10">
+                  <div className="absolute right-0 mt-5 w-48 bg-indigo-950 border rounded-lg shadow-lg z-10">
                     <ul className="py-2">
                       {/* Category Dropdown */}
                       <li className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer relative" onClick={toggleCategoryDropdown}>
@@ -439,26 +427,27 @@ const Assets = () => {
                       </li>
 
                       {/* Asset Status Dropdown */}
-                      <li className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer" onClick={() => handleAssetStatusSelect(selectedAssetStatus)}>
-                      Asset Status: {selectedAssetStatus || "Select"}
-                    </li>
-                    {assetStatuses.map(status => (
-                      <li
-                        key={status}
-                        className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer"
-                        onClick={() => handleAssetStatusSelect(status)}
-                      >
-                        {status}
-                      </li>))}
+                      <li className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer relative" onClick={toggleAssetStatusDropdown}>
+                        Asset Status
+                        {isAssetStatusDropdownOpen && (
+                          <div className="absolute left-full top-0 mt-2 w-40 bg-indigo-950 border rounded-lg shadow-lg z-10">
+                            <ul className="py-2">
+                              {assetStatuses.map(status => (
+                                <li
+                                  key={status}
+                                  className="px-4 py-2 text-slate-200 hover:bg-red-500 cursor-pointer"
+                                  onClick={() => handleAssetStatusSelect(status)}
+                                >{status}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </li>
                     </ul>
                   </div>
                 )}
               </div>
-
-
               <div className="flex flex-col items-start pl-12">
-
-
                 {/* Range Slider */}
                 <div className="flex items-center space-x-2">
                   <input
@@ -486,15 +475,15 @@ const Assets = () => {
               className="bg-stone-100 shadow-lg shadow-zinc-400 rounded-lg overflow-hidden flex flex-col justify-between cursor-pointer"
             >
               <div className="flex justify-center items-center">
-              {assetImages[asset.assetId] ? (
-              <img
-                src={assetImages[asset.assetId] || defaultImage}
-                alt={`Asset ${asset.assetId}`}
-                style={{ width: '220px', height: '200px' }}
-              />
-            ) : (
-              <div>Loading image...</div>
-            )}
+                {assetImages[asset.assetId] ? (
+                  <img
+                    src={assetImages[asset.assetId] || defaultImage}
+                    alt={`Asset ${asset.assetId}`}
+                    style={{ width: '220px', height: '200px' }}
+                  />
+                ) : (
+                  <div>Loading image...</div>
+                )}
 
               </div>
               <div className="p-4 text-left relative">
@@ -549,107 +538,107 @@ const Assets = () => {
           totalItems={filteredAssets.length}
           itemsPerPage={itemsPerPage}
           onPageChange={setCurrentPage}
-          />
-          
-          {/* Overlapping Form for Asset Request */}
-          {showForm && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <form onSubmit={handleFormSubmit} className="bg-white p-5 rounded shadow-lg text-center w-1/4 h-45">
-  
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex-grow text-center">
-                    <h3 className="text-lg text-indigo-950 font-bold">Asset Request</h3>
-                  </div>
-                  {/* Close Button beside the heading */}
-                  <FontAwesomeIcon
-                    icon={faTimes}
-                    className="text-red-500 cursor-pointer ml-2" // Add margin for spacing
-                    onClick={() => setShowForm(false)} // Close the form
+        />
+
+        {/* Overlapping Form for Asset Request */}
+        {showForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <form onSubmit={handleFormSubmit} className="bg-white p-5 rounded shadow-lg text-center w-1/4 h-45">
+
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex-grow text-center">
+                  <h3 className="text-lg text-indigo-950 font-bold">Asset Request</h3>
+                </div>
+                {/* Close Button beside the heading */}
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className="text-red-500 cursor-pointer ml-2" // Add margin for spacing
+                  onClick={() => setShowForm(false)} // Close the form
+                />
+              </div>
+
+              <div className="flex flex-col space-y-4 mt-4">
+
+                {/* Asset ID Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset ID</label>
+                  <input
+                    type="text"
+                    value={formData.assetId}
+                    placeholder="Asset ID"
+                    readOnly
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
                   />
                 </div>
-  
-                <div className="flex flex-col space-y-4 mt-4">
-  
-                  {/* Asset ID Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset ID</label>
-                    <input
-                      type="text"
-                      value={formData.assetId}
-                      placeholder="Asset ID"
-                      readOnly
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                    />
-                  </div>
-  
-                  {/* User ID Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">User ID</label>
-                    <input
-                      type="text"
-                      value={formData.userId}
-                      placeholder="User ID"
-                      readOnly
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                    />
-                  </div>
-  
-                  {/* Asset Name Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset Name</label>
-                    <input
-                      type="text"
-                      value={formData.assetName}
-                      placeholder="Asset Name"
-                      readOnly
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                    />
-                  </div>
-  
-                  {/* Request Date Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Request Date</label>
-                    <input
-                      type="date"
-                      value={formData.assetReqDate}
-                      readOnly
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                    />
-                  </div>
-  
-                  {/*Asset Type Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset Type</label>
-                    <input
-                      type="text"
-                      value={formData.assetType}
-                      readOnly
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                    />
-                  </div>
-  
-                  {/* Request Reason Field */}
-                  <div className="relative">
-                    <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Request Reason</label>
-                    <textarea
-                      className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
-                      placeholder="Enter reason for asset request"
-                      value={formData.assetReqReason}
-                      onChange={(e) => setFormData({ ...formData, assetReqReason: e.target.value })}
-                      required
-                    />
-                  </div>
-  
-                  <button
-                    type="submit"
-                    className="bg-indigo-950 text-white px-4 py-2 rounded mt-4"
-                  >
-                    Submit Request
-                  </button>
+
+                {/* User ID Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">User ID</label>
+                  <input
+                    type="text"
+                    value={formData.userId}
+                    placeholder="User ID"
+                    readOnly
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
+                  />
                 </div>
-              </form>
-            </div>
-          )}
+
+                {/* Asset Name Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset Name</label>
+                  <input
+                    type="text"
+                    value={formData.assetName}
+                    placeholder="Asset Name"
+                    readOnly
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
+                  />
+                </div>
+
+                {/* Request Date Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Request Date</label>
+                  <input
+                    type="date"
+                    value={formData.assetReqDate}
+                    readOnly
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
+                  />
+                </div>
+
+                {/*Asset Type Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Asset Type</label>
+                  <input
+                    type="text"
+                    value={formData.assetType}
+                    readOnly
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
+                  />
+                </div>
+
+                {/* Request Reason Field */}
+                <div className="relative">
+                  <label className="absolute -top-3 left-3 px-1 bg-white text-sm font-semibold text-slate-500">Request Reason</label>
+                  <textarea
+                    className="p-3 border-2 bg-white border-slate-200 rounded w-full text-indigo-950 focus:outline-none"
+                    placeholder="Enter reason for asset request"
+                    value={formData.assetReqReason}
+                    onChange={(e) => setFormData({ ...formData, assetReqReason: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-indigo-950 text-white px-4 py-2 rounded mt-4"
+                >
+                  Submit Request
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {successMessage && (
           <div className="fixed top-5 right-5 bg-green-500 text-white p-3 rounded shadow-lg">

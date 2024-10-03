@@ -166,7 +166,7 @@ namespace Hexa_Hub.Controllers
             return Ok("Updation Successfull");
         }
 
-        [HttpPatch("{id}/password")]
+        [HttpPut("{id}/password")]
         [Authorize]
         public async Task<IActionResult> ChangeUserPassword(int id, PasswordDto passwordChangeDto)
         {

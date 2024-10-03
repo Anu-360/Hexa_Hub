@@ -33,7 +33,8 @@ public class MultiValues
     public enum AuditStatus
     {
         Sent=0,
-        Completed=1
+        InProgress =1,
+        Completed=2
     }
 
     public enum ServiceReqStatus
