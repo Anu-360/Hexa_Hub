@@ -23,9 +23,9 @@ namespace Hexa_Hub.Repository
                 .Select(a => new AllocatedAssetDto
                 {
                     AssetId = a.AssetId,
-                    AssetName = a.Asset.AssetName, // Assuming you have navigation properties for Asset
+                    AssetName = a.Asset.AssetName,
                     UserId = a.UserId,
-                    UserName = a.User.UserName // Assuming you have navigation properties for User
+                    UserName = a.User.UserName 
                 })
                 .ToListAsync();
 

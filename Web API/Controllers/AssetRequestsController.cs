@@ -57,95 +57,6 @@ namespace Hexa_Hub.Controllers
             }
         }
 
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
-        //{
-        //    if (id != assetRequestDto.AssetReqId)
-        //    {
-        //        return BadRequest("Id doesn't Match");
-        //    }
-
-        //    // Convert Request_Status from string to RequestStatus enum
-        //    if (Enum.TryParse<RequestStatus>(assetRequestDto.Request_Status, out var requestStatus))
-        //    {
-        //        if (requestStatus == RequestStatus.Allocated || requestStatus == RequestStatus.Rejected)
-        //        {
-        //            return BadRequest($"The Request ID {id} has been {requestStatus}");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Invalid Request Status");
-        //    }
-
-        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
-        //    if (existingRequest == null)
-        //    {
-        //        return NotFound("Request Not Found");
-        //    }
-
-        //    try
-        //    {
-        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
-        //        return Ok($"{assetRequestDto.Request_Status} has been Updated");
-        //    }
-        //    catch (AssetRequestNotFoundException)
-        //    {
-        //        return NotFound($"AssetRequest for user {id} Not Found.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { error = ex.Message });
-        //    }
-        //}
-
-
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] AssetRequestDto assetRequestDto)
-        //{
-        //    if (id != assetRequestDto.AssetReqId)
-        //    {
-        //        return BadRequest("Id doesn't match");
-        //    }
-
-        //    // Parse the string status from the DTO into the enum
-        //    if (Enum.TryParse(assetRequestDto.Request_Status, out RequestStatus parsedStatus))
-        //    {
-        //        // Check if the status is Allocated or Rejected
-        //        if (parsedStatus == RequestStatus.Allocated || parsedStatus == RequestStatus.Rejected)
-        //        {
-        //            return BadRequest($"The Request ID {id} has been {parsedStatus}");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // If parsing fails, return an error message
-        //        return BadRequest("Invalid Request_Status value");
-        //    }
-
-        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
-        //    if (existingRequest == null)
-        //    {
-        //        return NotFound("Request Not Found");
-        //    }
-
-        //    try
-        //    {
-        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
-        //        return Ok($"{assetRequestDto.Request_Status} has been Updated");
-        //    }
-        //    catch (AssetRequestNotFoundException)
-        //    {
-        //        return NotFound($"AssetRequest for user {id} not found.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { error = ex.Message });
-        //    }
-        //}
-
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -182,41 +93,7 @@ namespace Hexa_Hub.Controllers
             }
         }
 
-        //[HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> PutAssetRequest(int id, [FromBody] UpdateRequestClassDto assetRequestDto)
-        //{
-
-        //    if (id != assetRequestDto.AssetReqId)
-        //    {
-        //        return BadRequest("Id doesn't Match");
-        //    }
-        //    if (assetRequestDto.RequestStatusName == "Allocated" || assetRequestDto.RequestStatusName == "Rejected")
-        //    {
-        //        return BadRequest($"The Request ID {id} has already been Allcoated/Rejected and cannot be updated");
-        //    }
-        //    var existingRequest = await _assetRequest.GetAssetRequestById(id);
-        //    if (existingRequest == null)
-        //    {
-        //        return NotFound("Request Not Found");
-        //    }
-
-        //    try
-        //    {
-        //        await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
-        //        return Ok($"{assetRequestDto.AssetReqId} has been Updated");
-        //    }
-        //    catch (AssetRequestNotFoundException)
-        //    {
-        //        return NotFound($"AssetRequest for user {id} Not Found.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { error = ex.Message });
-        //    }
-        //}
-
-
+      
         // POST: api/AssetRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -400,29 +277,6 @@ namespace Hexa_Hub.Controllers
         {
            return await _assetRequest.GetAllAssetRequests();
         }
-
-        //[HttpGet("{id}")]
-        //[Authorize]
-        //public async Task<ActionResult<AssetRequestClassDto>> GetAssetRequestById(int id)
-        //{
-        //    // Admin can view all details, users can only view their own requests
-        //    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        //    var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-        //    var request = await _assetRequest.GetAssetRequestId(id);
-
-        //    if (request == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (userRole != "Admin" && request.UserId != userId)
-        //    {
-        //        return Forbid();
-        //    }
-
-        //    return Ok(request);
-        //}
 
         [HttpGet("{id}")]
         [Authorize]
