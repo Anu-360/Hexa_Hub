@@ -26,12 +26,7 @@ namespace Hexa_Hub.Repository
             {
                 UserName = dto.UserName,
                 UserMail = dto.UserMail,
-                //Gender = dto.Gender,
-                //Dept = dto.Dept,
-                //Designation = dto.Designation,
                 PhoneNumber = dto.PhoneNumber,
-                //Address = dto.Address,
-                //Password = dto.Password,
                 Branch = dto.Branch,
                 User_Type = Models.MultiValues.UserType.Employee
             };

@@ -54,26 +54,6 @@ namespace Hexa_Hub.Controllers
             }
         }
 
-        [HttpGet("invoice/{maintenanceId}")]
-        public async Task<IActionResult> DownloadInvoice(int maintenanceId)
-        {
-            try
-            {
-                var pdfBytes = await _maintenanceLogRepo.GenerateMaintenanceInvoicePdfAsync(maintenanceId);
-
-                if (pdfBytes == null || pdfBytes.Length == 0)
-                {
-                    return NotFound("Invoice could not be generated.");
-                }
-
-                return File(pdfBytes, "application/pdf", $"MaintenanceInvoice_{maintenanceId}.pdf");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
         [HttpGet("id/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MaintenanceClassDto>> GetMaintenanceLogById(int id)
