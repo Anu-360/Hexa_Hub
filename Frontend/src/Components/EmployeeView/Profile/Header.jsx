@@ -205,7 +205,7 @@ const Header = () => {
       </div>
 
       <div className="session-timer font-medium">
-        <p>
+        <p className="text-black">
           Session Expires In: <span className="text-red-500"> {formatTimeLeft()}</span>
         </p>
       </div>
