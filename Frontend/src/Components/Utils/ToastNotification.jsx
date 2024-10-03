@@ -20,7 +20,7 @@ const ToastNotification = () => {
 };
 
 export const showToast = (message, type = "success") => {
-    toast.dismiss();
+    // toast.dismiss();
     switch (type) {
         case "success":
             toast.success(message);

@@ -172,10 +172,8 @@ const AddAsset = () => {
             setSubCategories([...subCategories, response.data]);
             setNewSubCategoryDialog(false);
             setNewSubCategory({ name: '', categoryId: '', quantity: '' });
-                showToast('SubCategory Added Successfully', 'success');
         } catch (error) {
             console.error('Error adding subcategory:', error);
-            showToast('Failed to add SubCategory. Please try again', 'error');
         }
     };
 

@@ -39,7 +39,7 @@ const SignInPage = () => {
           navigate('/dashboard');
         }
         else {
-          alert('error');
+          alert('Unknown role.');
         }
       }, 2000);
 

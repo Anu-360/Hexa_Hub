@@ -14,6 +14,7 @@ import {
     IconButton,
     MenuItem,
 } from '@mui/material';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const AddAudit = () => {
     const { darkMode } = useTheme();
@@ -73,7 +74,9 @@ const AddAudit = () => {
         e.preventDefault();
         try {
             await axios.post(`https://localhost:7287/api/Audits`, formData);
-            alert('Audit added successfully!');
+            setTimeout(() => {
+                showToast('Category Added Successfully', 'success');
+            }, 2000)
             navigate('/admin/audit');
             setFormData({
                 AssetId: '',
@@ -84,6 +87,7 @@ const AddAudit = () => {
             });
         } catch (error) {
             console.error('Error adding audit:', error);
+            showToast('Asset Updated Failed', 'error');
             alert('Failed to add audit. Please try again.');
         }
     };
@@ -98,6 +102,7 @@ const AddAudit = () => {
             }}
         >
             <Box sx={{ display: 'flex', flex: 1 }}>
+            <ToastNotification />
                 <Box
                     component="main"
                     sx={{

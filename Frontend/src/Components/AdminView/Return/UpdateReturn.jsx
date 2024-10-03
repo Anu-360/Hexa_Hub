@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '../../ThemeContext';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const UpdateReturn = () => {
     const { id } = useParams();
@@ -58,10 +59,10 @@ const UpdateReturn = () => {
                 setReturnRequest({
                     returnId: data.returnId,
                     userId: data.userId, 
-                    userName: data.user.userName, // Access userName from user object
-            assetName: data.asset.assetName,
+                    userName: data.userName, 
+            assetName: data.assetName,
                     assetId: data.assetId,
-                    categoryName: data.category ? data.category.categoryName : '',
+                    categoryName: data.category ? data.categoryName : '',
                     categoryId: data.categoryId,
                     returnDate: new Date(data.returnDate).toISOString().split('T')[0],
                     reason: data.reason,
@@ -92,18 +93,22 @@ const UpdateReturn = () => {
                 returnId: returnRequest.returnId,
                 userId: returnRequest.userId,
                 assetId: returnRequest.assetId, 
-                userName: returnRequest.userName, // Ensure this is populated
-                assetName: returnRequest.assetName, // Ensure this is populated
-                categoryName: returnRequest.categoryName, // Ensure this is populated
+                userName: returnRequest.userName, 
+                assetName: returnRequest.assetName, 
+                categoryName: returnRequest.categoryName, 
                 categoryId: returnRequest.categoryId,
                 returnDate: returnRequest.returnDate,
                 reason: returnRequest.reason,
                 condition: returnRequest.condition,
                 returnStatus: statusMapReverse[returnRequest.returnStatus],
             });
+            setTimeout(() => {
+                showToast('Return Updated Successfully', 'success');
+            }, 2000)
             navigate('/admin/return');
         } catch (error) {
             console.error('Error updating return request details:', error.response?.data || error.message);
+            showToast('Return Updated Failed', 'error');
             setError('Failed to update return request. Please check your input and try again.');
         }
     };
@@ -134,6 +139,7 @@ const UpdateReturn = () => {
             }}
         >
             <Box sx={{ display: 'flex', flex: 1 }}>
+            <ToastNotification />
                 <Box
                     component="main"
                     sx={{

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '../../ThemeContext';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const UpdateMaintenanceLog = () => {
     const { id } = useParams();
@@ -80,16 +81,20 @@ const UpdateMaintenanceLog = () => {
     
         try {
             await axios.put(`https://localhost:7287/api/MaintenanceLogs/${id}`, dataToUpdate);
-            navigate('/admin/maintenance'); // Adjust the redirect path as necessary
+            setTimeout(() => {
+                showToast('Maintenance Updated Successfully', 'success');
+            }, 2000);
+            navigate('/admin/maintenance'); 
         } catch (error) {
             console.error('Error updating maintenance log details:', error.response?.data || error.message);
+            showToast('Maintenance Update Failed', 'error');
             setError('Failed to update maintenance log. Please check your input and try again.');
         }
     };
     
 
     const handleClose = () => {
-        navigate('/admin/maintenance'); // Adjust the redirect path as necessary
+        navigate('/admin/maintenance');
     };
 
     if (error) return <Typography color="error">{error}</Typography>;
@@ -104,6 +109,7 @@ const UpdateMaintenanceLog = () => {
             }}
         >
             <Box sx={{ display: 'flex', flex: 1 }}>
+            <ToastNotification />
                 <Box
                     component="main"
                     sx={{

@@ -216,7 +216,7 @@ const ReturnRequest = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {returnRequests.map((request) => (
+                                    {currentRequests.map((request) => (
                                         <tr key={request.returnId} className="text-lg border-b text-black">
                                             <td className="px-4 py-2">{request.returnId}</td>
                                             <td className="px-4 py-2">{request.assetId}</td>

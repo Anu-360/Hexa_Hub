@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '../../ThemeContext';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const UpdateServiceRequest = () => {
     const { id } = useParams();
@@ -89,9 +90,13 @@ const UpdateServiceRequest = () => {
 
         try {
             await axios.put(`https://localhost:7287/api/ServiceRequests/${id}`, dataToUpdate);
+            setTimeout(() => {
+                showToast('Category Added Successfully', 'success');
+            }, 2000);
             navigate('/admin/service');
         } catch (error) {
             console.error('Error updating service request details:', error.response?.data || error.message);
+            showToast('Service Updated Failed', 'error');
             setError('Failed to update service request. Please check your input and try again.');
         }
     };
@@ -112,6 +117,7 @@ const UpdateServiceRequest = () => {
             }}
         >
             <Box sx={{ display: 'flex', flex: 1 }}>
+            <ToastNotification />
                 <Box
                     component="main"
                     sx={{
@@ -178,29 +184,6 @@ const UpdateServiceRequest = () => {
                         />
                         <FormControl fullWidth margin="normal">
                             <InputLabel id="service-status-label">Service Request Status</InputLabel>
-                            {/* <Select
-                                labelId="service-status-label"
-                                name="serviceReqStatus"
-                                value={serviceRequest.serviceReqStatus}
-                                onChange={handleChange}
-                                disabled={serviceRequest.serviceReqStatus === 'Completed'}
-                            >
-                                {serviceRequest.serviceReqStatus === 'UnderReview' ? (
-                                    <>
-                                    <MenuItem key="approve" value="Approved">Approve</MenuItem>
-                                    <MenuItem key="reject" value="Rejected">Reject</MenuItem>
-                                    </>
-                                ) :
-                                serviceRequest.serviceReqStatus === 'Approved' ? (
-                                    <MenuItem key="completed" value="Completed">Completed</MenuItem>
-                                ) : (
-                                    <>
-                                        <MenuItem key="approved" value="Approved">Approved</MenuItem>
-                                        <MenuItem key="completed" value="Completed">Completed</MenuItem>
-                                        <MenuItem key="rejected" value="Rejected">Rejected</MenuItem>
-                                    </>
-                                )}
-                            </Select> */}
                             <Select
                                 labelId="service-status-label"
                                 name="serviceReqStatus"
