@@ -286,6 +286,7 @@ export default function AuditPage() {
                                         <MenuItem value="">All</MenuItem>
                                         <MenuItem value="Completed">Completed</MenuItem>
                                         <MenuItem value="Sent">Sent</MenuItem>
+                                        <MenuItem value="InProgress">InProgress</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <Box sx={{ mb: 2 }}>

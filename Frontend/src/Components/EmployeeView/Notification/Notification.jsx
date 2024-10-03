@@ -633,11 +633,6 @@ const Notifications = () => {
         } catch (error) {
             console.error('Error fetching asset details:', error);
         }
-
-        // // Set a timeout to hide the success prompt after 3 seconds
-        // setTimeout(() => {
-        //   setShowSuccessPrompt(false);
-        // }, 3000);
     };
 
     const toggleTrackDetails = () => {
@@ -775,15 +770,11 @@ const Notifications = () => {
                 }
             });
 
-            // Optionally, refresh the audit requests here
-            setShowSuccessPrompt(false); // Hide the input after update
-            setNotificationStatus('inactive'); // Reset notification status
+            setShowSuccessPrompt(false);
+            setNotificationStatus('inactive'); 
 
             if (assetResponse.status === 200) {
-                // Audit updated successfully
-                setShowAuditUpdateSuccess(true); // Show the success message after update
-          
-                // Hide the success message after 3 seconds
+                setShowAuditUpdateSuccess(true); 
                 setTimeout(() => {
                   setShowAuditUpdateSuccess(false);
                 }, 3000);

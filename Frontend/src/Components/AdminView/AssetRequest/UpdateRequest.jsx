@@ -72,7 +72,6 @@ const UpdateAssetRequest = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Updating asset request with details:", assetRequest);
-
         try {
             await axios.put(`https://localhost:7287/api/AssetRequests/${id}`, {
                 assetReqId: assetRequest.assetReqId,
@@ -85,6 +84,9 @@ const UpdateAssetRequest = () => {
                 assetReqReason: assetRequest.assetReqReason,
                 requestStatus: assetRequest.requestStatus === "Pending" ? 0 : assetRequest.requestStatus === "Allocated" ? 1 : 2,
             });
+            setTimeout(() => {
+                showToast('Request Updated Successfully', 'success');
+            }, 2000);
             navigate('/admin/request');
         } catch (error) {
             console.error('Error updating asset request details:', error.response?.data || error.message);

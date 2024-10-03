@@ -15,6 +15,7 @@ import {
     Grid,
     IconButton,
 } from '@mui/material';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const AddEmployee = () => {
     const { darkMode } = useTheme();
@@ -53,6 +54,7 @@ const AddEmployee = () => {
            
         } catch (error) {
             console.error("Error adding employee:", error);
+            showToast('Asset Updated Failed', 'error');
             alert('Failed to add employee. Please try again.');
         }
     };
@@ -69,6 +71,7 @@ const AddEmployee = () => {
             {/* <Header /> */}
             <Box sx={{ display: 'flex', flex: 1 }}>
                 {/* <Navbar /> */}
+                <ToastNotification/>
                 <Box
                     component="main"
                     sx={{

@@ -94,7 +94,19 @@ namespace Hexa_Hub.Controllers
         {
             var category = await _category.AddCategory(categoryDto);
             await _category.Save();
-            return CreatedAtAction("GetCategories", new { id = category.CategoryId }, category);
+            return CreatedAtAction("GetCategoryById", new { id = category.CategoryId }, category);
+        }
+
+        // GET: api/Categories/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            var category = await _category.GetCategoryById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
         }
 
         // DELETE: api/Categories/5
