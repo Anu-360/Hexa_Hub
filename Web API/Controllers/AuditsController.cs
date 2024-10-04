@@ -159,6 +159,17 @@ namespace Hexa_Hub.Controllers
                     }
                     var admins = await _userRepo.GetUsersByRole(UserType.Admin);
                 }
+                if (existingAudit.Audit_Status == AuditStatus.InProgress)
+                {
+                    var adminUsers = await _userRepo.GetUsersByAdmin();
+
+                    foreach (var admin in adminUsers)
+                    {
+
+                        await _notificationService.AuditInProgress(admin.UserMail, existingAudit.AuditId);
+                    }
+                    var admins = await _userRepo.GetUsersByRole(UserType.Admin);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {

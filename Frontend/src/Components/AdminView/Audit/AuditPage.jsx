@@ -131,16 +131,8 @@ export default function AuditPage() {
             body: tableRows,
             startY: 100,
             theme: 'grid',
-            styles: { fontSize: 8, cellPadding: 1 },
-            columnStyles: {
-                0: { cellWidth: 60 },
-                1: { cellWidth: 100 },
-                2: { cellWidth: 80 },
-                3: { cellWidth: 60 },
-                4: { cellWidth: 80 },
-                5: { cellWidth: 80 },
-                6: { cellWidth: 70 }
-            },
+            styles: { fontSize: 8, cellPadding: 5 },
+            columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 'auto' } },
             didDrawPage :function(data){
                 if (doc.internal.getNumberOfPages() === 1) {
                     doc.addImage(img, 'PNG', 10, 10, 30, 30);

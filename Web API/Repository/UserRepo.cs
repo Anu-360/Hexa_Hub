@@ -14,10 +14,12 @@ namespace Hexa_Hub.Repository
     {
         private readonly DataContext _context;
         private readonly IWebHostEnvironment _environment;
-        public UserRepo(DataContext context, IWebHostEnvironment environment)
+        private readonly INotificationService _notificationService;
+        public UserRepo(DataContext context, IWebHostEnvironment environment, INotificationService notificationService)
         {
             _context = context;
             _environment = environment;
+            _notificationService = notificationService;
         }
 
         public async Task<User> RegisterUser(UserRegisterDto dto)
@@ -28,7 +30,8 @@ namespace Hexa_Hub.Repository
                 UserMail = dto.UserMail,
                 PhoneNumber = dto.PhoneNumber,
                 Branch = dto.Branch,
-                User_Type = Models.MultiValues.UserType.Employee
+                User_Type = Models.MultiValues.UserType.Employee,
+                Password = "Hexahub@123"
             };
 
             await _context.Users.AddAsync(user);
@@ -55,7 +58,7 @@ namespace Hexa_Hub.Repository
             user.ProfileImage = Encoding.UTF8.GetBytes(defaultImageFileName);
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
-
+            await _notificationService.UserProfileCreated(dto.UserMail, dto.UserName, user.Password);
             return user;
         }
 
