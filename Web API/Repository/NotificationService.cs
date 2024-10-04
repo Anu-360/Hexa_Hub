@@ -24,7 +24,15 @@ namespace Hexa_Hub.Repository
         public async Task AduitCompleted(string UserMail,int AuditId)
         {
             var subject = "Aduit Request Completed";
-            var emailBody = $"Greetings HexaHub,<br><br>I have completed my assigned Audit Request {AuditId} .";
+            var emailBody = $"Greetings HexaHub,<br><br>Audit Request For Audit ID : {AuditId} has been Completed.";
+
+            await _emailService.SendEmailAsync(UserMail, subject, emailBody);
+        }
+
+        public async Task AuditInProgress(string UserMail, int AuditId)
+        {
+            var subject = "Aduit Request Completed";
+            var emailBody = $"Greetings HexaHub,<br><br>Audit Request For Audit ID : {AuditId} has been Set to InProgress.";
 
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
@@ -114,6 +122,15 @@ namespace Hexa_Hub.Repository
             await _emailService.SendEmailAsync(UserMail, subject, emailBody);
         }
 
-        
+        //User Added
+        public async Task UserProfileCreated(string UserMail, string UserName, string Password)
+        {
+            var subject = "Hexahub Profile";
+            var emailBody = $"Dear {UserName},<br><br>Your Profile has been created for HexaHub Platform. Once You logs in please update your details for further procedures. <br><br>To Log into Hexahub use http://localhost:5173/ <br><br>UserEmail : {UserMail} <br><br>Password:{Password} <br><br>Best regards,<br>HexaHub";
+
+
+            await _emailService.SendEmailAsync(UserMail, subject, emailBody);
+        }
+
     }
 }

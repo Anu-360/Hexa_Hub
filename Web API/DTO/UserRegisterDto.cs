@@ -34,7 +34,7 @@ namespace Hexa_Hub.DTO
         //[MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
         //[RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
         //    ErrorMessage = "Password must contain Uppercase, alphanumeric and special characters")]
-        //public string Password { get; set; }
+        public string Password { get; set; }
 
         [Required]
         public string Branch { get; set; }

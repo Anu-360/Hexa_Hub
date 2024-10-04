@@ -24,8 +24,7 @@ const AddEmployee = () => {
         UserMail: '',
         PhoneNumber: '',
         Branch: '',
-        // Password: "",
-        
+        Password: "Hexahub@123",
     });
     const navigate = useNavigate();
 
@@ -40,21 +39,26 @@ const AddEmployee = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Create a new object that includes the default password
+        const dataToSend = {
+            ...formData,
+            Password: "Hexahub@123",  // Add the default password here
+        };
+
         try {
-            await axios.post('https://localhost:7287/api/Users', formData);
+            await axios.post('https://localhost:7287/api/Users', dataToSend);
             alert('Employee added successfully!');
             navigate('/admin/employee');
             setFormData({
                 UserName: '',
                 UserMail: '',
-                // PhoneNumber: '',
+                PhoneNumber: '',
                 Branch: '',
-                Password:'',
             });
-           
         } catch (error) {
             console.error("Error adding employee:", error);
-            showToast('Asset Updated Failed', 'error');
+            showToast('Employee Addition Failed', 'error');
             alert('Failed to add employee. Please try again.');
         }
     };
@@ -85,7 +89,7 @@ const AddEmployee = () => {
                     <Container maxWidth="md" sx={{ mt: 10 }}>
                         
                         <Paper elevation={3} sx={{ p: 4 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                                 <IconButton onClick={handleClose} aria-label="close">
                                     <CloseIcon />
                                 </IconButton>
@@ -142,18 +146,6 @@ const AddEmployee = () => {
                                             variant="outlined"
                                         />
                                     </Grid>
-                                    {/* <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            name="Password"
-                                            label="Password"
-                                            type= "password"
-                                            value={formData.Password}
-                                            onChange={handleChange}
-                                            required
-                                            variant="outlined"
-                                        />
-                                    </Grid> */}
                                     <Grid item xs={12}>
                                         <Button 
                                             type="submit" 

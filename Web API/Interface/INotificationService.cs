@@ -18,6 +18,9 @@ namespace Hexa_Hub.Interface
 
         Task AssetRequestSent(string UserMail, int assetId);
 
+        Task UserProfileCreated(string UserMail, string UserName, string Password);
+        Task AuditInProgress(string UserMail, int AuditId);
+
 
 
     }
