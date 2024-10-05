@@ -7,6 +7,7 @@ using System.Text;
 using Hexa_Hub.Repository;
 using Hexa_Hub.Exceptions;
 using static Hexa_Hub.Models.MultiValues;
+using log4net;
 
 
 namespace Hexa_Hub.Controllers
@@ -17,12 +18,14 @@ namespace Hexa_Hub.Controllers
     {
         private readonly DataContext _context;
         private readonly IAsset _asset;
+        private readonly iLoggerService _log;
 
-        public AssetsController(DataContext context, IAsset asset)
+        public AssetsController(DataContext context, IAsset asset, iLoggerService log)
 
         {
             _context = context;
             _asset = asset;
+            _log = log;
         }
 
         //GET: api/Assets
@@ -30,6 +33,7 @@ namespace Hexa_Hub.Controllers
        [Authorize]
         public async Task<ActionResult<IEnumerable<Asset>>> GetAssets()
         {
+            _log.LogInfo("Fetching all assets");
             return await _asset.GetAllAssets();
         }
 
@@ -38,6 +42,8 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<AssetDtoClass>>> GetAllAssets()
         {
+            _log.LogInfo("Fetching all assets");
+
             var assets = await _asset.GetAssetsAll();
             return Ok(assets);
         }
@@ -77,6 +83,8 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<List<Asset>> GetAllDetailsOfAssets()
         {
+            _log.LogInfo("Fetching all assets");
+
             return await _asset.GetAllDetailsOfAssets();
         }
 
@@ -85,11 +93,15 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<AssetDto>> GetAssetByName(string name)
         {
+            _log.LogInfo("Fetching assets by name");
+
             var assetDtos = await _asset.GetAssetByName(name);
 
 
             if (assetDtos == null || !assetDtos.Any())
             {
+                _log.LogDebug($"No assets Fetched in {name}");
+
                 throw new AssetNotFoundException($"No assets found containing '{name}'.");
             }
             return Ok(assetDtos);
@@ -109,6 +121,8 @@ namespace Hexa_Hub.Controllers
 
             if (assetDtos == null || !assetDtos.Any())
             {
+                _log.LogDebug($"No assets Fetched in {minPrice} to {maxPrice}");
+
                 return NotFound($" No assets found in the price range {minPrice} to {maxPrice} ");
             }
 
@@ -126,6 +140,8 @@ namespace Hexa_Hub.Controllers
 
             if (assetDtos == null || !assetDtos.Any())
             {
+                _log.LogDebug($"No assets Fetched in {location}");
+
                 throw new AssetNotFoundException($"No assets found containing '{location}'.");
             }
             return Ok(assetDtos);
@@ -140,6 +156,8 @@ namespace Hexa_Hub.Controllers
 
             if (assetDtos == null || !assetDtos.Any())
             {
+                _log.LogDebug($"No assets Fetched in {status}");
+
                 return NotFound($"No assets found with status '{status}'.");
             }
 
@@ -469,14 +487,18 @@ namespace Hexa_Hub.Controllers
         [HttpGet("get-image/{assetId}")]
         public async Task<IActionResult> GetAssetImage(int assetId)
         {
+
             var asset = await _context.Assets.FindAsync(assetId);
             if (asset == null || asset.AssetImage == null || asset.AssetImage.Length == 0)
             {
+                _log.LogDebug($"No asset image Fetched");
+
                 return NotFound("Asset not found or no image available.");
             }
 
             
             var fileBytes = asset.AssetImage;
+            _log.LogInfo("asset image fetched");
 
             return File(fileBytes, "image/jpeg");
         }

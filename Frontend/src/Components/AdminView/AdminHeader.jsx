@@ -25,6 +25,7 @@ const Header = ({ handleDrawerToggle }) => {
   const handleLogout = (e) => {
     e.preventDefault();
     Cookies.remove('token');
+    Cookies.remove('role');
     navigate('/signin');
   };
 

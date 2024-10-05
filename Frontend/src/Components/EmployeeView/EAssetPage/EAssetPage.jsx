@@ -73,10 +73,10 @@ const Assets = () => {
       const response = await fetch(`https://localhost:7287/api/Assets/get-image/${assetId}`);
       if (response.ok) {
         const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob); // Convert blob to URL
+        const imageUrl = URL.createObjectURL(blob); 
         setAssetImages((prevImages) => ({
           ...prevImages,
-          [assetId]: imageUrl, // Store the image URL by assetId
+          [assetId]: imageUrl, 
         }));
       } else {
         console.error(`Failed to fetch image for asset ${assetId}`);
@@ -233,6 +233,7 @@ const Assets = () => {
       });
       setShowForm(false);
       setTimeout(() => setSuccessMessage(''), 3000);
+      window.location.reload();
     }
   };
 

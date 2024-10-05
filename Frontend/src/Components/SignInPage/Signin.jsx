@@ -33,6 +33,9 @@ const SignInPage = () => {
       Cookies.set('token', token);
       const decode = jwtDecode(token);
       const userRole = decode.role;
+      Cookies.set('role' , userRole);
+      console.log('Decoded Token:', decode); 
+      console.log('Navigating to:', userRole === 'Admin' ? '/admin/Dashboard' : '/dashboard');  // Log 
       setTimeout(() => {
         if (userRole === 'Admin') {
           navigate('/admin/Dashboard');
