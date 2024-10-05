@@ -25,12 +25,14 @@ namespace Hexa_Hub.Controllers
         private readonly IAssetRequest _assetRequest;
         private readonly IAssetAllocation _assetAlloc;
         private readonly IAsset _asset;
-        public AssetRequestsController(DataContext context, IAssetRequest assetRequest, IAssetAllocation assetAlloc, IAsset asset)
+        private readonly iLoggerService _log;
+        public AssetRequestsController(DataContext context, IAssetRequest assetRequest, IAssetAllocation assetAlloc, IAsset asset, iLoggerService log)
         {
             _context = context;
             _assetRequest = assetRequest;
             _assetAlloc = assetAlloc;
             _asset = asset;
+            _log = log;
         }
 
         // GET: api/AssetRequests
@@ -39,18 +41,21 @@ namespace Hexa_Hub.Controllers
         public async Task<ActionResult<IEnumerable<AssetRequestClassDto>>> GetAssetRequests()
         {
             //User can see his own details whereas Admin can see all users details
-
+            _log.LogInfo("Fetching Asset Requests");
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var userRole = User.FindFirstValue(ClaimTypes.Role);
             if (userRole == "Admin")
             {
+                _log.LogInfo("Fetched Asset Requests");
                 return await _assetRequest.GetAllAssetRequests();
+
             }
             else
             {
                 var req = await _assetRequest.GetAssetRequestsByUserId(userId);
                 if (req == null)
                 {
+                    _log.LogDebug("Asset Request Not Found");
                     return NotFound();
                 }
                 return Ok(req);
@@ -62,33 +67,45 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAssetRequest(int id, [FromBody] UpdateRequestClassDto assetRequestDto)
         {
+            _log.LogInfo("Update Asset Requests Process Started");
             if (id != assetRequestDto.AssetReqId)
             {
+                _log.LogDebug("Asset Requests Id Doesnt match");
                 return BadRequest(new { error = "Id doesn't match" });
             }
 
             var existingRequest = await _assetRequest.GetAssetRequestById(id);
             if (existingRequest == null)
             {
+                _log.LogDebug("Asset Requests Id Doesnt match");
+
                 return NotFound(new { error = "Request not found" });
             }
 
             if (existingRequest.Request_Status == RequestStatus.Allocated || existingRequest.Request_Status == RequestStatus.Rejected)
             {
+                _log.LogDebug("Asset Requests Id Already allocated or Rejected");
+
                 return BadRequest(new { error = $"The Request ID {id} has already been Allocated/Rejected and cannot be updated." });
             }
 
             try
             {
                 await _assetRequest.UpdateAssetRequest(id, assetRequestDto);
+                _log.LogInfo("Updated Asset Requests");
+
                 return Ok(new { message = $"{assetRequestDto.AssetReqId} has been updated" });
             }
             catch (AssetRequestNotFoundException ex)
             {
+                _log.LogError("Asset Requests Id Doesnt match", ex);
+
                 return NotFound(new { error = ex.Message });
             }
             catch (Exception ex)
             {
+                _log.LogError("Asset Requests Id Doesnt match", ex);
+
                 return BadRequest(new { error = ex.Message });
             }
         }
@@ -100,6 +117,8 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<ActionResult<AssetRequest>> PostAssetRequest(AssetRequestDto assetRequestDto)
         {
+            _log.LogInfo("Adding Asset Requests Process Started");
+
             var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             assetRequestDto.UserId = loggedInUserId;
             if (assetRequestDto.UserId != loggedInUserId)
@@ -110,10 +129,14 @@ namespace Hexa_Hub.Controllers
             
             if (asset.Asset_Status == Models.MultiValues.AssetStatus.Allocated || asset.Asset_Status == Models.MultiValues.AssetStatus.UnderMaintenance)
             {
+                _log.LogDebug("Asset Requests Id Already allocated");
+
                 return StatusCode(403, "The Requested Asset is currently locked (Allocated to another user)");
             }
 
             await _assetRequest.AddAssetRequest(assetRequestDto);
+            _log.LogInfo("Added Asset Requests");
+
             await _assetRequest.Save();
 
 
@@ -125,6 +148,7 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> DeleteAssetRequest(int id)
         {
+
             try
             {
                 var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -275,13 +299,17 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<AssetRequestClassDto>>> GetAllAssetRequests()
         {
-           return await _assetRequest.GetAllAssetRequests();
+            _log.LogInfo("Fetching Asset Requests");
+
+            return await _assetRequest.GetAllAssetRequests();
         }
 
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<AssetRequestClassDto>> GetAssetRequestById(int id)
         {
+            _log.LogInfo("Fetching Asset Requests by id");
+
             var requestDto = await _assetRequest.GetAssetRequestId(id);
             return Ok(requestDto);
         }

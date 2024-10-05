@@ -16,11 +16,13 @@ namespace Hexa_Hub.Controllers
     {
         private readonly IUserRepo _userRepo;
         private readonly DataContext _context;
+        private readonly iLoggerService _log;
 
-        public UsersController(DataContext context, IUserRepo userRepo)
+        public UsersController(DataContext context, IUserRepo userRepo, iLoggerService iLogger)
         {
             _context = context;
             _userRepo = userRepo;
+            _log = iLogger;
         }
 
         // GET: api/Users
@@ -28,6 +30,7 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
+            _log.LogInfo("Fetching all users");
             return await _userRepo.GetAllUser();
         }
 
@@ -35,9 +38,12 @@ namespace Hexa_Hub.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole([FromQuery] UserType role)
         {
+            _log.LogInfo("Fetching users by Role");
             var users = await _userRepo.GetUsersByRole(role);
             if (users == null || !users.Any())
             {
+                _log.LogDebug("Error Fetching users");
+
                 return NotFound("No users found with the specified role.");
             }
             return Ok(users);
@@ -105,17 +111,21 @@ namespace Hexa_Hub.Controllers
         {
             if (id != userDto.UserId)
             {
+                _log.LogDebug("Id doesnt match");
                 return BadRequest("Check Id");
             }
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (id.ToString() != currentUserId && !User.IsInRole("Admin"))
             {
+                _log.LogDebug("Role doesnt match");
                 return Forbid("You do not have permission to update this user.");
             }
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
+                _log.LogDebug("User Not found");
+
                 return NotFound("User not Found");
             }
 
@@ -131,38 +141,39 @@ namespace Hexa_Hub.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                // Try to parse the string value from userDto to the UserType enum
                 if (Enum.TryParse<UserType>(userDto.User_Type, out var parsedUserType))
                 {
                     user.User_Type = parsedUserType;
                 }
                 else
                 {
-                    // Handle the case where the string cannot be parsed
+                    _log.LogDebug("Role doesnt match");
                     return BadRequest($"Invalid User_Type value: {userDto.User_Type}");
                 }
             }
 
             else
             {
-                user.User_Type = user.User_Type; // No change to role
+                user.User_Type = user.User_Type;
             }
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!UserExists(id))
                 {
+                    _log.LogError("Id doesnt match", ex);
                     return NotFound("User not Found");
                 }
                 else
                 {
+                    _log.LogError("Id doesnt match", ex);
                     throw;
                 }
             }
-
+            _log.LogInfo("Updation Success");
             return Ok("Updation Successfull");
         }
 
@@ -172,23 +183,31 @@ namespace Hexa_Hub.Controllers
         {
             if (id != passwordChangeDto.UserId)
             {
+                _log.LogDebug("User Not found");
+
                 return BadRequest("Check Your Id");
             }
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (id.ToString() != currentUserId)
             {
+                _log.LogDebug("User Not found");
+
                 return Forbid("Check your Id ");
             }
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
+                _log.LogDebug("User Not found");
+
                 return NotFound("User not Found");
             }
 
             if (user.Password != passwordChangeDto.CurrentPassword)
             {
+                _log.LogDebug("Password Doesnt mtach");
+
                 return Unauthorized("Current password is incorrect.");
             }
 
@@ -198,18 +217,22 @@ namespace Hexa_Hub.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!UserExists(id))
                 {
+                    _log.LogError("User Not found", ex);
+
                     return NotFound("Id not Found");
                 }
                 else
                 {
+                    _log.LogError("User Not found", ex);
+
                     throw;
                 }
             }
-
+            _log.LogInfo($"Password Changed by {user.UserId}");
             return Ok("Password Changed Successfully");
         }
 
@@ -222,10 +245,12 @@ namespace Hexa_Hub.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _log.LogDebug($"{ModelState}");
                 return BadRequest(ModelState);
             }
 
             var user = await _userRepo.RegisterUser(dto);
+            _log.LogInfo("User Registered Successfully");
 
             return CreatedAtAction("GetUser", new { id = user.UserId }, user);
             
@@ -237,9 +262,13 @@ namespace Hexa_Hub.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            _log.LogInfo("Deleting User Has Started");
+
             var user = await _userRepo.GetUserById(id);
             if (user == null)
             {
+                _log.LogDebug("Id Doesnt mtach");
+
                 return NotFound("Id Not Found");
             }
 
@@ -250,8 +279,11 @@ namespace Hexa_Hub.Controllers
             }
             catch (UserNotFoundException ex)
             {
+                _log.LogDebug("Id Not found");
+
                 return NotFound(ex.Message);
             }
+            _log.LogInfo("User deleted");
 
             return Ok($"{id} Has been deleted");
         }

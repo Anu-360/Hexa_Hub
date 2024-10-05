@@ -173,6 +173,7 @@ const Header = () => {
   const handleLogout = () => {
     // Clear the token and redirect to the landing page
     Cookies.remove('token');
+    Cookies.remove('role');
     navigate('/');
   };
 
@@ -272,7 +273,7 @@ const Header = () => {
         </div>
         <div className="relative">
       {isLogDropdownOpen && (
-            <div ref={logDropdownRef} className="absolute right-0 mt-5 w-48 bg-indigo-950 border rounded-lg shadow-lg z-10">
+            <div ref={logDropdownRef} className="absolute right-0 mt-5 w-48 bg-indigo-950 border rounded-lg shadow-lg z-10" onClick={handleLogout}>
               <ul className="py-2">
               <li className="px-4 py-2 hover:bg-red-500 cursor-pointer">
               <Link to="/" className="block text-slate-200 hover:text-indigo-950 w-full h-full">Logout</Link>

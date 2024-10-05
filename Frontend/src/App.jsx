@@ -28,7 +28,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { EmployeeRoute, AdminRoute } from './Components/PrivateRoute';
 
 const AdminLayout = ({ mobileOpen, handleDrawerToggle }) => (
   <>
@@ -56,26 +56,26 @@ function App() {
           <Routes>
             <Route path="/" element={<HexaHubLandingPage />} />
             <Route path="/signin" element={<SignInPage />} />
-            <Route path="Privacy" element={<Privacy/>}/>
-            <Route path="Terms" element={<Terms/>}/>
-            <Route path="dashboard" element={<EmpDashboard />} />
-            <Route path="ServiceRequest" element={<ServiceRequest />} />
-            <Route path="ReturnRequest" element={<ReturnRequest />} />
-            <Route path="Asset" element={<EAssetPage />} />
-            <Route path="Notification" element={<Notification />} />
-            <Route path="Profile" element={<Profile />} />
-            <Route path="Settings" element={<Settings />} />
+            <Route path="Privacy" element={<Privacy />} />
+            <Route path="Terms" element={<Terms />} />
+            <Route path="dashboard" element={<EmployeeRoute><EmpDashboard /></EmployeeRoute>} />
+            <Route path="ServiceRequest" element={<EmployeeRoute><ServiceRequest /></EmployeeRoute>} />
+            <Route path="ReturnRequest" element={<EmployeeRoute><ReturnRequest /></EmployeeRoute>} />
+            <Route path="Asset" element={<EmployeeRoute><EAssetPage /></EmployeeRoute>} />
+            <Route path="Notification" element={<EmployeeRoute><Notification /></EmployeeRoute>} />
+            <Route path="Profile" element={<EmployeeRoute><Profile /></EmployeeRoute>} />
+            <Route path="Settings" element={<EmployeeRoute><Settings /></EmployeeRoute>} />
 
             <Route path="admin" element={<AdminLayout mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />}>
-              <Route path="Dashboard" element={<Dashboard />} />
-              <Route path="employee/*" element={<EmpLink />} />
-              <Route path="asset/*" element={<AssetLink />} />
-              <Route path="request/*" element={<RequestLink />} />
-              <Route path="allocation/*" element={<AllocationLink />} />
-              <Route path="return/*" element={<ReturnLink />} />
-              <Route path="audit/*" element={<AuditLink />} />
-              <Route path="service/*" element={<ServiceLink />} />
-              <Route path="maintenance/*" element={<MaintenanceLink />} />
+              <Route path="Dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
+              <Route path="employee/*" element={<AdminRoute><EmpLink /></AdminRoute>} />
+              <Route path="asset/*" element={<AdminRoute><AssetLink /></AdminRoute>} />
+              <Route path="request/*" element={<AdminRoute><RequestLink /></AdminRoute>} />
+              <Route path="allocation/*" element={<AdminRoute><AllocationLink /></AdminRoute>} />
+              <Route path="return/*" element={<AdminRoute><ReturnLink /></AdminRoute>} />
+              <Route path="audit/*" element={<AdminRoute><AuditLink /></AdminRoute>} />
+              <Route path="service/*" element={<AdminRoute><ServiceLink /></AdminRoute>} />
+              <Route path="maintenance/*" element={<AdminRoute><MaintenanceLink /></AdminRoute>} />
             </Route>
           </Routes>
         </Box>

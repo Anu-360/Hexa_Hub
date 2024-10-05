@@ -13,12 +13,22 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Options;
 using System.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using log4net;
 namespace Hexa_Hub
 {
     public class Program
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         public static void Main(string[] args)
         {
+            //log4net.Config.XmlConfigurator.Configure();
+            var logRepository = LogManager.GetRepository(System.Reflection.Assembly.GetEntryAssembly());
+            log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            log.Info("Application starting...");
+
+
+
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddScoped<ICategory, CategoryService>();
@@ -33,7 +43,9 @@ namespace Hexa_Hub
             builder.Services.AddScoped<IReturnReqRepo, ReturnRequestRepo>();
             builder.Services.AddScoped<IEmail, EmailService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<iLoggerService>(provider => new Log4NetLogger(typeof(Program)));
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 
       
 

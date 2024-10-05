@@ -12,11 +12,13 @@ namespace Hexa_Hub.Repository
     {
         private readonly DataContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly iLoggerService _log;
 
-        public AssetService(DataContext context, IWebHostEnvironment environment)
+        public AssetService(DataContext context, IWebHostEnvironment environment, iLoggerService log)
         {
             _context = context;
             _environment = environment;
+            _log = log;
         }
 
         //public async Task<List<Asset>> GetAllAssets()
@@ -53,6 +55,8 @@ namespace Hexa_Hub.Repository
 
         public async Task<List<AssetDtoClass>> GetAssetsAll()
         {
+            _log.LogInfo("Fetching Asset ");
+
             return await _context.Assets
          .Include(a => a.Category)       
          .Include(a => a.SubCategories)  
@@ -74,6 +78,8 @@ namespace Hexa_Hub.Repository
         }
         public async Task<List<Asset>> GetAllAssets()
         {
+            _log.LogInfo("Fetching all assets");
+
             return await _context.Assets
                                  .ToListAsync();
         }
@@ -98,6 +104,8 @@ namespace Hexa_Hub.Repository
 
     public async Task<List<Asset>> GetAllDetailsOfAssets()
         {
+            _log.LogInfo("Fetching all assets");
+
             return await _context.Assets
                                  .Include(a => a.Category)
                                  .Include(a => a.SubCategories)
@@ -112,12 +120,16 @@ namespace Hexa_Hub.Repository
 
         public async Task<Asset?> GetAssetById(int id)
         {
+            _log.LogInfo("Fetching assets by id");
+
             return await _context.Assets
                                  .FirstOrDefaultAsync(a => a.AssetId == id);
         }
 
         public async Task<AssetDtoClass?> GetAssetByAssetId(int id)
         {
+            _log.LogInfo("Fetching assets by id");
+
             return await _context.Assets
                                  .Include(a => a.Category)
                                  .Include(a => a.SubCategories)
@@ -181,6 +193,8 @@ namespace Hexa_Hub.Repository
 
         public async Task<Asset> UpdateAssetDto(int id, AssetUpdateDto assetDto)
         {
+            _log.LogInfo("Update assets process started");
+
             byte[]? assetImageBytes = null;
             var existingAsset = await _context.Assets.FindAsync(id);
             if (assetDto.AssetImage != null)
@@ -198,10 +212,10 @@ namespace Hexa_Hub.Repository
             
             if (existingAsset == null)
             {
+                _log.LogDebug("asset id not found");
                 throw new AssetNotFoundException($"Asset with ID {id} not found");
             }
 
-            // Update asset properties
             existingAsset.AssetName = assetDto.AssetName;
             existingAsset.AssetDescription = assetDto.AssetDescription;
             existingAsset.CategoryId = assetDto.CategoryId;
@@ -214,7 +228,10 @@ namespace Hexa_Hub.Repository
             existingAsset.Expiry_Date = assetDto.Expiry_Date;
 
             _context.Assets.Update(existingAsset);
-            await _context.SaveChangesAsync(); // Make sure to save changes
+
+            await _context.SaveChangesAsync();
+            _log.LogInfo("asset updated");
+
             return existingAsset;
         }
 
@@ -226,6 +243,8 @@ namespace Hexa_Hub.Repository
 
         public async Task<IEnumerable<AssetDto>> GetAssetByName(string name)
         {
+            _log.LogInfo("Fetching assets by name");
+
             var assetDetails = await (from asset in _context.Assets
                                       where EF.Functions.Like(asset.AssetName, $"%{name}%")
                                       select new AssetDto
@@ -322,11 +341,16 @@ namespace Hexa_Hub.Repository
 
         public async Task DeleteAsset(int id)
         {
+            _log.LogInfo("Delete asset process started");
+
             var asset = await _context.Assets.FindAsync(id);
             if (asset == null)
             {
-            throw new AssetNotFoundException($"Asset with ID {id} Not Found");
+                _log.LogDebug("asset id not found");
+
+                throw new AssetNotFoundException($"Asset with ID {id} Not Found");
             }
+            _log.LogInfo("deleted asset");
 
             _context.Assets.Remove(asset);
 
@@ -375,6 +399,8 @@ namespace Hexa_Hub.Repository
 
         public async Task<string?> UploadAssetImageAsync(int assetId, IFormFile file)
         {
+            _log.LogInfo("uploading assets image");
+
             var asset = await _context.Assets.FindAsync(assetId);
             if (asset == null)
             {
@@ -391,6 +417,8 @@ namespace Hexa_Hub.Repository
             }
 
             await _context.SaveChangesAsync();
+            _log.LogInfo("Assets Image uploaded");
+
             return "Image uploaded successfully"; // Return a success message or other relevant info
         }
 
@@ -434,6 +462,8 @@ namespace Hexa_Hub.Repository
 
         public async Task<Asset> AddAsset(AssetDto assetDto)
         {
+            _log.LogInfo("Adding asset process started");
+
             // Convert IFormFile to byte[]
             byte[]? assetImageBytes = null;
 
@@ -463,6 +493,7 @@ namespace Hexa_Hub.Repository
 
             await _context.AddAsync(asset);
             await _context.SaveChangesAsync();
+            _log.LogInfo("Added asset");
 
             return asset;
         }
