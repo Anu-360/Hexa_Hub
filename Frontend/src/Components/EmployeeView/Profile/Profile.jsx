@@ -7,6 +7,7 @@ import { faBuilding } from '@fortawesome/free-solid-svg-icons/faBuilding';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import ToastNotification, { showToast } from '../../Utils/ToastNotification';
 
 const Profile = () => {
   const [isEditable, setIsEditable] = useState(false);
@@ -180,7 +181,7 @@ const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handlePasswordChange = async () => {
     if (!currentPassword || !newPassword) {
-      alert("Please fill out both fields.");
+      showToast('All fields Required!', 'warning');
       return;
     }
   
@@ -214,16 +215,17 @@ const [showNewPassword, setShowNewPassword] = useState(false);
 
       // Check for status 200 and display success message from the backend
       if (response.status === 200) {
-        alert(response.data); 
+        // alert(response.data); 
         setCurrentPassword("");
         setNewPassword("");
         setShowCurrentPassword(false);
         setShowNewPassword(false);// Backend sends "Password Changed Successfully"
+        showToast('Login Successful!', 'success');
       }
     } catch (error) {
       
       console.error("Error updating password", error);
-      alert("Failed to update password. Please check your current password and try again.");
+      showToast('Check password', 'warning');
     }
   
     // Hide the password form after submission
@@ -244,7 +246,9 @@ const [showNewPassword, setShowNewPassword] = useState(false);
   };
   
   return (
+    
     <div className="min-h-screen bg-white">
+      <ToastNotification />
       <Header />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="p-5 font-bold">
@@ -289,6 +293,7 @@ const [showNewPassword, setShowNewPassword] = useState(false);
 
   {/* Conditional rendering of the password modal */}
 {isPasswordFormVisible && (
+  
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded-lg shadow-md relative w-96">
       <h2 className="text-xl font-bold mb-4 text-indigo-950">Change Password</h2>

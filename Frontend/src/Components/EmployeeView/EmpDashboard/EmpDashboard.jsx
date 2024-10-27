@@ -75,7 +75,7 @@ const CircularGauge = ({ percentage, label }) => {
 };
 
 const EmpDashboard = () => {
-    
+
     const [assetTableData, setAssetTableData] = useState([]);
     const [requestsCount, setRequestsCount] = useState(0);
     const [returnRequests, setReturnRequests] = useState([]);
@@ -88,76 +88,139 @@ const EmpDashboard = () => {
 
     // Week labels for the current month
     const weekLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
-    
+
     useEffect(() => {
-        const token = Cookies.get('token');
-        if (token) {
-            const decoded = jwtDecode(token);
-            console.log('Decoded token payload:', decoded);
-
-            // Extract the userId from the 'nameid' field
-            const userId = decoded.nameid;
-
-            // Ensure fetchData can access userId
-            const fetchData = async () => {
-                const decodedToken = jwtToken();
-                if (!decodedToken) {
-                    console.error("No valid Token found");
-                    return;
-                }
-                try {
-                    const response = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`);
-                    console.log("Fetched Data:", response.data);
-
-                    // Check if data is directly an array or inside a $values property
-                    const assetAllocations = Array.isArray(response.data.$values) ? response.data.$values : response.data;
-
-                    if (Array.isArray(assetAllocations)) {
-                        setAssetTableData(assetAllocations);
-                        console.log("Asset Allocations:", assetAllocations);
-                    } else {
-                        console.error("Expected an array for asset allocations", response.data);
-                    }
-                    // Fetch all Service Requests
-                    const serviceResponse = await axios.get(`https://localhost:7287/api/ServiceRequests`);
-
-                    const allServiceRequests = Array.isArray(serviceResponse.data.$values) ? serviceResponse.data.$values : serviceResponse.data;
-                    // Filter Service Requests by userId
-                    const serviceRequests = allServiceRequests.filter(request => request.userId === parseInt(userId));
-
-                    // Fetch all Return Requests
-                    const returnResponse = await axios.get(`https://localhost:7287/api/ReturnRequests`);
-                    const allReturnRequests = Array.isArray(returnResponse.data.$values) ? returnResponse.data.$values : returnResponse.data;
-                    // Filter Return Requests by userId
-                    const returnRequests = allReturnRequests.filter(request => request.userId === parseInt(userId));
-
-                    const assetRequestsResponse = await axios.get(`https://localhost:7287/api/AssetRequests`);
-                    
-                    const allAssetRequests = Array.isArray(assetRequestsResponse.data.$values) ? assetRequestsResponse.data.$values : assetRequestsResponse.data;
-                    const assetRequests = allAssetRequests.filter(request => request.userId === parseInt(userId));
-
-                    // Group requests by weeks (for asset and service requests)
-                    const assetRequestsPerWeek = groupRequestsByWeek(assetRequests);
-                    const serviceRequestsPerWeek = groupRequestsByWeek(serviceRequests);
-
-                    // Update state with calculated weekly data
-                    setAssetRequestsData(assetRequestsPerWeek);
-                    setServiceRequestsData(serviceRequestsPerWeek);
-
-                    // Sum the total number of requests raised by the user
-                    const totalRequests = serviceRequests.length + returnRequests.length + assetRequests.length;
-                    setRequestsCount(totalRequests);
-                    console.log("Total Requests Raised:", totalRequests);
-
-
-                } catch (error) {
-                    console.error(error.response ? error.response.data : error.message);
-
-                }
-            };
-
-            fetchData();
+        const decoded = jwtToken();
+        if (!decoded) {
+            console.error("No valid Token found");
+            return;
         }
+
+        // Extract the userId from the 'nameid' field
+        const userId = decoded.nameid;
+        const fetchData = async () => {
+            const decodedToken = jwtToken();
+            if (!decodedToken) {
+                console.error("No valid Token found");
+                return;
+            }
+
+            setLoading(true);
+            setError(null);
+
+            // Separate try-catch blocks for each request
+            try {
+                const response = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`);
+                const assetAllocations = Array.isArray(response.data.$values) ? response.data.$values : response.data;
+                setAssetTableData(assetAllocations);
+                console.log("Asset Allocations:", assetAllocations);
+            } catch (error) {
+                console.error("Error fetching Asset Allocations:", error.response ? error.response.data : error.message);
+                setError("Failed to load asset allocations.");
+            }
+
+            let serviceRequests = [];
+            try {
+                const serviceResponse = await axios.get(`https://localhost:7287/api/ServiceRequests`);
+                const allServiceRequests = Array.isArray(serviceResponse.data.$values) ? serviceResponse.data.$values : serviceResponse.data;
+                serviceRequests = allServiceRequests.filter(request => request.userId === parseInt(userId));
+                setServiceRequestsData(groupRequestsByWeek(serviceRequests));
+            } catch (error) {
+                console.error("Error fetching Service Requests:", error.response ? error.response.data : error.message);
+                setError("Failed to load service requests.");
+            }
+
+            let returnRequests = [];
+            try {
+                const returnResponse = await axios.get(`https://localhost:7287/api/ReturnRequests`);
+                const allReturnRequests = Array.isArray(returnResponse.data.$values) ? returnResponse.data.$values : returnResponse.data;
+                returnRequests = allReturnRequests.filter(request => request.userId === parseInt(userId));
+                setReturnRequests(returnRequests);
+                setReturnedAssetsCount(returnRequests.length);
+            } catch (error) {
+                console.error("Error fetching Return Requests:", error.response ? error.response.data : error.message);
+                setError("Failed to load return requests.");
+            }
+
+            let assetRequests = [];
+            try {
+                const assetRequestsResponse = await axios.get(`https://localhost:7287/api/AssetRequests`);
+                const allAssetRequests = Array.isArray(assetRequestsResponse.data.$values) ? assetRequestsResponse.data.$values : assetRequestsResponse.data;
+                assetRequests = allAssetRequests.filter(request => request.userId === parseInt(userId));
+                setAssetRequestsData(groupRequestsByWeek(assetRequests));
+            } catch (error) {
+                console.error("Error fetching Asset Requests:", error.response ? error.response.data : error.message);
+                setError("Failed to load asset requests.");
+            }
+
+            // Calculate and update requests count
+            const totalRequests = serviceRequests.length + returnRequests.length + assetRequests.length;
+            setRequestsCount(totalRequests);
+            console.log("Total Requests Raised:", totalRequests);
+
+            setLoading(false);
+        };
+        fetchData();
+        // // Ensure fetchData can access userId
+        // const fetchData = async () => {
+        //     const decodedToken = jwtToken();
+        //     if (!decodedToken) {
+        //         console.error("No valid Token found");
+        //         return;
+        //     }
+        //     try {
+        //         const response = await axios.get(`https://localhost:7287/api/AssetAllocations/user/${userId}`);
+        //         console.log("Fetched Data:", response.data);
+
+        //         // Check if data is directly an array or inside a $values property
+        //         const assetAllocations = Array.isArray(response.data.$values) ? response.data.$values : response.data;
+
+        //         if (Array.isArray(assetAllocations)) {
+        //             setAssetTableData(assetAllocations);
+        //             console.log("Asset Allocations:", assetAllocations);
+        //         } else {
+        //             console.error("Expected an array for asset allocations", response.data);
+        //         }
+        //         // Fetch all Service Requests
+        //         const serviceResponse = await axios.get(`https://localhost:7287/api/ServiceRequests`);
+
+        //         const allServiceRequests = Array.isArray(serviceResponse.data.$values) ? serviceResponse.data.$values : serviceResponse.data;
+        //         // Filter Service Requests by userId
+        //         const serviceRequests = allServiceRequests.filter(request => request.userId === parseInt(userId));
+
+        //         // Fetch all Return Requests
+        //         const returnResponse = await axios.get(`https://localhost:7287/api/ReturnRequests`);
+        //         const allReturnRequests = Array.isArray(returnResponse.data.$values) ? returnResponse.data.$values : returnResponse.data;
+        //         // Filter Return Requests by userId
+        //         const returnRequests = allReturnRequests.filter(request => request.userId === parseInt(userId));
+
+        //         const assetRequestsResponse = await axios.get(`https://localhost:7287/api/AssetRequests`);
+
+        //         const allAssetRequests = Array.isArray(assetRequestsResponse.data.$values) ? assetRequestsResponse.data.$values : assetRequestsResponse.data;
+        //         const assetRequests = allAssetRequests.filter(request => request.userId === parseInt(userId));
+
+        //         // Group requests by weeks (for asset and service requests)
+        //         const assetRequestsPerWeek = groupRequestsByWeek(assetRequests);
+        //         const serviceRequestsPerWeek = groupRequestsByWeek(serviceRequests);
+
+        //         // Update state with calculated weekly data
+        //         setAssetRequestsData(assetRequestsPerWeek);
+        //         setServiceRequestsData(serviceRequestsPerWeek);
+
+        //         // Sum the total number of requests raised by the user
+        //         const totalRequests = serviceRequests.length + returnRequests.length + assetRequests.length;
+        //         setRequestsCount(totalRequests);
+        //         console.log("Total Requests Raised:", totalRequests);
+
+
+        //     } catch (error) {
+        //         console.error(error.response ? error.response.data : error.message);
+
+        //     }
+        // };
+
+        // fetchData();
+        // }
     }, []); // Add userId as a dependency if necessary
 
     const assetCount = assetTableData.length;

@@ -412,14 +412,14 @@ namespace Hexa_Hub.Repository
                 using (var memoryStream = new MemoryStream())
                 {
                     await file.CopyToAsync(memoryStream);
-                    asset.AssetImage = memoryStream.ToArray(); // Store as byte array
+                    asset.AssetImage = memoryStream.ToArray();
                 }
             }
 
             await _context.SaveChangesAsync();
             _log.LogInfo("Assets Image uploaded");
 
-            return "Image uploaded successfully"; // Return a success message or other relevant info
+            return "Image uploaded successfully";
         }
 
         //public async Task<string?> UploadAssetImageAsync(int assetId, IFormFile file)

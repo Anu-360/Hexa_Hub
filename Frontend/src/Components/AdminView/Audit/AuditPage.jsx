@@ -126,6 +126,11 @@ export default function AuditPage() {
             console.error("Error loading the logo image:", error);
             return;
         }
+        const companyInfo = {
+            address: "No.4, West Mada Church Street, Royapuram, Chennai, Tamil Nadu, 600013",
+            phoneNumber: "Phone: 044 3355 3355  Email: hexawarehub@gmail.com",
+            website: "website: HexaHub.in"
+        }
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
@@ -135,14 +140,39 @@ export default function AuditPage() {
             columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 'auto' } },
             didDrawPage :function(data){
                 if (doc.internal.getNumberOfPages() === 1) {
-                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
-                doc.setFontSize(18);
-                doc.text("HexaHub", 50, 30);
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    // doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                    doc.setDrawColor(153, 0, 0);
+                    doc.setLineWidth(10);
+                    doc.line(0, 0, pageWidth, 0);
+                    // doc.line(0, 40, pageWidth, 40);
+                    doc.addImage(img, 'PNG', pageWidth - 135, 7, 30, 30);
+                    doc.setFontSize(18);
+                    doc.text("HexaHub", pageWidth - 100, 27);
                 doc.setFontSize(20);
                 doc.text("Audit List", 40, 60);
                 doc.setFontSize(10);
                 let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
                 doc.text(filterText, 40, 80);
+                doc.setDrawColor(153, 0, 0);
+                doc.setLineWidth(2);
+                doc.line(0, pageHeight - 50, pageWidth, pageHeight - 50);
+
+                doc.setFontSize(8);
+                const getTextWidth = (text) => {
+                    return doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                };
+                
+                const centerText = (text, y) => {
+                    const textWidth = getTextWidth(text);
+                    const textX = (pageWidth - textWidth) / 2;
+                    doc.text(text, textX, y);
+                };
+                
+                centerText(companyInfo.address, pageHeight - 35);
+                centerText(companyInfo.phoneNumber, pageHeight - 25);
+                centerText(companyInfo.website, pageHeight - 15);
                 }
             },
         });
