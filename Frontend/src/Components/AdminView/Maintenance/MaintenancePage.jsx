@@ -88,18 +88,19 @@ export default function MaintenancePage() {
     };
 
     const logo = "/Images/logo.png";
-    const generatePDF = async() =>{
+
+    const generatePDF = async () => {
         const doc = new jsPDF({
             orientation: 'landscape',
-            unit:'pt',
+            unit: 'pt',
             format: 'a4'
         });
-
+    
         const tableColumn = ["Maintenance ID", "User Name", "Asset Name", "Maintenance Date", "Description", "Cost"];
         const tableRows = [];
-
-        filteredLogs.forEach(log =>{
-            const RequestData = [
+    
+        filteredLogs.forEach(log => {
+            const requestData = [
                 log.maintenanceId,
                 log.userName,
                 log.assetName,
@@ -107,37 +108,75 @@ export default function MaintenancePage() {
                 log.maintenance_Description,
                 log.cost
             ];
-            tableRows.push(RequestData);
+            tableRows.push(requestData);
         });
+    
         let img;
-    try {
-        img = await loadImage(logo);
-    } catch (error) {
-        console.error("Error loading the logo image:", error);
-        return;
-    }
+        try {
+            img = await loadImage(logo);
+        } catch (error) {
+            console.error("Error loading the logo image:", error);
+            return;
+        }
+    
+        const companyInfo = {
+            address: "No.4, West Mada Church Street, Royapuram, Chennai, Tamil Nadu, 600013",
+            phoneNumber: "Phone: 044 3355 3355  Email: hexawarehub@gmail.com",
+            website: "Website: HexaHub.in"
+        };
+    
         doc.autoTable({
             head: [tableColumn],
             body: tableRows,
-            startY: 100,
+            startY: 120,
             theme: 'grid',
             styles: { fontSize: 8, cellPadding: 5 },
             columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 'auto' } },
-            didDrawPage :function(data){
+            didDrawPage: function (data) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+    
                 if (doc.internal.getNumberOfPages() === 1) {
-                    doc.addImage(img, 'PNG', 10, 10, 30, 30);
-                doc.setFontSize(18);
-                doc.text("HexaHub", 50, 30);
-                doc.setFontSize(20);
-                doc.text("Maintenance Log List", 40, 60);
-                doc.setFontSize(10);
-                let filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
-                doc.text(filterText, 40, 80);
+                    doc.setDrawColor(153, 0, 0);
+                    doc.setLineWidth(10);
+                    doc.line(0, 0, pageWidth, 0);
+                    // doc.line(0, 40, pageWidth, 40);
+                    doc.addImage(img, 'PNG', pageWidth - 135, 7, 30, 30);
+                    doc.setFontSize(18);
+                    doc.text("HexaHub", pageWidth - 100, 27);
+                    doc.setFontSize(20);
+                    doc.text("Maintenance Log List", 40, 80);
+    
+                    // Display filters above the table
+                    doc.setFontSize(10);
+                    const filterText = `Filters: Date Range: ${minDate ? new Date(minDate).toLocaleDateString() : 'N/A'} - ${maxDate ? new Date(maxDate).toLocaleDateString() : 'N/A'}${selectedStatus ? `, Status: ${selectedStatus}` : ''}`;
+                    doc.text(filterText, 40, 100);
+    
+                    doc.setDrawColor(153, 0, 0);
+                    doc.setLineWidth(2);
+                    doc.line(0, pageHeight - 50, pageWidth, pageHeight - 50);
+
+                    doc.setFontSize(8);
+                    const getTextWidth = (text) => {
+                        return doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                    };
+                    
+                    const centerText = (text, y) => {
+                        const textWidth = getTextWidth(text);
+                        const textX = (pageWidth - textWidth) / 2;
+                        doc.text(text, textX, y);
+                    };
+                    
+                    centerText(companyInfo.address, pageHeight - 35);
+                    centerText(companyInfo.phoneNumber, pageHeight - 25);
+                    centerText(companyInfo.website, pageHeight - 15);
                 }
             },
         });
+    
         doc.save("MaintenanceLog_List.pdf");
-    }
+    };
+    
     const loadImage = (url) => {
         return new Promise((resolve, reject) => {
             const img = new Image();

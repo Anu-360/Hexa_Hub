@@ -168,7 +168,8 @@ namespace Hexa_Hub.Repository
             {
                 _log.LogInfo("Validating User");
                 var user = await _context.Users
-                    .FirstOrDefaultAsync(vu => vu.UserMail == email && vu.Password == password);
+                .FirstOrDefaultAsync(vu => EF.Functions.Collate(vu.UserMail, "Latin1_General_BIN") == email &&
+                         EF.Functions.Collate(vu.Password, "Latin1_General_BIN") == password);
 
                 if (user != null)
                 {
@@ -187,6 +188,7 @@ namespace Hexa_Hub.Repository
                 throw;
             }
         }
+
 
 
         public async Task<string?> UploadProfileImage(int userId, IFormFile file)

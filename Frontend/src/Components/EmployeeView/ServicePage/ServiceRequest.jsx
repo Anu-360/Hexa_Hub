@@ -157,6 +157,7 @@ const ServiceRequest = () => {
       setShowForm(false);
       setSuccessMessage('Service request sent successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
+      window.location.reload();
 
     } catch (error) {
       console.error("Error submitting service request:", error.response ? error.response.data : error.message);
@@ -184,7 +185,7 @@ const ServiceRequest = () => {
           {loading ? (
             <p>Loading service requests...</p>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-center text-gray-500">No Service Requests Sent.</p>
           ) : (
             <>
               {/* Table for Service Requests */}

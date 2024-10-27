@@ -14,10 +14,10 @@ import Cookies from 'js-cookie';
 export const jwtToken = () => {
     const token = Cookies.get('token');
     if (!token) {
-        return null; // Return null if no token is found
+        return null; 
     }
     try {
-        return jwtDecode(token); // Decode the token
+        return jwtDecode(token);
     } catch (error) {
         console.error('Error decoding token:', error);
         return null;

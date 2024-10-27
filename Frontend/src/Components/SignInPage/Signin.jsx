@@ -35,7 +35,7 @@ const SignInPage = () => {
       const userRole = decode.role;
       Cookies.set('role' , userRole);
       console.log('Decoded Token:', decode); 
-      console.log('Navigating to:', userRole === 'Admin' ? '/admin/Dashboard' : '/dashboard');  // Log 
+      console.log('Navigating to:', userRole === 'Admin' ? '/admin/Dashboard' : '/dashboard');
       setTimeout(() => {
         if (userRole === 'Admin') {
           navigate('/admin/Dashboard');

@@ -135,8 +135,6 @@ const ReturnRequest = () => {
             console.log("Return Request Submitted:", response.data);
         } catch (error) {
             console.error("Error submitting return request:", error);
-
-
         }
 
         // Reset form after submission
@@ -153,6 +151,7 @@ const ReturnRequest = () => {
         setShowForm(false);
         setSuccessMessage('Return request sent successfully!');
         setTimeout(() => setSuccessMessage(''), 3000);
+        window.location.reload();
     };
 
     // Calculate the index of the last item and the first item of the current page
@@ -175,7 +174,7 @@ const ReturnRequest = () => {
                     {loading ? (
                         <p>Loading return requests...</p>
                     ) : error ? (
-                        <p className="text-red-500">{error}</p>
+                        <p className="text-center text-gray-500">No Return Requests Sent.</p>
                     ) : (
                         <>
 
